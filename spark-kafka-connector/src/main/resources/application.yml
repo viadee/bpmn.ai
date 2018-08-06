@@ -1,0 +1,12 @@
+spring:
+  kafka:
+    bootstrap-servers: 192.168.3.23:9092
+    consumer:
+      group-id: spark-kafka-consumer2
+    template:
+      default-topic: processInstance
+
+logging:
+  level:
+    root: WARN
+    de.viadee.ki: DEBUG
