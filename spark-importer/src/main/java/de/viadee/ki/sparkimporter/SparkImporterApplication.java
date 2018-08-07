@@ -6,20 +6,21 @@ import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesCountStep;
 import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesTypesOccurenceStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
+import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.spark.sql.functions.count;
+import java.io.File;
 
 public class SparkImporterApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(SparkImporterApplication.class);
     private static SparkImporterArguments ARGS;
 
-    // Nutzen von JCommander um Parameter flexibel eingeben zu können.
+    // Use JCommander for flexible usage of Parameters
     private static JCommander jCommander;
 
 
@@ -27,24 +28,28 @@ public class SparkImporterApplication {
     public static void main(String[] arguments){
         ARGS = SparkImporterArguments.getInstance();
 
-        //JCommander starten
+        //instantiate JCommander
         jCommander = JCommander.newBuilder()
                 .addObject(SparkImporterArguments.getInstance())
                 .build();
         try {
             jCommander.parse(arguments);
         } catch (ParameterException e) {
-            LOG.error("Parsing der Parameter fehlgeschlagen. Fehlermeldung: " + e.getMessage());
+            LOG.error("Parsing of parameters failed. Error message: " + e.getMessage());
             jCommander.usage();
             System.exit(1);
         }
 
 
-        //Spark Importer Code starter hier
+        //SparkImporter code starts here
 
-        //Konfiguration wird von Umgebung geladen (z.B. via spark-submit)
+        //Delete destination files, required to avoid exception during runtime
+        FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
+
+        //Configuration is being loaded from Environment (e.g. when using spark-submit)
         SparkSession sparkSession = SparkSession.builder().getOrCreate();
 
+        //laoad CSV file
         Dataset<Row> dataset = loadCSVFile(sparkSession);
 
         //Define steps to run
@@ -53,12 +58,7 @@ public class SparkImporterApplication {
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.run(dataset, true);
 
-
-        //Zieldatei löschen, falls bereits existierend
-        //FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
-
-
-        //Aufräumen
+        //Cleanup
         sparkSession.close();
     }
 
