@@ -1,6 +1,6 @@
 package de.viadee.ki.sparkimporter.preprocessing;
 
-import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStep;
+import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStepInterface;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PreprocessingRunner {
 
-    private List<PreprocessingStep> preprocessorSteps = new ArrayList<>();
+    private List<PreprocessingStepInterface> preprocessorSteps = new ArrayList<>();
 
     private static PreprocessingRunner instance;
 
@@ -23,16 +23,16 @@ public class PreprocessingRunner {
     }
 
     public void run(Dataset<Row> initialDataset, boolean writeStepResultsIntoFile) {
-        for(PreprocessingStep ps : this.preprocessorSteps) {
+        for(PreprocessingStepInterface ps : this.preprocessorSteps) {
             ps.runPreprocessingStep(initialDataset, writeStepResultsIntoFile);
         }
     }
 
-    public void addPreprocessorStep(PreprocessingStep step) {
+    public void addPreprocessorStep(PreprocessingStepInterface step) {
         this.preprocessorSteps.add(step);
     }
 
-    public void removePreprocessorStep(PreprocessingStep step) {
+    public void removePreprocessorStep(PreprocessingStepInterface step) {
         this.preprocessorSteps.remove(step);
     }
 }

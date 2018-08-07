@@ -2,9 +2,12 @@ package de.viadee.ki.sparkimporter;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesCountStep;
+import de.viadee.ki.sparkimporter.exceptions.NoDataImporterDefinedException;
+import de.viadee.ki.sparkimporter.importing.DataImportRunner;
+import de.viadee.ki.sparkimporter.importing.implementations.CSVDataImporter;
+import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesCountStepInterface;
 import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesTypesOccurenceStep;
+import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesTypesOccurenceStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.Dataset;
@@ -18,7 +21,7 @@ import java.io.File;
 public class SparkImporterApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(SparkImporterApplication.class);
-    private static SparkImporterArguments ARGS;
+    public static SparkImporterArguments ARGS;
 
     // Use JCommander for flexible usage of Parameters
     private static JCommander jCommander;
@@ -49,28 +52,26 @@ public class SparkImporterApplication {
         //Configuration is being loaded from Environment (e.g. when using spark-submit)
         SparkSession sparkSession = SparkSession.builder().getOrCreate();
 
-        //laoad CSV file
-        Dataset<Row> dataset = loadCSVFile(sparkSession);
+        //Import data
+        DataImportRunner dataImportRunner = DataImportRunner.getInstance();
 
-        //Define steps to run
+        //Import from CSV file
+        dataImportRunner.setDataImporter(new CSVDataImporter());
+        Dataset<Row> dataset = null;
+        try {
+            dataset = dataImportRunner.runImport(sparkSession);
+        } catch (NoDataImporterDefinedException e) {
+            e.printStackTrace();
+        }
+
+        //Define preprocessing steps to run
         PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
-        preprocessingRunner.addPreprocessorStep(new GetVariablesCountStep());
-        preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
+        preprocessingRunner.addPreprocessorStep(new GetVariablesCountStepInterface());
+        preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStepInterface());
         preprocessingRunner.run(dataset, true);
 
         //Cleanup
         sparkSession.close();
     }
-
-    private static Dataset<Row> loadCSVFile(SparkSession sparkSession) {
-        //Load source CSV file
-        return sparkSession.sqlContext().read()
-                .format("com.databricks.spark.csv")
-                .option("inferSchema", "true")
-                .option("delimiter", ARGS.getDelimiter())
-                .option("header", "true")
-                .load(ARGS.getFileSource());
-    }
-
 
 }
