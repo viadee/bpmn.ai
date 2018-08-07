@@ -5,9 +5,9 @@ import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.exceptions.NoDataImporterDefinedException;
 import de.viadee.ki.sparkimporter.importing.DataImportRunner;
 import de.viadee.ki.sparkimporter.importing.implementations.CSVDataImporter;
-import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesCountStepInterface;
+import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesCountStep;
 import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesTypesOccurenceStepInterface;
+import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesTypesOccurenceStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.Dataset;
@@ -66,8 +66,8 @@ public class SparkImporterApplication {
 
         //Define preprocessing steps to run
         PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
-        preprocessingRunner.addPreprocessorStep(new GetVariablesCountStepInterface());
-        preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStepInterface());
+        preprocessingRunner.addPreprocessorStep(new GetVariablesCountStep());
+        preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.run(dataset, true);
 
         //Cleanup

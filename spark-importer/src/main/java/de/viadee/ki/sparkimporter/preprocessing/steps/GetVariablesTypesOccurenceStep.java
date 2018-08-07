@@ -6,20 +6,19 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
 import static org.apache.spark.sql.functions.count;
-import static org.apache.spark.sql.functions.desc;
 
-public class GetVariablesCountStepInterface implements PreprocessingStepInterface {
+public class GetVariablesTypesOccurenceStep implements PreprocessingStepInterface {
 
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> initialDataSet, boolean writeStepResultIntoFile) {
 
-        //Determine number of process variables per instance and start the ones having the most
-        Dataset<Row> variablesCountDataset = initialDataSet.groupBy("proc_inst_id_")
-                .agg(count("name_").alias("variables_count")).
-                        orderBy(desc("variables_count"));
+        //Determine the process instances with their variable names and types
+        Dataset<Row> variablesTypesDataset = initialDataSet.select("name_", "var_type_")
+                .groupBy("name_","var_type_")
+                .agg(count("*").alias("occurences"));
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(variablesCountDataset, "variables_count");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(variablesTypesDataset, "variables_types");
         }
 
         //just analysing the data
