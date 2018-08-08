@@ -1,0 +1,37 @@
+node {
+
+    def mvnHome = tool 'apache-maven-3.3.3'
+    def jdk = tool 'jdk8_40'
+    def buildEnvironment = ["JAVA_HOME=${jdk}", "PATH+MAVEN=${mvnHome}/bin:${env.JAVA_HOME}/bin"]
+
+    try {
+
+        stage('clean') {
+            deleteDir()
+        }
+
+        stage('scm') {
+            checkout scm
+        }
+
+        stage('build') {
+            withEnv(buildEnvironment) {
+                sh 'mvn clean package -Dbuild.number=${BUILD_NUMBER}'
+            }
+        }
+
+       
+    } catch (error) {
+
+        currentBuild.result = "FAILURE"
+
+        mail body: "-> bpmn.ai spark-importer" ,
+            replyTo: '',
+            subject: 'bpmn.ai Build fehlgeschlagen',
+            to: 'mim@viadee.de'
+			cc: 'kof@viadee.de'
+
+        throw err
+
+    }
+}
