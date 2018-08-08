@@ -5,6 +5,8 @@ import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.exceptions.NoDataImporterDefinedException;
 import de.viadee.ki.sparkimporter.importing.DataImportRunner;
 import de.viadee.ki.sparkimporter.importing.implementations.CSVDataImporter;
+import de.viadee.ki.sparkimporter.preprocessing.steps.CreateResultingDMDatasetStep;
+import de.viadee.ki.sparkimporter.preprocessing.steps.FilterOutEmptyVariableLinesStep;
 import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesCountStep;
 import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesTypesOccurenceStep;
@@ -50,7 +52,8 @@ public class SparkImporterApplication {
         FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
 
         //Configuration is being loaded from Environment (e.g. when using spark-submit)
-        SparkSession sparkSession = SparkSession.builder().getOrCreate();
+        SparkSession sparkSession = SparkSession.builder()
+                .getOrCreate();
 
         //Import data
         DataImportRunner dataImportRunner = DataImportRunner.getInstance();
@@ -68,6 +71,8 @@ public class SparkImporterApplication {
         PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
         preprocessingRunner.addPreprocessorStep(new GetVariablesCountStep());
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
+        preprocessingRunner.addPreprocessorStep(new FilterOutEmptyVariableLinesStep());
+        preprocessingRunner.addPreprocessorStep(new CreateResultingDMDatasetStep());
         preprocessingRunner.run(dataset, true);
 
         //Cleanup

@@ -19,7 +19,6 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.11</artifactId>
             <version>2.3.1</version>
-            <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.databricks/spark-csv -->
         <dependency>
@@ -32,7 +31,6 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.11</artifactId>
             <version>2.3.1</version>
-            <scope>compile</scope>
         </dependency>
 
 
@@ -42,6 +40,24 @@
             <artifactId>jcommander</artifactId>
             <version>1.72</version>
         </dependency>
+
+
+        <!-- dependencies needed for running in IntelliJ -->
+        <!-- https://mvnrepository.com/artifact/com.univocity/univocity-parsers -->
+        <dependency>
+            <groupId>com.univocity</groupId>
+            <artifactId>univocity-parsers</artifactId>
+            <version>2.7.5</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
+
+
+
     </dependencies>
 
 
