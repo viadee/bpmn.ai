@@ -11,6 +11,8 @@ public class PreprocessingRunner {
 
     private List<PreprocessingStepInterface> preprocessorSteps = new ArrayList<>();
 
+    public static int stepCounter = 1;
+
     private static PreprocessingRunner instance;
 
     private PreprocessingRunner(){}
@@ -23,8 +25,11 @@ public class PreprocessingRunner {
     }
 
     public void run(Dataset<Row> initialDataset, boolean writeStepResultsIntoFile) {
+        stepCounter = 1;
+
+        Dataset<Row> dataset = initialDataset;
         for(PreprocessingStepInterface ps : this.preprocessorSteps) {
-            ps.runPreprocessingStep(initialDataset, writeStepResultsIntoFile);
+            dataset = ps.runPreprocessingStep(dataset, writeStepResultsIntoFile);
         }
     }
 

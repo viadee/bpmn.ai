@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.util;
 
+import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -24,6 +25,6 @@ public class SparkImporterUtils {
                 .write()
                 .format("com.databricks.spark.csv")
                 .option("header", "true")
-                .save(args.getFileDestination()+"/"+subDirectory);
+                .save(args.getFileDestination()+"/"+ String.format("%02d", PreprocessingRunner.stepCounter++) + "_" + subDirectory);
     }
 }

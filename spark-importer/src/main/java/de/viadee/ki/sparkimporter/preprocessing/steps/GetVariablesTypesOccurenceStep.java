@@ -21,7 +21,7 @@ public class GetVariablesTypesOccurenceStep implements PreprocessingStepInterfac
             SparkImporterUtils.getInstance().writeDatasetToCSV(variablesTypesDataset, "variables_types");
         }
 
-        //just analysing the data
-        return initialDataSet;
+        //return preprocessed data
+        return variablesTypesDataset;
     }
 }
