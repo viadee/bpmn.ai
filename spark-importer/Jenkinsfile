@@ -11,13 +11,16 @@ node {
         }
 
         stage('scm') {
-            checkout scm
+            checkout scm			
         }
 
         stage('build') {
-            withEnv(buildEnvironment) {
-                sh 'mvn clean package -Dbuild.number=${BUILD_NUMBER}'
-            }
+            dir('spark-importer')
+			{
+				withEnv(buildEnvironment) {
+					sh 'mvn clean package -Dbuild.number=${BUILD_NUMBER}'
+				}
+			}
         }
 
        
@@ -25,7 +28,7 @@ node {
 
         currentBuild.result = "FAILURE"
 
-        mail body: "-> bpmn.ai spark-importer" ,
+        mail body: "Zum Build-Protokoll des bpmn.ai spark-importer https://portal.intern.viadee.de/jenkins/job/bpmn.ai%20spark%20importer/workflow-stage/" ,
             replyTo: '',
             subject: 'bpmn.ai Build fehlgeschlagen',
             to: 'mim@viadee.de'
