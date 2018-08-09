@@ -3,6 +3,7 @@ package de.viadee.ki.sparkimporter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.exceptions.NoDataImporterDefinedException;
+import de.viadee.ki.sparkimporter.exceptions.WrongCacheValueTypeException;
 import de.viadee.ki.sparkimporter.importing.DataImportRunner;
 import de.viadee.ki.sparkimporter.importing.implementations.CSVDataImporter;
 import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
@@ -28,6 +29,9 @@ public class SparkImporterApplication {
     private static JCommander jCommander;
 
     public static void main(String[] arguments){
+
+        long startMillis = System.currentTimeMillis();
+
         ARGS = SparkImporterArguments.getInstance();
 
         //instantiate JCommander
@@ -81,13 +85,22 @@ public class SparkImporterApplication {
         PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
         preprocessingRunner.addPreprocessorStep(new GetVariablesCountStep());
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
+        preprocessingRunner.addPreprocessorStep(new ReduceDatasetToSingleProcessInstanceRowsStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
         preprocessingRunner.addPreprocessorStep(new CreateResultingDMDatasetStep());
-        preprocessingRunner.run(dataset, SparkImporterArguments.getInstance().isWriteStepResultsToCSV());
+        try {
+            preprocessingRunner.run(dataset, SparkImporterArguments.getInstance().isWriteStepResultsToCSV());
+        } catch (WrongCacheValueTypeException e) {
+            e.printStackTrace();
+        }
 
         //Cleanup
         sparkSession.close();
         SparkImporterCache.getInstance().stopIgnite();
+
+        long endMillis = System.currentTimeMillis();
+
+        LOG.info("Job ran for " + ((endMillis-startMillis)/1000) + " seconds in total.");
     }
 
 }

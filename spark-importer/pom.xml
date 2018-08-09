@@ -129,6 +129,8 @@
                             <artifactSet>
                                 <includes>
                                     <include>com.beust:jcommander</include>
+                                    <include>org.apache.ignite:ignite-core</include>
+                                    <include>javax.cache:**</include>
                                 </includes>
                             </artifactSet>
                         </configuration>

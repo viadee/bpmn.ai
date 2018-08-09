@@ -36,11 +36,16 @@ public class SparkImporterUtils {
     }
 
     public void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory) {
+        writeDatasetToCSV(dataSet, subDirectory, "|");
+    }
+
+    public void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory, String delimiter) {
         //save dataset into CSV file
         dataSet.coalesce(1)
                 .write()
                 .format("com.databricks.spark.csv")
                 .option("header", "true")
+                .option("delimiter", delimiter)
                 .save(args.getFileDestination()+"/"+ String.format("%02d", PreprocessingRunner.getInstance().getNextCounter()) + "_" + subDirectory);
     }
 

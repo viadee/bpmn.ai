@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.preprocessing;
 
+import de.viadee.ki.sparkimporter.exceptions.WrongCacheValueTypeException;
 import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
@@ -25,7 +26,7 @@ public class PreprocessingRunner {
         return instance;
     }
 
-    public void run(Dataset<Row> dataset, boolean writeStepResultsIntoFile) {
+    public void run(Dataset<Row> dataset, boolean writeStepResultsIntoFile) throws WrongCacheValueTypeException {
         for(PreprocessingStepInterface ps : this.preprocessorSteps) {
             dataset = ps.runPreprocessingStep(dataset, writeStepResultsIntoFile);
         }
@@ -34,10 +35,6 @@ public class PreprocessingRunner {
 
     public void addPreprocessorStep(PreprocessingStepInterface step) {
         this.preprocessorSteps.add(step);
-    }
-
-    public void removePreprocessorStep(PreprocessingStepInterface step) {
-        this.preprocessorSteps.remove(step);
     }
 
     public synchronized int getNextCounter() {
