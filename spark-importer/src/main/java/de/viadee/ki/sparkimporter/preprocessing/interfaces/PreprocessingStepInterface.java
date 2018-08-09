@@ -8,8 +8,8 @@ public interface PreprocessingStepInterface {
     /**
      * Defines one preprocessing step and what to do with the data
      *
-     * @param initialDataSet the incoming dataset for this preprocessing step
+     * @param dataSet the incoming dataset for this preprocessing step
      * @return the resulting dataset of the preprocessing step
      */
-    Dataset<Row> runPreprocessingStep(Dataset<Row> initialDataSet, boolean writeStepResultIntoFile);
+    Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile);
 }

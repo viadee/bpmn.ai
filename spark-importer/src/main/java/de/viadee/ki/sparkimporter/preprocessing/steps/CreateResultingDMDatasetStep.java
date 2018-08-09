@@ -1,58 +1,83 @@
 package de.viadee.ki.sparkimporter.preprocessing.steps;
 
+import de.viadee.ki.sparkimporter.SparkImporterApplication;
 import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterCache;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
+import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
+import scala.collection.immutable.Map;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import static org.apache.spark.sql.functions.count;
 
 public class CreateResultingDMDatasetStep implements PreprocessingStepInterface {
 
     private static final Logger LOG = LoggerFactory.getLogger(CreateResultingDMDatasetStep.class);
 
+    //default columns that should always be there
+    private final String[] DEFAULT_COLUMNS = new String []{
+            "id_",
+            "proc_inst_id_",
+            "proc_def_key_",
+            "proc_def_id_",
+            "start_time_",
+            "end_time_",
+            "duration_",
+            "start_act_id_",
+            "end_act_id_",
+            "state_",
+            "name_",
+            "var_type_",
+            "rev_",
+            "bytearray_id_",
+            "double_",
+            "long_"
+    };
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> initialDataSet, boolean writeStepResultIntoFile) {
-
-        //get all distinct variable names
-        Dataset<Row> variableNames = initialDataSet.select("name_", "var_type_")
-                .groupBy("name_","var_type_")
-                .agg(count("*"))
-                .select("name_","var_type_")
-                .distinct();
-
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
 
         //create List for new column names
         List<StructField> columnsOfMlDataset = new ArrayList<>();
 
-        //write column names into list
-        variableNames.foreach(row -> {
-            columnsOfMlDataset.add(DataTypes.createStructField(row.getString(0), DataTypes.StringType, true));
-        });
+        //add variable column names that contains the value to dataset
+        Dataset<Row> mapDataset = SparkImporterUtils.getInstance().getVariableTypeValueColumnMappingDataset();
+        dataset = dataset.join(mapDataset,SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE);
 
-        List<Row> data = new ArrayList<>();
-        StructType schema = new StructType(columnsOfMlDataset.toArray(new StructField[columnsOfMlDataset.size()]));
-        data.add(RowFactory.create(new String[columnsOfMlDataset.size()]));
+        //get variables from Ignite cache
+        java.util.Map<String, String> variables = SparkImporterCache.getInstance().getAllCacheValues(SparkImporterCache.CACHE_VARIABLE_NAMES_AND_TYPES);
 
-        SparkSession sparkSession = SparkSession.builder().getOrCreate();
-        Dataset<Row> newDataset = sparkSession.createDataFrame(data, schema).toDF();
+        for(String key : variables.keySet()) {
+            String variableName = key;
+            String variableType = variables.get(key);
 
-        newDataset.show();
+            dataset = dataset.withColumn(variableName, SparkImporterUtils.getInstance().createVariableValueColumnFromVariableNameAndType(dataset, variableName, variableType));
+
+            if(SparkImporterArguments.getInstance().isRevisionCount()) {
+                //TODO: add counter to show real count
+                dataset = dataset.withColumn(variableName+"_rev", SparkImporterUtils.getInstance().createVariableRevColumnFromVariableName(dataset, variableName));
+            }
+        }
+
+        //cleanup help columns
+        dataset = dataset.drop("valueField");
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(newDataset, "new_dataset");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "dm_dataset");
         }
 
         //returning prepocessed dataset
-        return newDataset;
+        return dataset;
     }
 }

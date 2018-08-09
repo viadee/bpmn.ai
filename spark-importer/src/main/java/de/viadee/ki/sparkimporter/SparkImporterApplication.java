@@ -5,12 +5,11 @@ import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.exceptions.NoDataImporterDefinedException;
 import de.viadee.ki.sparkimporter.importing.DataImportRunner;
 import de.viadee.ki.sparkimporter.importing.implementations.CSVDataImporter;
-import de.viadee.ki.sparkimporter.preprocessing.steps.CreateResultingDMDatasetStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.FilterOutEmptyVariableLinesStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesCountStep;
 import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesTypesOccurenceStep;
+import de.viadee.ki.sparkimporter.preprocessing.steps.*;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterCache;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -28,8 +27,6 @@ public class SparkImporterApplication {
     // Use JCommander for flexible usage of Parameters
     private static JCommander jCommander;
 
-
-
     public static void main(String[] arguments){
         ARGS = SparkImporterArguments.getInstance();
 
@@ -44,7 +41,6 @@ public class SparkImporterApplication {
             jCommander.usage();
             System.exit(1);
         }
-
 
         //SparkImporter code starts here
 
@@ -67,16 +63,27 @@ public class SparkImporterApplication {
             e.printStackTrace();
         }
 
+        //write imported CSV structure to file for debugging
+        SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
+
+        //remove duplicated columns created at CSV import step
+        dataset = SparkImporterUtils.getInstance().removeDuplicatedColumnsFromCSV(dataset);
+
+        //write imported unique column CSV structure to file for debugging
+        SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_unique_columns_result");
+
+
         //Define preprocessing steps to run
         PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
         preprocessingRunner.addPreprocessorStep(new GetVariablesCountStep());
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
-        preprocessingRunner.addPreprocessorStep(new FilterOutEmptyVariableLinesStep());
+        preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
         preprocessingRunner.addPreprocessorStep(new CreateResultingDMDatasetStep());
         preprocessingRunner.run(dataset, true);
 
         //Cleanup
         sparkSession.close();
+        SparkImporterCache.getInstance().stopIgnite();
     }
 
 }
