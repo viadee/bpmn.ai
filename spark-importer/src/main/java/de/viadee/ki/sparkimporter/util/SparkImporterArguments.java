@@ -54,6 +54,9 @@ public class SparkImporterArguments {
             "als Zähler exportiert werden sollen. Die Zählspalte besitzt den Namen <VARIABLEN_NAME>_rev.", arity = 1)
     private boolean revisionCount = true;
 
+    @Parameter(names = {"--step-results", "-sr"}, description = "Should step results be written into CSV files?")
+    private boolean writeStepResultsToCSV = false;
+
     /**
      * Privater Konstruktor um DataExtractorArguments als Singleton abzubilden
      */
@@ -90,6 +93,14 @@ public class SparkImporterArguments {
 
     public String getEnclosing() {
         return enclosing;
+    }
+
+    public boolean isWriteStepResultsToCSV() {
+        return writeStepResultsToCSV;
+    }
+
+    public void setWriteStepResultsToCSV(boolean writeStepResultsToCSV) {
+        this.writeStepResultsToCSV = writeStepResultsToCSV;
     }
 
     /**

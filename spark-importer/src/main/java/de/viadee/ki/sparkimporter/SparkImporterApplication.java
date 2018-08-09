@@ -64,14 +64,18 @@ public class SparkImporterApplication {
         }
 
         //write imported CSV structure to file for debugging
-        SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
+        if(SparkImporterArguments.getInstance().isWriteStepResultsToCSV()) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
+        }
+
 
         //remove duplicated columns created at CSV import step
         dataset = SparkImporterUtils.getInstance().removeDuplicatedColumnsFromCSV(dataset);
 
         //write imported unique column CSV structure to file for debugging
-        SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_unique_columns_result");
-
+        if(SparkImporterArguments.getInstance().isWriteStepResultsToCSV()) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_unique_columns_result");
+        }
 
         //Define preprocessing steps to run
         PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
@@ -79,7 +83,7 @@ public class SparkImporterApplication {
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
         preprocessingRunner.addPreprocessorStep(new CreateResultingDMDatasetStep());
-        preprocessingRunner.run(dataset, true);
+        preprocessingRunner.run(dataset, SparkImporterArguments.getInstance().isWriteStepResultsToCSV());
 
         //Cleanup
         sparkSession.close();

@@ -1,6 +1,7 @@
 package de.viadee.ki.sparkimporter.preprocessing;
 
 import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -28,6 +29,7 @@ public class PreprocessingRunner {
         for(PreprocessingStepInterface ps : this.preprocessorSteps) {
             dataset = ps.runPreprocessingStep(dataset, writeStepResultsIntoFile);
         }
+        SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "result");
     }
 
     public void addPreprocessorStep(PreprocessingStepInterface step) {
