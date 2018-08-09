@@ -92,7 +92,7 @@ public class SparkImporterUtils {
                             when(sourceDataSet.col("valueField").equalTo("long_"), sourceDataSet.col("long_"))
                             .when(sourceDataSet.col("valueField").equalTo("text_"), sourceDataSet.col("text_"))
                             .when(sourceDataSet.col("valueField").equalTo("text_2"), sourceDataSet.col("text2_")))
-                    .otherwise("");
+                    .otherwise("0");
         return col;
     }
 
