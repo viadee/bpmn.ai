@@ -3,10 +3,14 @@ package de.viadee.ki.sparkimporter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.exceptions.NoDataImporterDefinedException;
+import de.viadee.ki.sparkimporter.exceptions.WrongCacheValueTypeException;
 import de.viadee.ki.sparkimporter.importing.DataImportRunner;
 import de.viadee.ki.sparkimporter.importing.implementations.CSVDataImporter;
 import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.preprocessing.steps.*;
+import de.viadee.ki.sparkimporter.preprocessing.steps.AddVariablesColumnsStep;
+import de.viadee.ki.sparkimporter.preprocessing.steps.AggregateToProcessInstanceaStep;
+import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesTypesOccurenceStep;
+import de.viadee.ki.sparkimporter.preprocessing.steps.VariablesTypeEscalationStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterCache;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -24,14 +28,15 @@ public class SparkImporterApplication {
     private static final Logger LOG = LoggerFactory.getLogger(SparkImporterApplication.class);
     public static SparkImporterArguments ARGS;
 
-    // Use JCommander for flexible usage of Parameters
-    private static JCommander jCommander;
-
     public static void main(String[] arguments){
+
+        long startMillis = System.currentTimeMillis();
+
         ARGS = SparkImporterArguments.getInstance();
 
         //instantiate JCommander
-        jCommander = JCommander.newBuilder()
+        // Use JCommander for flexible usage of Parameters
+        JCommander jCommander = JCommander.newBuilder()
                 .addObject(SparkImporterArguments.getInstance())
                 .build();
         try {
@@ -71,6 +76,7 @@ public class SparkImporterApplication {
 
         //remove duplicated columns created at CSV import step
         dataset = SparkImporterUtils.getInstance().removeDuplicatedColumnsFromCSV(dataset);
+        dataset = SparkImporterUtils.getInstance().removeEmptyLinesAfterImport(dataset);
 
         //write imported unique column CSV structure to file for debugging
         if(SparkImporterArguments.getInstance().isWriteStepResultsToCSV()) {
@@ -79,15 +85,28 @@ public class SparkImporterApplication {
 
         //Define preprocessing steps to run
         PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
-        preprocessingRunner.addPreprocessorStep(new GetVariablesCountStep());
+
+        //it's faster if we do not reduce the dataset columns in the beginning and rejoin the dataset later, left steps in commented if required later
+        //preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
-        preprocessingRunner.addPreprocessorStep(new CreateResultingDMDatasetStep());
-        preprocessingRunner.run(dataset, SparkImporterArguments.getInstance().isWriteStepResultsToCSV());
+        preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
+        preprocessingRunner.addPreprocessorStep(new AggregateToProcessInstanceaStep());
+        //preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
+
+        try {
+            preprocessingRunner.run(dataset, SparkImporterArguments.getInstance().isWriteStepResultsToCSV());
+        } catch (WrongCacheValueTypeException e) {
+            e.printStackTrace();
+        }
 
         //Cleanup
         sparkSession.close();
         SparkImporterCache.getInstance().stopIgnite();
+
+        long endMillis = System.currentTimeMillis();
+
+        LOG.info("Job ran for " + ((endMillis-startMillis)/1000) + " seconds in total.");
     }
 
 }

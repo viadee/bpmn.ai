@@ -1,0 +1,16 @@
+{
+	"config": {
+		"data_extraction": {},
+        "preprocessing": {
+			"variable_configuration": [
+				{
+					"variable_name": "",
+					"variable_type": "",
+					"use_variable": true,
+					"comment": ""
+				}
+			]
+		},
+		"model_learning": {}
+	}
+}
