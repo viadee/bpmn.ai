@@ -7,16 +7,42 @@ import de.viadee.ki.sparkimporter.events.ActivityInstanceEvent;
 import de.viadee.ki.sparkimporter.events.ProcessInstanceEvent;
 import de.viadee.ki.sparkimporter.events.VariableUpdateEvent;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.MockConsumer;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.spark.streaming.Duration;
+import org.apache.spark.streaming.StreamingContext;
+import org.junit.Before;
 import org.junit.Test;
+import org.apache.spark.streaming.kafka010.*;
+import org.apache.spark.streaming.api.java.*;
+import org.apache.spark.api.java.*;
+import org.apache.spark.api.java.function.*;
+import org.junit.runner.RunWith;
+import org.mockito.BDDMockito;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.apache.spark.*;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.legacy.PowerMockRunner;
+import scala.Tuple2;
 
+import java.util.*;
+import org.powermock.api.easymock.PowerMock;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.powermock.configuration.ConfigurationType.PowerMock;
+
+@RunWith(PowerMockRunner.class)
 public class SparkImporterApplicationTest {
 
-    @Test
-    public void test1() throws Exception {
+
+    private MockConsumer consumer;
+    private Collection<String> topics;
+
+    @Before
+    public void setupKafkaMock() throws Exception {
 
         // Mock Kafka erzeugen
 
@@ -41,6 +67,8 @@ public class SparkImporterApplicationTest {
             topicsCollection.add(partition.topic());
         }
 
+        topics = topicsCollection;
+
         // Mock Consumer Einstellungen
         MockConsumer<String, String> testConsumer = new MockConsumer<>(
                 OffsetResetStrategy.EARLIEST);
@@ -60,13 +88,44 @@ public class SparkImporterApplicationTest {
         ConsumerRecord<String, String> record3 = new ConsumerRecord<>(topic2, 3, 4, null, generateVariableUpdateData());
         testConsumer.addRecord(record3);
 
+        consumer = testConsumer;
 
-        // Überprüfung
-        ConsumerRecords<String, String> testRec = testConsumer.poll(1000);
-        for (ConsumerRecord<String, String> rec : testRec) {
-            System.out.println("Topic: " + rec.topic() + " Offset: " + rec.offset() + " Key: " + rec.key() + " Value: " + rec.value());
-        }
+    }
 
+    @Mock
+    JavaStreamingContext streamingContext;
+
+    @Test
+    public void testKafkaUtils() {
+
+        SparkConf conf = new     SparkConf(false).setMaster("local[2]").setAppName("My app");
+        JavaStreamingContext jsc = new JavaStreamingContext(conf, new Duration(1000));
+
+
+
+        PowerMockito.mockStatic(KafkaUtils.class);
+
+        // Geht nicht..
+        PowerMockito.when(KafkaUtils.createDirectStream(any(), any(), any())).then..
+
+
+
+        final JavaInputDStream<ConsumerRecord<String, String>> stream =
+                KafkaUtils.createDirectStream(
+                        streamingContext,
+                        LocationStrategies.PreferConsistent(),
+                        ConsumerStrategies.<String, String>Subscribe(topics, settings)
+                );
+
+
+//        JavaDStream<String> stream1 = stream.map(
+//                new Function<ConsumerRecord<String, String>, String>() {
+//                    @Override
+//                    public String call(ConsumerRecord<String, String> r) {
+//                        return r.value();
+//                    }
+//                }
+//        );
     }
 
     /**
