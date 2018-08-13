@@ -1,7 +1,6 @@
 package de.viadee.ki.sparkimporter.util;
 
 import com.beust.jcommander.Parameter;
-
 import de.viadee.ki.sparkimporter.util.validation.ParsingMethodValidator;
 import de.viadee.ki.sparkimporter.util.validation.ProcessIdValidator;
 

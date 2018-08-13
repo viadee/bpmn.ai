@@ -6,8 +6,6 @@ import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
-import static org.apache.spark.sql.functions.first;
-
 public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
 
     @Override
