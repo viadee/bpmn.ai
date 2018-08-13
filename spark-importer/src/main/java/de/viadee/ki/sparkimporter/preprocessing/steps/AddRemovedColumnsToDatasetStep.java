@@ -1,19 +1,21 @@
 package de.viadee.ki.sparkimporter.preprocessing.steps;
 
+import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
+import static org.apache.spark.sql.functions.col;
 import static org.apache.spark.sql.functions.first;
 
-public class ReduceDatasetToSingleProcessInstanceRowsStep implements PreprocessingStepInterface {
+public class AddRemovedColumnsToDatasetStep implements PreprocessingStepInterface {
 
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
 
-        dataset = dataset.select(
+        Dataset<Row> initialDataset = PreprocessingRunner.helper_datasets.get(PreprocessingRunner.DATASET_INITIAL).select(
                 SparkImporterVariables.VAR_ID,
                 SparkImporterVariables.VAR_SUPER_PROCESS_INSTANCE_ID,
                 SparkImporterVariables.VAR_SUPER_CASE_INSTANCE_ID,
@@ -37,14 +39,8 @@ public class ReduceDatasetToSingleProcessInstanceRowsStep implements Preprocessi
                 SparkImporterVariables.VAR_DELETE_REASON,
                 SparkImporterVariables.VAR_TENANT_ID,
                 SparkImporterVariables.VAR_STATE,
-                SparkImporterVariables.VAR_BYTEARRAY_ID,
-                SparkImporterVariables.VAR_DOUBLE,
-                SparkImporterVariables.VAR_LONG,
-                SparkImporterVariables.VAR_TEXT,
-                SparkImporterVariables.VAR_TEXT2,
-                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
-                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
-                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION)
+                SparkImporterVariables.VAR_BYTEARRAY_ID
+        )
                 .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
                 .agg(
                         first(SparkImporterVariables.VAR_ID).as(SparkImporterVariables.VAR_ID),
@@ -69,19 +65,13 @@ public class ReduceDatasetToSingleProcessInstanceRowsStep implements Preprocessi
                         first(SparkImporterVariables.VAR_DELETE_REASON).as(SparkImporterVariables.VAR_DELETE_REASON),
                         first(SparkImporterVariables.VAR_TENANT_ID).as(SparkImporterVariables.VAR_TENANT_ID),
                         first(SparkImporterVariables.VAR_STATE).as(SparkImporterVariables.VAR_STATE),
-                        first(SparkImporterVariables.VAR_BYTEARRAY_ID).as(SparkImporterVariables.VAR_BYTEARRAY_ID),
-                        first(SparkImporterVariables.VAR_DOUBLE).as(SparkImporterVariables.VAR_DOUBLE),
-                        first(SparkImporterVariables.VAR_LONG).as(SparkImporterVariables.VAR_LONG),
-                        first(SparkImporterVariables.VAR_TEXT).as(SparkImporterVariables.VAR_TEXT),
-                        first(SparkImporterVariables.VAR_TEXT2).as(SparkImporterVariables.VAR_TEXT2),
-                        first(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).as(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME),
-                        first(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE).as(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE),
-                        first(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION).as(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION)
-                );
+                        first(SparkImporterVariables.VAR_BYTEARRAY_ID).as(SparkImporterVariables.VAR_BYTEARRAY_ID)
+                ).withColumnRenamed(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
 
+        dataset = dataset.join(initialDataset, col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).equalTo(col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right")), "left");
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "reduced_to_line_per_process_instance");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "joined_columns");
         }
 
         //return preprocessed data

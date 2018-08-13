@@ -1,0 +1,52 @@
+package de.viadee.ki.sparkimporter.preprocessing.steps;
+
+import de.viadee.ki.sparkimporter.exceptions.WrongCacheValueTypeException;
+import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterCache;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
+import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import org.apache.spark.sql.*;
+
+import java.util.Set;
+
+import static org.apache.spark.sql.functions.when;
+
+public class AddVariablesColumnsStep implements PreprocessingStepInterface {
+
+    @Override
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) throws WrongCacheValueTypeException {
+
+        Set<String> variables = SparkImporterCache.getInstance().getAllCacheValues(SparkImporterCache.CACHE_VARIABLE_NAMES_AND_TYPES, String[].class).keySet();
+
+        for(String v : variables) {
+            dataset = dataset.select("*").withColumn(v, when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).equalTo(v),
+                    when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE).equalTo("string"), dataset.col(SparkImporterVariables.VAR_TEXT))
+                            .when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE).equalTo("null"), dataset.col(SparkImporterVariables.VAR_TEXT))
+                            .when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE).equalTo("boolean"), dataset.col(SparkImporterVariables.VAR_LONG))
+                            .when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE).equalTo("long"), dataset.col(SparkImporterVariables.VAR_LONG))
+                            .when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE).equalTo("serializable"), dataset.col(SparkImporterVariables.VAR_TEXT2))
+                            .otherwise(""))
+                    .otherwise(""));
+
+            if(SparkImporterArguments.getInstance().isRevisionCount()) {
+                dataset = dataset.withColumn(v+"_rev", dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION));
+            }
+        }
+
+        //drop unnecesssary columns
+        dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
+                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
+                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
+                SparkImporterVariables.VAR_LONG,
+                SparkImporterVariables.VAR_TEXT,
+                SparkImporterVariables.VAR_TEXT2);
+
+        if(writeStepResultIntoFile) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "add_var_columns");
+        }
+
+        //return preprocessed data
+        return dataset;
+    }
+}

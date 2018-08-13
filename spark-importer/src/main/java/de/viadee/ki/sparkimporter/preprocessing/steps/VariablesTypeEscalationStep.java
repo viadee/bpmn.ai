@@ -16,13 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.*;
-import static org.apache.spark.sql.functions.lit;
-import static org.apache.spark.sql.functions.when;
+import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME;
+import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE;
 
 public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
 
@@ -83,19 +81,19 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
             SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_escalated_help");
         }
 
-        //cleanup initial data
-        dataset = dataset.withColumn(VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
-                when(dataset.col(VAR_PROCESS_INSTANCE_VARIABLE_TYPE).isin("null",""),
-                        lit(helpDataSet
-                                .select(VAR_PROCESS_INSTANCE_VARIABLE_NAME, VAR_PROCESS_INSTANCE_VARIABLE_TYPE)
-                                .filter(VAR_PROCESS_INSTANCE_VARIABLE_NAME+" == "+dataset.col(VAR_PROCESS_INSTANCE_VARIABLE_NAME))
-                                .first().getString(1)))
-                        //lit(filteredVariables.get(preprocessedDataSet.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME))))
-        .otherwise(dataset.col(VAR_PROCESS_INSTANCE_VARIABLE_TYPE)));
-
-        if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "variable_types_escalated");
-        }
+//        //cleanup initial data
+//        dataset = dataset.withColumn(VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
+//                when(dataset.col(VAR_PROCESS_INSTANCE_VARIABLE_TYPE).isin("null",""),
+//                        lit(helpDataSet
+//                                .select(VAR_PROCESS_INSTANCE_VARIABLE_NAME, VAR_PROCESS_INSTANCE_VARIABLE_TYPE)
+//                                .filter(VAR_PROCESS_INSTANCE_VARIABLE_NAME+" == "+dataset.col(VAR_PROCESS_INSTANCE_VARIABLE_NAME))
+//                                .first().getString(1)))
+//                        //lit(filteredVariables.get(preprocessedDataSet.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME))))
+//        .otherwise(dataset.col(VAR_PROCESS_INSTANCE_VARIABLE_TYPE)));
+//
+//        if(writeStepResultIntoFile) {
+//            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "variable_types_escalated");
+//        }
 
         //returning prepocessed dataset
         return dataset;
@@ -112,7 +110,7 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
             } else {
                 //check which one to be used --> escalation
                 //TODO: currently only done for null and empty strings, should be done for multiple types with a variableType hierarchy
-                if (!variableType.equals(null) && !variableType.equals("")) {
+                if (!variableType.equals("null") && !variableType.equals("")) {
                     lastVariableType = variableType;
                 }
             }

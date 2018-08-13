@@ -83,11 +83,15 @@ public class SparkImporterApplication {
 
         //Define preprocessing steps to run
         PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
-        preprocessingRunner.addPreprocessorStep(new GetVariablesCountStep());
+
+        //it's faster if we do not reduce the dataset columns in the beginning and rejoin the dataset later.
+        //preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
-        preprocessingRunner.addPreprocessorStep(new ReduceDatasetToSingleProcessInstanceRowsStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
-        preprocessingRunner.addPreprocessorStep(new CreateResultingDMDatasetStep());
+        preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
+        preprocessingRunner.addPreprocessorStep(new AggregateToProcessInstanceaStep());
+        //preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
+
         try {
             preprocessingRunner.run(dataset, SparkImporterArguments.getInstance().isWriteStepResultsToCSV());
         } catch (WrongCacheValueTypeException e) {
