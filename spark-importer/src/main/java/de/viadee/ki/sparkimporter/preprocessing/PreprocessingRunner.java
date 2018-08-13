@@ -13,13 +13,13 @@ import java.util.Map;
 
 public class PreprocessingRunner {
 
-    private List<PreprocessingStepInterface> preprocessorSteps = new ArrayList<>();
+    private final List<PreprocessingStepInterface> preprocessorSteps = new ArrayList<>();
 
     private static int stepCounter = 0;
 
     public final static String DATASET_INITIAL = "initial";
 
-    public static Map<String, Dataset<Row>> helper_datasets = new HashMap<>();
+    public static final Map<String, Dataset<Row>> helper_datasets = new HashMap<>();
 
     private static PreprocessingRunner instance;
 

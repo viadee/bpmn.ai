@@ -28,9 +28,6 @@ public class SparkImporterApplication {
     private static final Logger LOG = LoggerFactory.getLogger(SparkImporterApplication.class);
     public static SparkImporterArguments ARGS;
 
-    // Use JCommander for flexible usage of Parameters
-    private static JCommander jCommander;
-
     public static void main(String[] arguments){
 
         long startMillis = System.currentTimeMillis();
@@ -38,7 +35,8 @@ public class SparkImporterApplication {
         ARGS = SparkImporterArguments.getInstance();
 
         //instantiate JCommander
-        jCommander = JCommander.newBuilder()
+        // Use JCommander for flexible usage of Parameters
+        JCommander jCommander = JCommander.newBuilder()
                 .addObject(SparkImporterArguments.getInstance())
                 .build();
         try {
@@ -78,6 +76,7 @@ public class SparkImporterApplication {
 
         //remove duplicated columns created at CSV import step
         dataset = SparkImporterUtils.getInstance().removeDuplicatedColumnsFromCSV(dataset);
+        dataset = SparkImporterUtils.getInstance().removeEmptyLinesAfterImport(dataset);
 
         //write imported unique column CSV structure to file for debugging
         if(SparkImporterArguments.getInstance().isWriteStepResultsToCSV()) {
@@ -87,7 +86,7 @@ public class SparkImporterApplication {
         //Define preprocessing steps to run
         PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
 
-        //it's faster if we do not reduce the dataset columns in the beginning and rejoin the dataset later.
+        //it's faster if we do not reduce the dataset columns in the beginning and rejoin the dataset later, left steps in commented if required later
         //preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());

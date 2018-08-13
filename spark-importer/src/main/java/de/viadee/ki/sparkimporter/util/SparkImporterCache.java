@@ -14,9 +14,9 @@ public class SparkImporterCache {
 
     public final static String CACHE_VARIABLE_NAMES_AND_TYPES = "cacheVariableNamesAndTypes";
 
-    private Map<String, IgniteCache<String, Object>> caches = new HashMap<>();
-    private Map<String, Class> cacheValueTypes = new HashMap<>();
-    private Ignite ignite;
+    private final Map<String, IgniteCache<String, Object>> caches = new HashMap<>();
+    private final Map<String, Class> cacheValueTypes = new HashMap<>();
+    private final Ignite ignite;
 
     private static SparkImporterCache instance;
 
@@ -54,7 +54,7 @@ public class SparkImporterCache {
 
     }
 
-    public<T extends Object> T getValueFromCache(String cacheName, String valueKey, Class<T> valueType) throws WrongCacheValueTypeException {
+    public<T> T getValueFromCache(String cacheName, String valueKey, Class<T> valueType) throws WrongCacheValueTypeException {
         if(caches.containsKey(cacheName)) {
             if(cacheValueTypes.get(cacheName) == null
                     || !cacheValueTypes.get(cacheName).equals(valueType)) {
@@ -68,15 +68,13 @@ public class SparkImporterCache {
         }
     }
 
-    public<T extends Object> Map<String, T> getAllCacheValues(String cacheName, Class<T> valueType) throws WrongCacheValueTypeException {
+    public<T> Map<String, T> getAllCacheValues(String cacheName, Class<T> valueType) throws WrongCacheValueTypeException {
         IgniteCache<String, Object> cache = caches.get(cacheName);
         Map<String, T> result = new HashMap<>();
-        Iterator<Cache.Entry<String, Object>> it = cache.iterator();
-        while(it.hasNext()) {
-            Cache.Entry<String, Object> entry = it.next();
-            if(cacheValueTypes.get(cacheName) == null
-                || !cacheValueTypes.get(cacheName).equals(valueType)) {
-                throw new WrongCacheValueTypeException("provided value type '"+valueType.getSimpleName()+"' does not match the one from cache '"+cacheValueTypes.get(cacheName).getSimpleName()+"'");
+        for (Cache.Entry<String, Object> entry : cache) {
+            if (cacheValueTypes.get(cacheName) == null
+                    || !cacheValueTypes.get(cacheName).equals(valueType)) {
+                throw new WrongCacheValueTypeException("provided value type '" + valueType.getSimpleName() + "' does not match the one from cache '" + cacheValueTypes.get(cacheName).getSimpleName() + "'");
             } else {
                 result.put(entry.getKey(), ((T) entry.getValue()));
             }

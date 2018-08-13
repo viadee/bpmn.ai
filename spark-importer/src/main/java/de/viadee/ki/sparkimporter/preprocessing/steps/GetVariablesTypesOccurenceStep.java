@@ -20,9 +20,7 @@ public class GetVariablesTypesOccurenceStep implements PreprocessingStepInterfac
                 .agg(max(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION).alias(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION))
                 .filter(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME+" <> 'null'"); // don't consider null variables'
 
-        variablesTypesDataset.foreach(row -> {
-            SparkImporterCache.getInstance().addValueToCache(SparkImporterCache.CACHE_VARIABLE_NAMES_AND_TYPES, row.getString(0), new String[]{row.getString(1), row.getInt(2)+""});
-        });
+        variablesTypesDataset.foreach(row -> SparkImporterCache.getInstance().addValueToCache(SparkImporterCache.CACHE_VARIABLE_NAMES_AND_TYPES, row.getString(0), new String[]{row.getString(1), row.getInt(2)+""}));
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(variablesTypesDataset, "variables_types_help");

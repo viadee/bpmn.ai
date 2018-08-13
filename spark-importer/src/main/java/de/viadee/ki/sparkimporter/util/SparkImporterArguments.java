@@ -11,7 +11,7 @@ public class SparkImporterArguments {
 
 	private static SparkImporterArguments sparkImporterArguments = null;
 
-	public static final String ID_ALL = "all";
+	private static final String ID_ALL = "all";
 
 	public static final String DEFAULT_ENCLOSING = "";
 

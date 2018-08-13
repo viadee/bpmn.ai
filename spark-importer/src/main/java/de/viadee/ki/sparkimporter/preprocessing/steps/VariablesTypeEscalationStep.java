@@ -12,8 +12,6 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +21,6 @@ import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS
 import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE;
 
 public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
-
-    private static final Logger LOG = LoggerFactory.getLogger(VariablesTypeEscalationStep.class);
-
 
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) throws WrongCacheValueTypeException {
@@ -37,10 +32,9 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
         String lastVariableType = "";
         int lastVariableMaxRevision = 0;
         int variableOccurences = 0;
-        for (String key : variables.keySet()) {
-            String variable = key;
-            String type = variables.get(key)[0];
-            int revision = Integer.parseInt(variables.get(key)[1]);
+        for (String variable : variables.keySet()) {
+            String type = variables.get(variable)[0];
+            int revision = Integer.parseInt(variables.get(variable)[1]);
 
             processVariable(variable, type, revision, lastVariableName, lastVariableType, lastVariableMaxRevision, variableOccurences);
 
