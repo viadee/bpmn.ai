@@ -22,11 +22,11 @@ public class SparkImporterArguments {
 
 	@Parameter(names = { "--parsing-method",
 			"-pm" }, description = "Chooses a parsing method (either process or activity) and thereby the level of analysis. ", validateWith = ParsingMethodValidator.class)
-	private final String parsingMethod = PARSING_METHOD_PROCESS;
+	private String parsingMethod = PARSING_METHOD_PROCESS;
 
 	@Parameter(names = { "--process-processId",
 			"-pid" }, description = "Optional parameter to only process a single process instance. ", validateWith = ProcessIdValidator.class)
-	private final String processId = ID_ALL;
+	private String processId = ID_ALL;
 
 	@Parameter(names = { "--file-source",
 			"-fs" }, required = true, description = "Path an name of the CSV-File to be processed. You can generate the file with a query such as this one: SELECT *\r\n"
@@ -48,14 +48,14 @@ public class SparkImporterArguments {
 
 	@Parameter(names = { "--enclosing",
 			"-e" }, description = "Enclosing characters around fields such as [\"]. For this particular case, please take care of special character escaping by prefixing a backslash.")
-	private final String enclosing = DEFAULT_ENCLOSING;
+	private String enclosing = DEFAULT_ENCLOSING;
 
 	@Parameter(names = { "--revision-count", "-rc" }, description = "Boolean toggle to enable the counting of changes "
 			+ "to a variable. It results in a number of columns named <VARIABLE_NAME>_rev.", arity = 1)
-	private final boolean revisionCount = true;
+	private boolean revisionCount = true;
 
 	@Parameter(names = { "--step-results",
-			"-sr" }, description = "Should intermediate results be written into CSV files?")
+			"-sr" }, description = "Should intermediate results be written into CSV files?", arity = 1)
 	private boolean writeStepResultsToCSV = false;
 
 	/**
