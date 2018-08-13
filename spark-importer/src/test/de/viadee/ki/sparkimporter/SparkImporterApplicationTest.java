@@ -1,26 +1,60 @@
 package de.viadee.ki.sparkimporter;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
-import de.viadee.ki.sparkimporter.exceptions.NoDataImporterDefinedException;
-import de.viadee.ki.sparkimporter.importing.DataImportRunner;
-import de.viadee.ki.sparkimporter.importing.implementations.CSVDataImporter;
-import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.preprocessing.steps.*;
-import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
-import de.viadee.ki.sparkimporter.util.SparkImporterCache;
-import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.io.File;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.MockConsumer;
+import org.apache.kafka.clients.consumer.OffsetResetStrategy;
+import org.apache.kafka.common.TopicPartition;
+import org.junit.Test;
 
 public class SparkImporterApplicationTest {
 
+    @Test
+    public void test1() {
 
+        // Mock Kafka erzeugen
+
+        String topic = "processInstance";
+        Collection<TopicPartition> partitions = new ArrayList<>();
+        Collection<String> topicsCollection = new ArrayList<>();
+        partitions.add(new TopicPartition(topic, 1));
+        Map<TopicPartition, Long> partitionsBeginningMap = new HashMap<>();
+        Map<TopicPartition, Long> partitionsEndMap = new HashMap<>();
+
+        // Anzahl Records und Partitionen initialisieren
+        long records = 4;
+        for (TopicPartition partition : partitions) {
+            partitionsBeginningMap.put(partition, 0l);
+            partitionsEndMap.put(partition, records);
+            topicsCollection.add(partition.topic());
+        }
+
+        MockConsumer<String, String> testConsumer = new MockConsumer<>(
+                OffsetResetStrategy.EARLIEST);
+        testConsumer.subscribe(topicsCollection);
+        testConsumer.rebalance(partitions);
+        testConsumer.updateBeginningOffsets(partitionsBeginningMap);
+        testConsumer.updateEndOffsets(partitionsEndMap);
+
+        // Testdaten (4 Stück)
+
+        ConsumerRecord<String, String> record0 = new ConsumerRecord<>(topic, 1, 1, null,"dd");
+        testConsumer.addRecord(record0);
+        ConsumerRecord<String, String> record1 = new ConsumerRecord<>(topic, 1, 2, null,"ddd");
+        testConsumer.addRecord(record1);
+        ConsumerRecord<String, String> record2 = new ConsumerRecord<>(topic, 1, 3, null,"dddd");
+        testConsumer.addRecord(record2);
+        ConsumerRecord<String, String> record3 = new ConsumerRecord<>(topic, 1, 4, null,"ddddd");
+        testConsumer.addRecord(record3);
+
+        // Do Stuff
+
+
+
+    }
 
 }
