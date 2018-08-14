@@ -1,7 +1,5 @@
 package de.viadee.ki.sparkimporter;
 
-import java.util.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.viadee.ki.sparkimporter.events.ActivityInstanceEvent;
 import de.viadee.ki.sparkimporter.events.ProcessInstanceEvent;
@@ -10,32 +8,24 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.MockConsumer;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.Duration;
-import org.apache.spark.streaming.StreamingContext;
+import org.apache.spark.streaming.api.java.JavaInputDStream;
+import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.kafka010.ConsumerStrategies;
+import org.apache.spark.streaming.kafka010.KafkaUtils;
+import org.apache.spark.streaming.kafka010.LocationStrategies;
 import org.junit.Before;
 import org.junit.Test;
-import org.apache.spark.streaming.kafka010.*;
-import org.apache.spark.streaming.api.java.*;
-import org.apache.spark.api.java.*;
-import org.apache.spark.api.java.function.*;
 import org.junit.runner.RunWith;
-import org.mockito.BDDMockito;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
-import org.apache.spark.*;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.legacy.PowerMockRunner;
-import scala.Tuple2;
 
 import java.util.*;
-import org.powermock.api.easymock.PowerMock;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.powermock.configuration.ConfigurationType.PowerMock;
-
-@RunWith(PowerMockRunner.class)
-public class SparkImporterApplicationTest {
+//@RunWith(PowerMockRunner.class)
+public class SparkImporterApplicationKafkaTest {
 
 
     private MockConsumer consumer;
@@ -106,16 +96,16 @@ public class SparkImporterApplicationTest {
         PowerMockito.mockStatic(KafkaUtils.class);
 
         // Geht nicht..
-        PowerMockito.when(KafkaUtils.createDirectStream(any(), any(), any())).then..
+        //PowerMockito.when(KafkaUtils.createDirectStream(any(), any(), any())).then..
 
 
 
-        final JavaInputDStream<ConsumerRecord<String, String>> stream =
-                KafkaUtils.createDirectStream(
-                        streamingContext,
-                        LocationStrategies.PreferConsistent(),
-                        ConsumerStrategies.<String, String>Subscribe(topics, settings)
-                );
+//        final JavaInputDStream<ConsumerRecord<String, String>> stream =
+//                KafkaUtils.createDirectStream(
+//                        streamingContext,
+//                        LocationStrategies.PreferConsistent(),
+//                        ConsumerStrategies.<String, String>Subscribe(topics, settings)
+//                );
 
 
 //        JavaDStream<String> stream1 = stream.map(
