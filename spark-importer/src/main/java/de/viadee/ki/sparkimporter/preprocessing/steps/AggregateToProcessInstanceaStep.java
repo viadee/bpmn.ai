@@ -6,7 +6,9 @@ import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,9 +18,12 @@ public class AggregateToProcessInstanceaStep implements PreprocessingStepInterfa
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
 
+        //apply max aggregator to known date columns start_time_ and end_time_ so that no date formatting is done in custom aggregator
+        List<String> dateFormatColumns = Arrays.asList(new String[]{SparkImporterVariables.VAR_START_TIME, SparkImporterVariables.VAR_END_TIME});
+
         Map<String, String> aggregationMap = new HashMap<>();
         for(String column : dataset.columns()) {
-            if(column.endsWith("_rev")) {
+            if(column.endsWith("_rev") || dateFormatColumns.contains(column)) {
                 aggregationMap.put(column, "max");
             } else {
                 aggregationMap.put(column, "AllButEmptyString");

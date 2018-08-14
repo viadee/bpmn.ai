@@ -7,10 +7,6 @@ import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
-import scala.Array;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AllButEmptyStringAggregationFunction extends UserDefinedAggregateFunction {
 
@@ -61,13 +57,6 @@ public class AllButEmptyStringAggregationFunction extends UserDefinedAggregateFu
         if (!input.isNullAt(0)) {
             String currentValue = (buffer.size() == 0 || buffer.getString(0) == null ? "" : buffer.getString(0));
             String value = (currentValue.equals("") ? input.getString(0) : currentValue);
-
-            if(value.contains("BWG")) {
-                int ii = 0;
-            }
-            if(buffer.size() > 0 && !buffer.getString(0).equals("")) {
-                int j = 1;
-            }
             buffer.update(0, value);
         }
     }
@@ -84,13 +73,6 @@ public class AllButEmptyStringAggregationFunction extends UserDefinedAggregateFu
             value = buffer2.getString(0);
         } else {
             value = buffer1.getString(0);
-        }
-
-        if(value.contains("BWGV")) {
-            int ii = 0;
-        }
-        if(buffer2.size() > 0 && !buffer2.getString(0).equals("")) {
-            int j = 1;
         }
         buffer1.update(0, value);
     }

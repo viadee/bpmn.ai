@@ -7,7 +7,6 @@ import org.apache.ignite.Ignition;
 
 import javax.cache.Cache;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class SparkImporterCache {
