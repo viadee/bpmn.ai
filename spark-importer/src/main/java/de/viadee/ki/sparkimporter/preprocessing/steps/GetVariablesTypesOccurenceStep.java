@@ -7,7 +7,9 @@ import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import static org.apache.spark.sql.functions.max;
 

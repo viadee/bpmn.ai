@@ -1,6 +1,5 @@
 package de.viadee.ki.sparkimporter.preprocessing.steps;
 
-import de.viadee.ki.sparkimporter.exceptions.WrongCacheValueTypeException;
 import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -23,7 +22,7 @@ import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS
 public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) throws WrongCacheValueTypeException {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
 
         //get all distinct variable names
         Map<String, String> variables = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_RAW);
@@ -81,7 +80,7 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
         return dataset;
     }
 
-    private void processVariable(Map<String, String> variables, String variableName, String variableType, int revision, String lastVariableName, String lastVariableType, int lastVariableMaxRevision, int variableOccurences) throws WrongCacheValueTypeException {
+    private void processVariable(Map<String, String> variables, String variableName, String variableType, int revision, String lastVariableName, String lastVariableType, int lastVariableMaxRevision, int variableOccurences) {
         if (variableName.equals(lastVariableName)) {
             variableOccurences++;
 

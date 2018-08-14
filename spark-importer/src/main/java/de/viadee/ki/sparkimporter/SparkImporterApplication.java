@@ -3,7 +3,6 @@ package de.viadee.ki.sparkimporter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.exceptions.NoDataImporterDefinedException;
-import de.viadee.ki.sparkimporter.exceptions.WrongCacheValueTypeException;
 import de.viadee.ki.sparkimporter.importing.DataImportRunner;
 import de.viadee.ki.sparkimporter.importing.implementations.CSVDataImporter;
 import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
@@ -97,11 +96,9 @@ public class SparkImporterApplication {
         preprocessingRunner.addPreprocessorStep(new AggregateToProcessInstanceaStep());
         //preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
 
-        try {
-            preprocessingRunner.run(dataset, SparkImporterArguments.getInstance().isWriteStepResultsToCSV());
-        } catch (WrongCacheValueTypeException e) {
-            e.printStackTrace();
-        }
+
+        //Run preprocessing runner
+        preprocessingRunner.run(dataset, SparkImporterArguments.getInstance().isWriteStepResultsToCSV());
 
         //Cleanup
         sparkSession.close();
