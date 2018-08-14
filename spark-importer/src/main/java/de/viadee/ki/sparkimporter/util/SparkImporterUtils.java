@@ -4,6 +4,7 @@ import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SaveMode;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
@@ -35,10 +36,12 @@ public class SparkImporterUtils {
         //save dataset into CSV file
         dataSet.coalesce(1)
                 .write()
-                .format("com.databricks.spark.csv")
                 .option("header", "true")
                 .option("delimiter", delimiter)
-                .save(args.getFileDestination()+"/"+ String.format("%02d", PreprocessingRunner.getInstance().getNextCounter()) + "_" + subDirectory);
+                .option("ignoreLeadingWhiteSpace", "false")
+                .option("ignoreTrailingWhiteSpace", "false")
+                .mode(SaveMode.Overwrite)
+                .csv(args.getFileDestination()+"/"+ String.format("%02d", PreprocessingRunner.getInstance().getNextCounter()) + "_" + subDirectory);
     }
 
     public Dataset<Row> removeDuplicatedColumnsFromCSV(Dataset<Row> dataset) {

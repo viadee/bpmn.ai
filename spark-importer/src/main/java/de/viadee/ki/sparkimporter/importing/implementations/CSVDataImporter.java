@@ -12,11 +12,12 @@ public class CSVDataImporter implements DataImporterInterface {
     @Override
     public Dataset<Row> importData(SparkSession sparkSession) {
         //Load source CSV file
-        return sparkSession.sqlContext().read()
-                .format("com.databricks.spark.csv")
+        return sparkSession.read()
                 .option("inferSchema", "true")
                 .option("delimiter", ARGS.getDelimiter())
                 .option("header", "true")
-                .load(ARGS.getFileSource());
+                .option("ignoreLeadingWhiteSpace", "false")
+                .option("ignoreTrailingWhiteSpace", "false")
+                .csv(ARGS.getFileSource());
     }
 }
