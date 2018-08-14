@@ -2,7 +2,6 @@ package de.viadee.ki.sparkimporter.util.validation;
 
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.ParameterException;
-
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 
 /**
