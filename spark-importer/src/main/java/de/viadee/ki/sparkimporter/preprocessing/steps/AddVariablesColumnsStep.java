@@ -31,7 +31,9 @@ public class AddVariablesColumnsStep implements PreprocessingStepInterface {
                     .otherwise(""));
 
             if(SparkImporterArguments.getInstance().isRevisionCount()) {
-                dataset = dataset.withColumn(v+"_rev", dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION));
+                dataset = dataset.withColumn(v+"_rev",
+                        when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).equalTo(v), dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION))
+                        .otherwise("0"));
             }
         }
 

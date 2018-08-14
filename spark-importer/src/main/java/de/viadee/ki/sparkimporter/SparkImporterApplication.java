@@ -7,6 +7,7 @@ import de.viadee.ki.sparkimporter.exceptions.WrongCacheValueTypeException;
 import de.viadee.ki.sparkimporter.importing.DataImportRunner;
 import de.viadee.ki.sparkimporter.importing.implementations.CSVDataImporter;
 import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
+import de.viadee.ki.sparkimporter.preprocessing.aggregation.AllButEmptyStringAggregationFunction;
 import de.viadee.ki.sparkimporter.preprocessing.steps.AddVariablesColumnsStep;
 import de.viadee.ki.sparkimporter.preprocessing.steps.AggregateToProcessInstanceaStep;
 import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesTypesOccurenceStep;
@@ -55,6 +56,9 @@ public class SparkImporterApplication {
         //Configuration is being loaded from Environment (e.g. when using spark-submit)
         SparkSession sparkSession = SparkSession.builder()
                 .getOrCreate();
+
+        //register our own aggregation function
+        sparkSession.udf().register("AllButEmptyString", new AllButEmptyStringAggregationFunction());
 
         //Import data
         DataImportRunner dataImportRunner = DataImportRunner.getInstance();

@@ -18,7 +18,11 @@ public class AggregateToProcessInstanceaStep implements PreprocessingStepInterfa
 
         Map<String, String> aggregationMap = new HashMap<>();
         for(String column : dataset.columns()) {
-            aggregationMap.put(column, "max");
+            if(column.endsWith("_rev")) {
+                aggregationMap.put(column, "max");
+            } else {
+                aggregationMap.put(column, "AllButEmptyString");
+            }
         }
         dataset = dataset.groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).agg(aggregationMap);
 
@@ -26,12 +30,18 @@ public class AggregateToProcessInstanceaStep implements PreprocessingStepInterfa
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
 
         String pattern = "max\\((.+)\\)";
+        String pattern2 = "allbutemptystring\\((.+)\\)";
         Pattern r = Pattern.compile(pattern);
+        Pattern r2 = Pattern.compile(pattern2);
 
         for(String columnName : dataset.columns()) {
             Matcher m = r.matcher(columnName);
+            Matcher m2 = r2.matcher(columnName);
             if(m.find()) {
                 String newColumnName = m.group(1);
+                dataset = dataset.withColumnRenamed(columnName, newColumnName);
+            } else if(m2.find()) {
+                String newColumnName = m2.group(1);
                 dataset = dataset.withColumnRenamed(columnName, newColumnName);
             }
         }
