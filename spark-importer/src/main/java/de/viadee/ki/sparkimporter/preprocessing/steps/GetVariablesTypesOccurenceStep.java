@@ -1,11 +1,13 @@
 package de.viadee.ki.sparkimporter.preprocessing.steps;
 
 import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterCache;
+import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+
+import java.util.*;
 
 import static org.apache.spark.sql.functions.max;
 
@@ -20,7 +22,17 @@ public class GetVariablesTypesOccurenceStep implements PreprocessingStepInterfac
                 .agg(max(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION).alias(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION))
                 .filter(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME+" <> 'null'"); // don't consider null variables'
 
-        variablesTypesDataset.foreach(row -> SparkImporterCache.getInstance().addValueToCache(SparkImporterCache.CACHE_VARIABLE_NAMES_AND_TYPES, row.getString(0), new String[]{row.getString(1), row.getInt(2)+""}));
+        //create broadcast variable for variables list
+        Map<String, String> variablesAndTypes = new HashMap<>();
+        Iterator<Row> it = variablesTypesDataset.toLocalIterator();
+        while(it.hasNext()) {
+            Row row = it.next();
+            variablesAndTypes.put(row.getString(0), row.getString(1));
+        }
+
+        //broadcast variable in Spark
+        SparkBroadcastHelper.getInstance().broadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_RAW, variablesAndTypes);
+
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(variablesTypesDataset, "variables_types_help");

@@ -13,7 +13,6 @@ import de.viadee.ki.sparkimporter.preprocessing.steps.AggregateToProcessInstance
 import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesTypesOccurenceStep;
 import de.viadee.ki.sparkimporter.preprocessing.steps.VariablesTypeEscalationStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
-import de.viadee.ki.sparkimporter.util.SparkImporterCache;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.Dataset;
@@ -106,7 +105,6 @@ public class SparkImporterApplication {
 
         //Cleanup
         sparkSession.close();
-        SparkImporterCache.getInstance().stopIgnite();
 
         long endMillis = System.currentTimeMillis();
 

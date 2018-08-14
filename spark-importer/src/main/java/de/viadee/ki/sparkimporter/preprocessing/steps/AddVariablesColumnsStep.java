@@ -2,13 +2,11 @@ package de.viadee.ki.sparkimporter.preprocessing.steps;
 
 import de.viadee.ki.sparkimporter.exceptions.WrongCacheValueTypeException;
 import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
-import de.viadee.ki.sparkimporter.util.SparkImporterCache;
-import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
-import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import de.viadee.ki.sparkimporter.util.*;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
+import java.util.Map;
 import java.util.Set;
 
 import static org.apache.spark.sql.functions.when;
@@ -18,7 +16,8 @@ public class AddVariablesColumnsStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) throws WrongCacheValueTypeException {
 
-        Set<String> variables = SparkImporterCache.getInstance().getAllCacheValues(SparkImporterCache.CACHE_VARIABLE_NAMES_AND_TYPES, String[].class).keySet();
+        Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
+        Set<String> variables = varMap.keySet();
 
         for(String v : variables) {
             dataset = dataset.select("*").withColumn(v, when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).equalTo(v),

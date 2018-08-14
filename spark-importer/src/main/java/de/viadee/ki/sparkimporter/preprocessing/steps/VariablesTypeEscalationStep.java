@@ -2,7 +2,7 @@ package de.viadee.ki.sparkimporter.preprocessing.steps;
 
 import de.viadee.ki.sparkimporter.exceptions.WrongCacheValueTypeException;
 import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterCache;
+import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -26,17 +26,17 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) throws WrongCacheValueTypeException {
 
         //get all distinct variable names
-        Map<String, String[]> variables = SparkImporterCache.getInstance().getAllCacheValues(SparkImporterCache.CACHE_VARIABLE_NAMES_AND_TYPES, String[].class);
+        Map<String, String> variables = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_RAW);
 
         String lastVariableName = "";
         String lastVariableType = "";
         int lastVariableMaxRevision = 0;
         int variableOccurences = 0;
         for (String variable : variables.keySet()) {
-            String type = variables.get(variable)[0];
-            int revision = Integer.parseInt(variables.get(variable)[1]);
+            String type = variables.get(variable);
+            int revision = 0;
 
-            processVariable(variable, type, revision, lastVariableName, lastVariableType, lastVariableMaxRevision, variableOccurences);
+            processVariable(variables, variable, type, revision, lastVariableName, lastVariableType, lastVariableMaxRevision, variableOccurences);
 
 
             if (!variable.equals(lastVariableName)) {
@@ -48,15 +48,17 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
             }
         }
         //handle last line
-        processVariable("", "",0, lastVariableName, lastVariableType, lastVariableMaxRevision, variableOccurences);
+        processVariable(variables, "", "",0, lastVariableName, lastVariableType, lastVariableMaxRevision, variableOccurences);
 
+        //update broadcasted variable
+        SparkBroadcastHelper.getInstance().broadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED, variables);
 
         //create new Dataset
         //write column names into list
         List<Row> filteredVariablesRows = new ArrayList<>();
 
         for (String key : variables.keySet()) {
-            filteredVariablesRows.add(RowFactory.create(key, variables.get(key)[0]));
+            filteredVariablesRows.add(RowFactory.create(key, variables.get(key)));
         }
 
         StructType schema = new StructType(new StructField[] {
@@ -79,7 +81,7 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
         return dataset;
     }
 
-    private void processVariable(String variableName, String variableType, int revision, String lastVariableName, String lastVariableType, int lastVariableMaxRevision, int variableOccurences) throws WrongCacheValueTypeException {
+    private void processVariable(Map<String, String> variables, String variableName, String variableType, int revision, String lastVariableName, String lastVariableType, int lastVariableMaxRevision, int variableOccurences) throws WrongCacheValueTypeException {
         if (variableName.equals(lastVariableName)) {
             variableOccurences++;
 
@@ -104,13 +106,13 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
             if (variableOccurences == 1) {
                 //only occurs once so add to list with correct tyoe
                 if (lastVariableType.equals("null") || lastVariableType.equals("")) {
-                    SparkImporterCache.getInstance().addValueToCache(SparkImporterCache.CACHE_VARIABLE_NAMES_AND_TYPES, lastVariableName, new String []{"string", lastVariableMaxRevision+""});
+                    variables.put(lastVariableName, "string");
                 } else {
-                    SparkImporterCache.getInstance().addValueToCache(SparkImporterCache.CACHE_VARIABLE_NAMES_AND_TYPES, lastVariableName, new String []{lastVariableType, lastVariableMaxRevision+""});
+                    variables.put(lastVariableName, lastVariableType);
                 }
             } else if(variableOccurences > 1) {
                 //occurred multiple types
-                SparkImporterCache.getInstance().addValueToCache(SparkImporterCache.CACHE_VARIABLE_NAMES_AND_TYPES, lastVariableName, new String []{lastVariableType, lastVariableMaxRevision+""});
+                variables.put(lastVariableName, lastVariableType);
             }
         }
     }
