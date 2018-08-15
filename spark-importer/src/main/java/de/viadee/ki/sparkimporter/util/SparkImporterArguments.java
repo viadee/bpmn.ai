@@ -9,8 +9,6 @@ public class SparkImporterArguments {
 
 	private static SparkImporterArguments sparkImporterArguments = null;
 
-	private static final String ID_ALL = "all";
-
 	@Parameter(names = { "--file-source",
 			"-fs" }, required = true, description = "Path an name of the CSV-File to be processed. You can generate the file with a query such as this one: SELECT *\r\n"
 					+ "FROM ACT_HI_PROCINST a\r\n" + "JOIN ACT_HI_VARINST v ON a.PROC_INST_ID_ = v.PROC_INST_ID_ \r\n"
