@@ -1,8 +1,6 @@
 package de.viadee.ki.sparkimporter.util;
 
 import com.beust.jcommander.Parameter;
-import de.viadee.ki.sparkimporter.util.validation.ParsingMethodValidator;
-import de.viadee.ki.sparkimporter.util.validation.ProcessIdValidator;
 
 /**
  * Configures command line parameters of the import application.
@@ -12,18 +10,6 @@ public class SparkImporterArguments {
 	private static SparkImporterArguments sparkImporterArguments = null;
 
 	private static final String ID_ALL = "all";
-
-	public static final String PARSING_METHOD_PROCESS = "process";
-
-	public static final String PARSING_METHOD_ACTIVITY = "activity";
-
-	@Parameter(names = { "--parsing-method",
-			"-pm" }, description = "Chooses a parsing method (either process or activity) and thereby the level of analysis. ", validateWith = ParsingMethodValidator.class)
-	private String parsingMethod = PARSING_METHOD_PROCESS;
-
-	@Parameter(names = { "--process-processId",
-			"-pid" }, description = "Optional parameter to only process a single process instance. ", validateWith = ProcessIdValidator.class)
-	private String processId = ID_ALL;
 
 	@Parameter(names = { "--file-source",
 			"-fs" }, required = true, description = "Path an name of the CSV-File to be processed. You can generate the file with a query such as this one: SELECT *\r\n"
@@ -57,10 +43,6 @@ public class SparkImporterArguments {
 		return revisionCount;
 	}
 
-	public String getProcessId() {
-		return processId;
-	}
-
 	public String getFileSource() {
 		return fileSource;
 	}
@@ -77,10 +59,6 @@ public class SparkImporterArguments {
 		return writeStepResultsToCSV;
 	}
 
-	public void setWriteStepResultsToCSV(boolean writeStepResultsToCSV) {
-		this.writeStepResultsToCSV = writeStepResultsToCSV;
-	}
-
 	/**
 	 * @return DataExtractorArguments-Instanz as Singleton
 	 */
@@ -93,8 +71,7 @@ public class SparkImporterArguments {
 
 	@Override
 	public String toString() {
-		return "SpringImporterArguments{" + "parsingMethod='" + parsingMethod + '\'' + ", processId='" + processId
-				+ '\'' + ", fileSource='" + fileSource + '\'' + ", delimiter='" + delimiter
+		return "SpringImporterArguments{" + "fileSource='" + fileSource + '\'' + ", delimiter='" + delimiter
 				+ '\'' + ", fileDestination='" + fileDestination + '\'' + ", revisionCount=" + revisionCount + '}';
 	}
 }
