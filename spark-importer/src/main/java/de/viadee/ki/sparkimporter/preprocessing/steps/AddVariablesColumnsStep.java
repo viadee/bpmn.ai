@@ -42,6 +42,7 @@ public class AddVariablesColumnsStep implements PreprocessingStepInterface {
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
+                SparkImporterVariables.VAR_DOUBLE,
                 SparkImporterVariables.VAR_LONG,
                 SparkImporterVariables.VAR_TEXT,
                 SparkImporterVariables.VAR_TEXT2);
