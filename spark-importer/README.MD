@@ -1,4 +1,4 @@
-# viadee Spark BPMN process data Importer
+# viadee Spark BPMN process data importer
 
 This is a Apache Spark application that takes data from an CSV export of Camunda history database tables and aggreates them to a data mining table containing one line per process instance including additional columns for every process variable.
 
