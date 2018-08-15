@@ -47,5 +47,5 @@ In order to run the application with spark-submit you first need to package the 
 	
 Then you can run the spark-submit command from the bin folder of your Apache Spark installation by referencing the created JAR file.
 
-	bin/spark-submit --class de.viadee.ki.sparkimporter.SparkImporterApplication --master "local[N]" --deploy-mode client --name ViadeeSparkImporter <path_to_packaged_jar> -fs <path_to_input_csv> -fd <path_to_target_folder_for_results> -d <field_delimiter>
+	bin/spark-submit --class de.viadee.ki.sparkimporter.SparkImporterApplication --master "local" --deploy-mode client --name ViadeeSparkImporter <path_to_packaged_jar> -fs <path_to_input_csv> -fd <path_to_target_folder_for_results> -d <field_delimiter>
 
