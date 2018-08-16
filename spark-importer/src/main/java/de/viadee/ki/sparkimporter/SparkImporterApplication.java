@@ -2,15 +2,13 @@ package de.viadee.ki.sparkimporter;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import de.viadee.ki.sparkimporter.Configuration.Configuration;
 import de.viadee.ki.sparkimporter.exceptions.NoDataImporterDefinedException;
 import de.viadee.ki.sparkimporter.importing.DataImportRunner;
 import de.viadee.ki.sparkimporter.importing.implementations.CSVDataImporter;
 import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.preprocessing.aggregation.AllButEmptyStringAggregationFunction;
-import de.viadee.ki.sparkimporter.preprocessing.steps.AddVariablesColumnsStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.AggregateToProcessInstanceaStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesTypesOccurenceStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.VariablesTypeEscalationStep;
+import de.viadee.ki.sparkimporter.preprocessing.steps.*;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.commons.io.FileUtils;
@@ -28,7 +26,7 @@ public class SparkImporterApplication {
 	public static SparkImporterArguments ARGS;
 
 	public static void main(String[] arguments) {
-
+		System.setProperty("hadoop.home.dir", "E:/hadoop_home");
 		final long startMillis = System.currentTimeMillis();
 
 		ARGS = SparkImporterArguments.getInstance();
@@ -82,6 +80,9 @@ public class SparkImporterApplication {
 			SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_unique_columns_result");
 		}
 
+		Configuration config= new Configuration();
+		config.createConfigFile(dataset);
+
 		// Define preprocessing steps to run
 		final PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
 
@@ -92,7 +93,8 @@ public class SparkImporterApplication {
 		preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
 		preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
 		preprocessingRunner.addPreprocessorStep(new AggregateToProcessInstanceaStep());
-		// preprocessingRunner.addPreprocessorStep(new
+		preprocessingRunner.addPreprocessorStep(new DropColumnsStep());
+		preprocessingRunner.addPreprocessorStep(new TypeCastStep());
 		// AddRemovedColumnsToDatasetStep());
 
 		// Run preprocessing runner

@@ -33,7 +33,7 @@ public class Configuration {
         config.put("config", configDetails);
         System.out.print(config);
 
-        try (FileWriter file = new FileWriter("/resources/pipeline_configuration.json")) {
+        try (FileWriter file = new FileWriter("pipeline_configuration.json")) {
 
             file.write(config.toJSONString());
             file.flush();
@@ -48,7 +48,7 @@ public class Configuration {
         JSONObject config= null;
         try {
 
-            Object obj = parser.parse(new FileReader("/resources/pipeline_configuration.json"));
+            Object obj = parser.parse(new FileReader("pipeline_configuration.json"));
 
             config = (JSONObject) obj;
             System.out.println(config);
