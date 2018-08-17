@@ -8,6 +8,9 @@ import org.apache.spark.sql.SaveMode;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -33,8 +36,15 @@ public class SparkImporterUtils {
     }
 
     private void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory, String delimiter) {
+
+        boolean aggreateCSVToOneFile = true;
+
+        if(aggreateCSVToOneFile) {
+            dataSet = dataSet.coalesce(1);
+        }
+
         //save dataset into CSV file
-        dataSet.coalesce(1)
+        dataSet
                 .write()
                 .option("header", "true")
                 .option("delimiter", delimiter)
@@ -42,9 +52,28 @@ public class SparkImporterUtils {
                 .option("ignoreTrailingWhiteSpace", "false")
                 .mode(SaveMode.Overwrite)
                 .csv(args.getFileDestination()+"/"+ String.format("%02d", PreprocessingRunner.getInstance().getNextCounter()) + "_" + subDirectory);
+
+        if(aggreateCSVToOneFile)
+            renameResultFile();
     }
 
-    public Dataset<Row> removeDuplicatedColumnsFromCSV(Dataset<Row> dataset) {
+    private void renameResultFile() {
+        //rename result file to deterministic name
+        SparkImporterArguments args = SparkImporterArguments.getInstance();
+        File dir = new File(args.getFileDestination()+"/"+ String.format("%02d", PreprocessingRunner.getInstance().getCounter()) + "_result");
+        if(!dir.isDirectory()) throw new IllegalStateException("Cannot find result folder!");
+        for(File file : dir.listFiles()) {
+            if(file.getName().startsWith("part-0000")) {
+                try {
+                    Files.copy(file.toPath(), new File(dir + "/../result.csv").toPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public Dataset<Row> removeDuplicatedColumns(Dataset<Row> dataset) {
         Dataset<Row> newDataset;
         //remove duplicated columns
         //find duplicated columns and their first name under which they occurred

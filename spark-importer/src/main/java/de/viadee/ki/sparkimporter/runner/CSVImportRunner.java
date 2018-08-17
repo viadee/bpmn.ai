@@ -38,7 +38,7 @@ public class CSVImportRunner implements ImportRunnerInterface {
         }
 
         // remove duplicated columns created at CSV import step
-        dataset = SparkImporterUtils.getInstance().removeDuplicatedColumnsFromCSV(dataset);
+        dataset = SparkImporterUtils.getInstance().removeDuplicatedColumns(dataset);
         dataset = SparkImporterUtils.getInstance().removeEmptyLinesAfterImport(dataset);
 
         // write imported unique column CSV structure to file for debugging

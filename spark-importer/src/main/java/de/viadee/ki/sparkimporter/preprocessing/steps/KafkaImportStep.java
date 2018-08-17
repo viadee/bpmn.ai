@@ -40,56 +40,43 @@ public class KafkaImportStep implements PreprocessingStepInterface {
                 "scopeActivityInstanceId"
         );
 
-        //create dataset for processInstance stream data
-        Dataset<Row> dspi = dataset.filter("topic == 'processInstance'");
-
-        //create dataset for variableUpdate stream data
-        Dataset<Row> dsvu = dataset.filter("topic == 'variableUpdate'");
-
-
-        //rename variableUpdate columns before merge
-        Dataset<Row> dsvu_ren = dsvu
-                .withColumnRenamed("variableName","name_")
-                .withColumnRenamed("longValue","long_")
-                .withColumnRenamed("doubleValue","double_")
-                .withColumnRenamed("textValue","text_")
-                .withColumnRenamed("complexValue","text2_")
-                .withColumnRenamed("serializerName","var_type_")
-                .withColumnRenamed("revision","rev_");
-
-        //merge
-        for(String columnName : dspi.columns()) {
-            dspi = dspi.withColumnRenamed(columnName, columnName.replaceAll("([A-Z])","_$1").concat("_").toLowerCase());
+        //rename columns
+        for(String columnName : dataset.columns()) {
+            dataset = dataset.withColumnRenamed(columnName, columnName.replaceAll("([A-Z])","_$1").concat("_").toLowerCase());
         }
 
-        Dataset<Row> merge = dspi.withColumnRenamed("process_instance_id_","processInstanceId").join(dsvu_ren, "processInstanceId");
-
-        //show result
-        dataset = merge
+        dataset = dataset
+                .withColumnRenamed("process_instance_id_", "proc_inst_id_")
+                .withColumnRenamed("duration_in_millis_", "duration_")
+                .withColumnRenamed("variable_name_", "name_")
+                .withColumnRenamed("long_value_", "long_")
+                .withColumnRenamed("double_value_", "double_")
+                .withColumnRenamed("text_value_", "text_")
+                .withColumnRenamed("complex_value_", "text2_")
+                .withColumnRenamed("serializer_name_", "var_type_")
+                .withColumnRenamed("revision_", "rev_")
                 .select("id_",
-                        "processInstanceId",
+                        "proc_inst_id_",
                         "business_key_",
                         "process_definition_key_",
                         "process_definition_id_",
                         "start_time_",
                         "end_time_",
-                        "duration_in_millis_",
+                        "duration_",
                         "state_",
+                        "event_type_",
                         "name_",
                         "var_type_",
                         "rev_",
                         "long_",
                         "double_",
                         "text_",
-                        "text2_")
-                .withColumnRenamed("processInstanceId", "proc_inst_id_")
-                .withColumnRenamed("duration_in_millis_", "duration_");
+                        "text2_");
 
         //convert all columns to string
         for(String columnName : dataset.columns()) {
             dataset = dataset.withColumn(columnName, dataset.col(columnName).cast("string").as(columnName));
         }
-
 
         // write imported CSV structure to file for debugging
         if (SparkImporterArguments.getInstance().isWriteStepResultsToCSV()) {
