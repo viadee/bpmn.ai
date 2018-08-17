@@ -1,10 +1,7 @@
 package de.viadee.ki.sparkimporter.runner;
 
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariablesColumnsStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateToProcessInstanceaStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.GetVariablesTypesOccurenceStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.output.DataSinkFilterStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
@@ -32,12 +29,12 @@ public class KafkaDataProcessingRunner implements ImportRunnerInterface {
         // it's faster if we do not reduce the dataset columns in the beginning and
         // rejoin the dataset later, left steps in commented if required later
         preprocessingRunner.addPreprocessorStep(new DataSinkFilterStep());
-        // preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
+        preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
         preprocessingRunner.addPreprocessorStep(new AggregateToProcessInstanceaStep());
-        // preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
+        preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 
         // Run processing runner

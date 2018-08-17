@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.spark.sql.functions.asc;
+import static org.apache.spark.sql.functions.desc;
+
 public class AggregateToProcessInstanceaStep implements PreprocessingStepInterface {
 
     @Override
@@ -24,17 +27,24 @@ public class AggregateToProcessInstanceaStep implements PreprocessingStepInterfa
         Map<String, String> aggregationMap = new HashMap<>();
         for(String column : dataset.columns()) {
             if(column.endsWith("_rev") || dateFormatColumns.contains(column)) {
-                aggregationMap.put(column, "max");
+                aggregationMap.put(column, "first");
             } else {
                 aggregationMap.put(column, "AllButEmptyString");
             }
         }
-        dataset = dataset.groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).agg(aggregationMap);
+
+
+        //first aggregation
+        dataset = dataset
+                .orderBy(desc("timestamp_"))
+                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
+                .agg(aggregationMap);
 
         //cleanup, so renaming columns and dropping not used ones
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
+        dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
-        String pattern = "max\\((.+)\\)";
+        String pattern = "first\\((.+)\\)";
         String pattern2 = "allbutemptystring\\((.+)\\)";
         Pattern r = Pattern.compile(pattern);
         Pattern r2 = Pattern.compile(pattern2);
@@ -51,6 +61,28 @@ public class AggregateToProcessInstanceaStep implements PreprocessingStepInterfa
             }
         }
 
+
+        //second aggregation
+        dataset = dataset
+                //.orderBy(asc(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID), asc(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME), desc("timestamp_"))
+                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
+                .agg(aggregationMap);
+
+        //cleanup again, so renaming columns and dropping not used ones
+        dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
+        dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+
+        for(String columnName : dataset.columns()) {
+            Matcher m = r.matcher(columnName);
+            Matcher m2 = r2.matcher(columnName);
+            if(m.find()) {
+                String newColumnName = m.group(1);
+                dataset = dataset.withColumnRenamed(columnName, newColumnName);
+            } else if(m2.find()) {
+                String newColumnName = m2.group(1);
+                dataset = dataset.withColumnRenamed(columnName, newColumnName);
+            }
+        }
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_to_process_instance");

@@ -18,7 +18,7 @@ public class KafkaImportStep implements PreprocessingStepInterface {
                 "caseDefinitionKey",
                 "caseDefinitionName",
                 "eventType",
-                "sequenceCounter",
+                //"sequenceCounter",
                 "superProcessInstanceId",
                 "superCaseInstanceId",
                 "endActivityId",
@@ -27,14 +27,14 @@ public class KafkaImportStep implements PreprocessingStepInterface {
                 "activityId",
                 "activityName",
                 "activityType",
-                "activityInstanceId",
+                //"activityInstanceId",
                 "activityInstanceState",
                 "parentActivityInstanceId",
                 "calledProcessInstanceId",
                 "calledCaseInstanceId",
                 "taskId",
                 "taskAssignee",
-                "timestamp",
+                //"timestamp",
                 "userOperationId",
                 "variableInstanceId",
                 "scopeActivityInstanceId"
@@ -55,16 +55,23 @@ public class KafkaImportStep implements PreprocessingStepInterface {
                 .withColumnRenamed("complex_value_", "text2_")
                 .withColumnRenamed("serializer_name_", "var_type_")
                 .withColumnRenamed("revision_", "rev_")
+                .withColumnRenamed("process_definition_key_", "proc_def_key_")
+                .withColumnRenamed("process_definition_id_", "proc_def_id_")
+                .withColumnRenamed("activity_instance_id_", "act_inst_id_")
+                .withColumnRenamed("revision_", "rev_")
                 .select("id_",
                         "proc_inst_id_",
                         "business_key_",
-                        "process_definition_key_",
-                        "process_definition_id_",
+                        "proc_def_key_",
+                        "proc_def_id_",
+                        "act_inst_id_",
                         "start_time_",
                         "end_time_",
                         "duration_",
                         "state_",
                         "name_",
+                        "sequence_counter_",
+                        "timestamp_",
                         "var_type_",
                         "rev_",
                         "long_",

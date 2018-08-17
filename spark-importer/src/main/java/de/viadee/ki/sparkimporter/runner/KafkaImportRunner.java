@@ -66,8 +66,6 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         JavaSparkContext jsc = new JavaSparkContext(sparkSession.sparkContext());
         JavaStreamingContext jssc = new JavaStreamingContext(jsc, Duration.apply(duration));
 
-        Collection<String> topics = Arrays.asList(new String[]{"processInstance","variableUpdate"});
-
         // Create direct kafka stream with brokers and topics
         JavaInputDStream<ConsumerRecord<String, String>> processInstances = KafkaUtils.createDirectStream(
                 jssc,
