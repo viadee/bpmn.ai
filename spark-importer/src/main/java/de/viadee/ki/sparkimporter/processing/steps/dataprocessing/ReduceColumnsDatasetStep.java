@@ -15,6 +15,7 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
+                SparkImporterVariables.VAR_STATE,
                 SparkImporterVariables.VAR_LONG,
                 SparkImporterVariables.VAR_TEXT,
                 SparkImporterVariables.VAR_TEXT2)

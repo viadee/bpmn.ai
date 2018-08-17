@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.spark.sql.functions.asc;
 import static org.apache.spark.sql.functions.desc;
+import static org.apache.spark.sql.functions.isnull;
 
 public class AggregateToProcessInstanceaStep implements PreprocessingStepInterface {
 
@@ -26,37 +26,42 @@ public class AggregateToProcessInstanceaStep implements PreprocessingStepInterfa
 
         Map<String, String> aggregationMap = new HashMap<>();
         for(String column : dataset.columns()) {
-            if(column.endsWith("_rev") || dateFormatColumns.contains(column)) {
+            if(column.endsWith("_rev")) {
+                aggregationMap.put(column, "max");
+            } else if(dateFormatColumns.contains(column)) {
                 aggregationMap.put(column, "first");
+            } else if(column.equals(SparkImporterVariables.VAR_STATE)) {
+                aggregationMap.put(column, "ProcessState");
             } else {
                 aggregationMap.put(column, "AllButEmptyString");
             }
         }
 
-
         //first aggregation
-        dataset = dataset
+        //take only variableUpdate rows
+        Dataset<Row> datasetVUAgg = dataset
+                .filter(isnull(dataset.col("state_")))
                 .orderBy(desc("timestamp_"))
                 .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
                 .agg(aggregationMap);
 
         //cleanup, so renaming columns and dropping not used ones
-        dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
-        dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+        datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
+        datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
-        String pattern = "first\\((.+)\\)";
-        String pattern2 = "allbutemptystring\\((.+)\\)";
+        //union again with processInstance rows
+        dataset
+                .filter(isnull(dataset.col("name_")))
+                .union(datasetVUAgg);
+
+
+        String pattern = "(first|max|allbutemptystring|processstate)\\((.+)\\)";
         Pattern r = Pattern.compile(pattern);
-        Pattern r2 = Pattern.compile(pattern2);
 
         for(String columnName : dataset.columns()) {
             Matcher m = r.matcher(columnName);
-            Matcher m2 = r2.matcher(columnName);
             if(m.find()) {
-                String newColumnName = m.group(1);
-                dataset = dataset.withColumnRenamed(columnName, newColumnName);
-            } else if(m2.find()) {
-                String newColumnName = m2.group(1);
+                String newColumnName = m.group(2);
                 dataset = dataset.withColumnRenamed(columnName, newColumnName);
             }
         }
@@ -74,12 +79,8 @@ public class AggregateToProcessInstanceaStep implements PreprocessingStepInterfa
 
         for(String columnName : dataset.columns()) {
             Matcher m = r.matcher(columnName);
-            Matcher m2 = r2.matcher(columnName);
             if(m.find()) {
-                String newColumnName = m.group(1);
-                dataset = dataset.withColumnRenamed(columnName, newColumnName);
-            } else if(m2.find()) {
-                String newColumnName = m2.group(1);
+                String newColumnName = m.group(2);
                 dataset = dataset.withColumnRenamed(columnName, newColumnName);
             }
         }

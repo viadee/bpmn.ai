@@ -10,36 +10,6 @@ public class KafkaImportStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
 
-        //drop unimportant columns
-        dataset = dataset.drop(
-                "caseInstanceId",
-                "caseExecutionId",
-                "caseDefinitionId",
-                "caseDefinitionKey",
-                "caseDefinitionName",
-                "eventType",
-                //"sequenceCounter",
-                "superProcessInstanceId",
-                "superCaseInstanceId",
-                "endActivityId",
-                "startActivityId",
-                "tenantId",
-                "activityId",
-                "activityName",
-                "activityType",
-                //"activityInstanceId",
-                "activityInstanceState",
-                "parentActivityInstanceId",
-                "calledProcessInstanceId",
-                "calledCaseInstanceId",
-                "taskId",
-                "taskAssignee",
-                //"timestamp",
-                "userOperationId",
-                "variableInstanceId",
-                "scopeActivityInstanceId"
-        );
-
         //rename columns
         for(String columnName : dataset.columns()) {
             dataset = dataset.withColumnRenamed(columnName, columnName.replaceAll("([A-Z])","_$1").concat("_").toLowerCase());
@@ -58,28 +28,9 @@ public class KafkaImportStep implements PreprocessingStepInterface {
                 .withColumnRenamed("process_definition_key_", "proc_def_key_")
                 .withColumnRenamed("process_definition_id_", "proc_def_id_")
                 .withColumnRenamed("activity_instance_id_", "act_inst_id_")
-                .withColumnRenamed("revision_", "rev_")
-                .select("id_",
-                        "proc_inst_id_",
-                        "business_key_",
-                        "proc_def_key_",
-                        "proc_def_id_",
-                        "act_inst_id_",
-                        "start_time_",
-                        "end_time_",
-                        "duration_",
-                        "state_",
-                        "name_",
-                        "sequence_counter_",
-                        "timestamp_",
-                        "var_type_",
-                        "rev_",
-                        "long_",
-                        "double_",
-                        "text_",
-                        "text2_");
+                .withColumnRenamed("revision_", "rev_");
 
-        //convert all columns to string
+        //convert all columns to string in order to be able to select the correct value for variables and to extract json structure in variables
         for(String columnName : dataset.columns()) {
             dataset = dataset.withColumn(columnName, dataset.col(columnName).cast("string").as(columnName));
         }

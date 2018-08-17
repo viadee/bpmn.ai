@@ -3,6 +3,7 @@ package de.viadee.ki.sparkimporter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggregationFunction;
+import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.runner.KafkaDataProcessingRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 import org.apache.commons.io.FileUtils;
@@ -44,6 +45,7 @@ public class SparkImporterKafkaDataProcessingApplication {
 
 		// register our own aggregation function
 		sparkSession.udf().register("AllButEmptyString", new AllButEmptyStringAggregationFunction());
+		sparkSession.udf().register("ProcessState", new ProcessStatesAggregationFunction());
 
 		KafkaDataProcessingRunner kafkaDataProcessingRunner = new KafkaDataProcessingRunner();
 		kafkaDataProcessingRunner.run(sparkSession);

@@ -12,6 +12,8 @@ public class InitialCleanupStep implements PreprocessingStepInterface {
 
         // remove duplicated columns created at CSV import step
         dataset = SparkImporterUtils.getInstance().removeDuplicatedColumns(dataset);
+
+        //TODO: comment why
         dataset = SparkImporterUtils.getInstance().removeEmptyLinesAfterImport(dataset);
 
         // write imported unique column CSV structure to file for debugging
