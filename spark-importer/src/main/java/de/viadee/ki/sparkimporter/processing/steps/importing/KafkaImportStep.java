@@ -64,7 +64,6 @@ public class KafkaImportStep implements PreprocessingStepInterface {
                         "end_time_",
                         "duration_",
                         "state_",
-                        "event_type_",
                         "name_",
                         "var_type_",
                         "rev_",
