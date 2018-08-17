@@ -10,19 +10,12 @@ import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.Duration;
-import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.apache.spark.streaming.kafka010.ConsumerStrategies;
 import org.apache.spark.streaming.kafka010.KafkaUtils;
-import org.apache.spark.streaming.kafka010.LocationStrategies;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.modules.junit4.legacy.PowerMockRunner;
-
-import java.util.*;
 
 //@RunWith(PowerMockRunner.class)
 public class SparkImporterApplicationKafkaTest {

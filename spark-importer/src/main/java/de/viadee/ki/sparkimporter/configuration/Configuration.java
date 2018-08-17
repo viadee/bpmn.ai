@@ -1,4 +1,4 @@
-package de.viadee.ki.sparkimporter.Configuration;
+package de.viadee.ki.sparkimporter.configuration;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

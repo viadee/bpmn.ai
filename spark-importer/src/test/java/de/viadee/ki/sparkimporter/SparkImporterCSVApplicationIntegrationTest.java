@@ -1,22 +1,17 @@
 package de.viadee.ki.sparkimporter;
 
-import com.google.common.collect.ObjectArrays;
-import de.viadee.ki.sparkimporter.importing.DataImportRunner;
-import de.viadee.ki.sparkimporter.importing.implementations.CSVDataImporter;
 import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.preprocessing.steps.AddVariablesColumnsStep;
 import de.viadee.ki.sparkimporter.preprocessing.steps.AggregateToProcessInstanceaStep;
 import de.viadee.ki.sparkimporter.preprocessing.steps.GetVariablesTypesOccurenceStep;
 import de.viadee.ki.sparkimporter.preprocessing.steps.VariablesTypeEscalationStep;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
-import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -29,7 +24,7 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class SparkImporterApplicationIntegrationTest {
+public class SparkImporterCSVApplicationIntegrationTest {
 
     private static final String TEST_INPUT_FILE_NAME = "./src/test/resources/integration_test_file.csv";
 
@@ -47,8 +42,6 @@ public class SparkImporterApplicationIntegrationTest {
         SparkConf sparkConf = new SparkConf();
         sparkConf.setJars(
                 combine(
-                        JavaSparkContext.jarOfClass(DataImportRunner.class.getClass()),
-                        JavaSparkContext.jarOfClass(CSVDataImporter.class.getClass()),
                         JavaSparkContext.jarOfClass(SparkImporterUtils.class.getClass()),
                         JavaSparkContext.jarOfClass(GetVariablesTypesOccurenceStep.class.getClass()),
                         JavaSparkContext.jarOfClass(VariablesTypeEscalationStep.class.getClass()),
@@ -63,7 +56,7 @@ public class SparkImporterApplicationIntegrationTest {
         SparkSession.builder().config(sparkConf).getOrCreate();
 
         // run main class
-        SparkImporterApplication.main(args);
+        SparkImporterCSVApplication.main(args);
 
         //read result csv
         BufferedReader resultFileReader = new BufferedReader(new FileReader(new File(TEST_OUTPUT_FILE_NAME)));
