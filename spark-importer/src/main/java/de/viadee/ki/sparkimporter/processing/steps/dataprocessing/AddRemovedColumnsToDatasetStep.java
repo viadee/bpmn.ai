@@ -29,17 +29,17 @@ public class AddRemovedColumnsToDatasetStep implements PreprocessingStepInterfac
                 SparkImporterVariables.VAR_DURATION,
                 SparkImporterVariables.VAR_START_USER_ID,
                 SparkImporterVariables.VAR_ACT_INST_ID,
-                SparkImporterVariables.VAR_START_ACT_ID,
-                SparkImporterVariables.VAR_END_ACT_ID,
-                SparkImporterVariables.VAR_CASE_INST_ID,
-                SparkImporterVariables.VAR_CASE_EXECUTION_ID,
-                SparkImporterVariables.VAR_CASE_DEF_ID,
-                SparkImporterVariables.VAR_CASE_DEF_KEY,
+                //SparkImporterVariables.VAR_START_ACT_ID,
+                //SparkImporterVariables.VAR_END_ACT_ID,
+                //SparkImporterVariables.VAR_CASE_INST_ID,
+                //SparkImporterVariables.VAR_CASE_EXECUTION_ID,
+                //SparkImporterVariables.VAR_CASE_DEF_ID,
+                //SparkImporterVariables.VAR_CASE_DEF_KEY,
                 SparkImporterVariables.VAR_TASK_ID,
                 SparkImporterVariables.VAR_DELETE_REASON,
-                SparkImporterVariables.VAR_TENANT_ID,
-                SparkImporterVariables.VAR_STATE,
-                SparkImporterVariables.VAR_BYTEARRAY_ID
+                SparkImporterVariables.VAR_TENANT_ID
+                //SparkImporterVariables.VAR_STATE
+                //SparkImporterVariables.VAR_BYTEARRAY_ID
         )
                 .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
                 .agg(
@@ -55,17 +55,17 @@ public class AddRemovedColumnsToDatasetStep implements PreprocessingStepInterfac
                         first(SparkImporterVariables.VAR_DURATION).as(SparkImporterVariables.VAR_DURATION),
                         first(SparkImporterVariables.VAR_START_USER_ID).as(SparkImporterVariables.VAR_START_USER_ID),
                         first(SparkImporterVariables.VAR_ACT_INST_ID).as(SparkImporterVariables.VAR_ACT_INST_ID),
-                        first(SparkImporterVariables.VAR_START_ACT_ID).as(SparkImporterVariables.VAR_START_ACT_ID),
-                        first(SparkImporterVariables.VAR_END_ACT_ID).as(SparkImporterVariables.VAR_END_ACT_ID),
-                        first(SparkImporterVariables.VAR_CASE_INST_ID).as(SparkImporterVariables.VAR_CASE_INST_ID),
-                        first(SparkImporterVariables.VAR_CASE_EXECUTION_ID).as(SparkImporterVariables.VAR_CASE_EXECUTION_ID),
-                        first(SparkImporterVariables.VAR_CASE_DEF_ID).as(SparkImporterVariables.VAR_CASE_DEF_ID),
-                        first(SparkImporterVariables.VAR_CASE_DEF_KEY).as(SparkImporterVariables.VAR_CASE_DEF_KEY),
+                        //first(SparkImporterVariables.VAR_START_ACT_ID).as(SparkImporterVariables.VAR_START_ACT_ID),
+                        //first(SparkImporterVariables.VAR_END_ACT_ID).as(SparkImporterVariables.VAR_END_ACT_ID),
+                        //first(SparkImporterVariables.VAR_CASE_INST_ID).as(SparkImporterVariables.VAR_CASE_INST_ID),
+                        //first(SparkImporterVariables.VAR_CASE_EXECUTION_ID).as(SparkImporterVariables.VAR_CASE_EXECUTION_ID),
+                        //first(SparkImporterVariables.VAR_CASE_DEF_ID).as(SparkImporterVariables.VAR_CASE_DEF_ID),
+                        //first(SparkImporterVariables.VAR_CASE_DEF_KEY).as(SparkImporterVariables.VAR_CASE_DEF_KEY),
                         first(SparkImporterVariables.VAR_TASK_ID).as(SparkImporterVariables.VAR_TASK_ID),
                         first(SparkImporterVariables.VAR_DELETE_REASON).as(SparkImporterVariables.VAR_DELETE_REASON),
-                        first(SparkImporterVariables.VAR_TENANT_ID).as(SparkImporterVariables.VAR_TENANT_ID),
-                        first(SparkImporterVariables.VAR_STATE).as(SparkImporterVariables.VAR_STATE),
-                        first(SparkImporterVariables.VAR_BYTEARRAY_ID).as(SparkImporterVariables.VAR_BYTEARRAY_ID)
+                        first(SparkImporterVariables.VAR_TENANT_ID).as(SparkImporterVariables.VAR_TENANT_ID)
+                        //first(SparkImporterVariables.VAR_STATE).as(SparkImporterVariables.VAR_STATE)
+                        //first(SparkImporterVariables.VAR_BYTEARRAY_ID).as(SparkImporterVariables.VAR_BYTEARRAY_ID)
                 ).withColumnRenamed(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
 
         dataset = dataset.join(initialDataset, col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).equalTo(col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right")), "left");

@@ -39,19 +39,29 @@ public class AggregateToProcessInstanceaStep implements PreprocessingStepInterfa
 
         //first aggregation
         //take only variableUpdate rows
-        Dataset<Row> datasetVUAgg = dataset
-                .filter(isnull(dataset.col("state_")))
-                .orderBy(desc("timestamp_"))
-                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
-                .agg(aggregationMap);
+
+        Dataset<Row> datasetVUAgg = null;
+
+        if(Arrays.asList(dataset.columns()).contains("timestamp_")) {
+            datasetVUAgg = dataset
+                    .filter(isnull(dataset.col("state_")))
+                    .orderBy(desc("timestamp_"))
+                    .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
+                    .agg(aggregationMap);
+        } else {
+            datasetVUAgg = dataset
+                    .filter(isnull(dataset.col("state_")))
+                    .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
+                    .agg(aggregationMap);
+        }
 
         //cleanup, so renaming columns and dropping not used ones
         datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
         datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
         //union again with processInstance rows
-        dataset
-                .filter(isnull(dataset.col("name_")))
+        dataset = dataset
+                .filter(isnull(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)))
                 .union(datasetVUAgg);
 
 
