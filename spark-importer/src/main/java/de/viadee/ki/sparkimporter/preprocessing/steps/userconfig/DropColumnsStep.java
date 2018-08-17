@@ -1,4 +1,4 @@
-package de.viadee.ki.sparkimporter.preprocessing.steps;
+package de.viadee.ki.sparkimporter.preprocessing.steps.userconfig;
 
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStepInterface;
