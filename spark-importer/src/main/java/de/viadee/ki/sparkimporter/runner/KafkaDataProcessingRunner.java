@@ -1,12 +1,12 @@
 package de.viadee.ki.sparkimporter.runner;
 
-import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.preprocessing.steps.dataprocessing.AddVariablesColumnsStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.dataprocessing.AggregateToProcessInstanceaStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.dataprocessing.GetVariablesTypesOccurenceStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.dataprocessing.VariablesTypeEscalationStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.output.DataSinkFilterStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.output.WriteToCSVStep;
+import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariablesColumnsStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateToProcessInstanceaStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.GetVariablesTypesOccurenceStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
+import de.viadee.ki.sparkimporter.processing.steps.output.DataSinkFilterStep;
+import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 import org.apache.spark.sql.Dataset;
@@ -26,7 +26,7 @@ public class KafkaDataProcessingRunner implements ImportRunnerInterface {
         System.out.println("================ STARTING PROCESSING DATA ================");
 
         //go through pipe elements
-        // Define preprocessing steps to run
+        // Define processing steps to run
         final PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
 
         // it's faster if we do not reduce the dataset columns in the beginning and
@@ -40,7 +40,7 @@ public class KafkaDataProcessingRunner implements ImportRunnerInterface {
         // preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 
-        // Run preprocessing runner
+        // Run processing runner
         preprocessingRunner.run(dataset, SparkImporterArguments.getInstance().isWriteStepResultsToCSV());
 
         // Cleanup

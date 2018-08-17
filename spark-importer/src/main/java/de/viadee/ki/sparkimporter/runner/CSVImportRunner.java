@@ -1,14 +1,14 @@
 package de.viadee.ki.sparkimporter.runner;
 
 import de.viadee.ki.sparkimporter.configuration.Configuration;
-import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.preprocessing.steps.dataprocessing.AddVariablesColumnsStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.dataprocessing.AggregateToProcessInstanceaStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.dataprocessing.GetVariablesTypesOccurenceStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.dataprocessing.VariablesTypeEscalationStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.output.WriteToCSVStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.userconfig.DropColumnsStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.userconfig.TypeCastStep;
+import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariablesColumnsStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateToProcessInstanceaStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.GetVariablesTypesOccurenceStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
+import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
+import de.viadee.ki.sparkimporter.processing.steps.userconfig.DropColumnsStep;
+import de.viadee.ki.sparkimporter.processing.steps.userconfig.TypeCastStep;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -55,7 +55,7 @@ public class CSVImportRunner implements ImportRunnerInterface {
         Configuration config= new Configuration();
         config.createConfigFile(dataset);
 
-        // Define preprocessing steps to run
+        // Define processing steps to run
         final PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
 
         // it's faster if we do not reduce the dataset columns in the beginning and
@@ -70,7 +70,7 @@ public class CSVImportRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new TypeCastStep());
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 
-        // Run preprocessing runner
+        // Run processing runner
         preprocessingRunner.run(dataset, SparkImporterArguments.getInstance().isWriteStepResultsToCSV());
 
         // Cleanup

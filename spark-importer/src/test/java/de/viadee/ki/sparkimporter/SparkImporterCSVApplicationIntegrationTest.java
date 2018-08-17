@@ -1,10 +1,10 @@
 package de.viadee.ki.sparkimporter;
 
-import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.preprocessing.steps.dataprocessing.AddVariablesColumnsStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.dataprocessing.AggregateToProcessInstanceaStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.dataprocessing.GetVariablesTypesOccurenceStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.dataprocessing.VariablesTypeEscalationStep;
+import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariablesColumnsStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateToProcessInstanceaStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.GetVariablesTypesOccurenceStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.commons.codec.digest.DigestUtils;

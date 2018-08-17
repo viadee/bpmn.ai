@@ -1,9 +1,9 @@
 package de.viadee.ki.sparkimporter.runner;
 
-import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.preprocessing.steps.importing.InitialCleanupStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.importing.KafkaImportStep;
-import de.viadee.ki.sparkimporter.preprocessing.steps.output.WriteToDataSinkStep;
+import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
+import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
+import de.viadee.ki.sparkimporter.processing.steps.importing.KafkaImportStep;
+import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -138,7 +138,7 @@ public class KafkaImportRunner implements ImportRunnerInterface {
     private synchronized void writeMasterDataset() {
 
         //go through pipe elements
-        // Define preprocessing steps to run
+        // Define processing steps to run
         final PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
 
         // it's faster if we do not reduce the dataset columns in the beginning and
@@ -147,7 +147,7 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new InitialCleanupStep());
         preprocessingRunner.addPreprocessorStep(new WriteToDataSinkStep());
 
-        // Run preprocessing runner
+        // Run processing runner
         preprocessingRunner.run(masterDataset, false);
 
     }

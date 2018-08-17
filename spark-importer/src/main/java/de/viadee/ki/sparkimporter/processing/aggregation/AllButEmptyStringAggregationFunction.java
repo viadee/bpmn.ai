@@ -1,4 +1,4 @@
-package de.viadee.ki.sparkimporter.preprocessing.aggregation;
+package de.viadee.ki.sparkimporter.processing.aggregation;
 
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.expressions.MutableAggregationBuffer;

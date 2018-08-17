@@ -2,7 +2,7 @@ package de.viadee.ki.sparkimporter;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import de.viadee.ki.sparkimporter.preprocessing.aggregation.AllButEmptyStringAggregationFunction;
+import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggregationFunction;
 import de.viadee.ki.sparkimporter.runner.KafkaDataProcessingRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 import org.apache.commons.io.FileUtils;

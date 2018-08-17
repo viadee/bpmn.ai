@@ -1,6 +1,6 @@
-package de.viadee.ki.sparkimporter.preprocessing;
+package de.viadee.ki.sparkimporter.processing;
 
-import de.viadee.ki.sparkimporter.preprocessing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 

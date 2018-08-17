@@ -28,7 +28,7 @@ public class Configuration {
         JSONArray variables= addVariableConfig(dataset);
         preprocessingDetails.put("variable_configuration", variables);
         configDetails.put("data_extraction", extractionDetails);
-        configDetails.put("preprocessing", preprocessingDetails);
+        configDetails.put("processing", preprocessingDetails);
         configDetails.put("model_learning", learningDetails);
         config.put("config", configDetails);
         System.out.print(config);

@@ -1,6 +1,6 @@
 package de.viadee.ki.sparkimporter.util;
 
-import de.viadee.ki.sparkimporter.preprocessing.PreprocessingRunner;
+import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
