@@ -4,112 +4,72 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.viadee.ki.sparkimporter.events.ActivityInstanceEvent;
 import de.viadee.ki.sparkimporter.events.ProcessInstanceEvent;
 import de.viadee.ki.sparkimporter.events.VariableUpdateEvent;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.MockConsumer;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.VoidFunction;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.streaming.Duration;
-import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.apache.spark.streaming.dstream.ConstantInputDStream;
-import org.apache.spark.streaming.kafka010.*;
+import org.apache.spark.streaming.kafka010.ConsumerStrategies;
+import org.apache.spark.streaming.kafka010.KafkaUtils;
+import org.apache.spark.streaming.kafka010.LocationStrategies;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.kafka.test.rule.KafkaEmbedded;
+import org.springframework.kafka.test.utils.KafkaTestUtils;
 
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
-
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"javax.security.*", "javax.management.*"})
-@PrepareForTest({KafkaUtils.class})
 public class SparkImporterKafkaApplicationIntegrationTest {
 
-
-    private MockConsumer consumer;
-    private Collection<String> topics;
-    private JavaStreamingContext jssc;
+    @ClassRule
+    public static KafkaEmbedded embeddedKafka = new KafkaEmbedded(
+            1, true, 3, "processInstance", "variableUpdate");
 
     @Before
     public void setupKafkaMock() throws Exception {
 
+
         // Mock Kafka erzeugen
-
-        System.setProperty("HADOOP_USER_NAME","something-you-like");
-
 
         String topic0 = "processInstance";
         String topic1 = "activityInstance";
         String topic2 = "variableUpdate";
 
-        Collection<TopicPartition> partitions = new ArrayList<>();
-        Collection<String> topicsCollection = new ArrayList<>();
-        partitions.add(new TopicPartition(topic0, 1));
-        partitions.add(new TopicPartition(topic1, 2));
-        partitions.add(new TopicPartition(topic2, 3));
-
-        Map<TopicPartition, Long> partitionsBeginningMap = new HashMap<>();
-        Map<TopicPartition, Long> partitionsEndMap = new HashMap<>();
-
-        // Anzahl Records und Partitionen initialisieren
-        long records = 20;
-        for (TopicPartition partition : partitions) {
-            partitionsBeginningMap.put(partition, 0l);
-            partitionsEndMap.put(partition, records);
-            topicsCollection.add(partition.topic());
-        }
-
-        topics = topicsCollection;
-
-        // Mock Consumer Einstellungen
-        MockConsumer<String, String> testConsumer = new MockConsumer<>(
-                OffsetResetStrategy.EARLIEST);
-        testConsumer.subscribe(topicsCollection);
-        testConsumer.rebalance(partitions);
-        testConsumer.updateBeginningOffsets(partitionsBeginningMap);
-        testConsumer.updateEndOffsets(partitionsEndMap);
-
-        // Testdaten (4 Stück)
-
-        ConsumerRecord<String, String> record0 = new ConsumerRecord<>(topic0, 1, 1, null, generateProcessData1());
-        testConsumer.addRecord(record0);
-        ConsumerRecord<String, String> record1 = new ConsumerRecord<>(topic0, 1, 2, null, generateProcessData2());
-        testConsumer.addRecord(record1);
-        ConsumerRecord<String, String> record2 = new ConsumerRecord<>(topic1, 2, 3, null, generateActivityData());
-        testConsumer.addRecord(record2);
-        ConsumerRecord<String, String> record3 = new ConsumerRecord<>(topic2, 3, 4, null, generateVariableUpdateData());
-        testConsumer.addRecord(record3);
-
-        consumer = testConsumer;
-
-
+        // Create Mock Data
+        Map<String, Object> senderProps = KafkaTestUtils.producerProps(embeddedKafka);
+        KafkaProducer<Integer, String> producer = new KafkaProducer<>(senderProps);
+        producer.send(new ProducerRecord<>("processInstance", 0, 0, "message0")).get();
+        producer.send(new ProducerRecord<>("processInstance", 0, 1, "message1")).get();
+        producer.send(new ProducerRecord<>("processInstance", 1, 2, "message2")).get();
+        producer.send(new ProducerRecord<>("processInstance", 1, 3, "message3")).get();
 
 
     }
 
-    @Mock
-    JavaStreamingContext streamingContext;
 
-    //@Test
+    @Test
     public void testKafkaUtils() throws Exception {
+
+        Map<String, Object> consumerProps =
+                KafkaTestUtils.consumerProps("sampleRawConsumer", "false", embeddedKafka);
 
         String topic0 = "processInstance";
         String topic1 = "activityInstance";
         String topic2 = "variableUpdate";
 
-        SparkConf conf = new SparkConf().setMaster("local[*]").setAppName(this.getClass().getSimpleName());
-        jssc = new JavaStreamingContext(conf, new Duration(1000));
+        SparkSession sparkSession = SparkSession.builder()
+                .master("local[*]")
+                .appName(this.getClass().getSimpleName())
+                .getOrCreate();
 
         List<ConsumerRecord<String, String>> list = new ArrayList<>();
         list.add(new ConsumerRecord<>(topic0, 1, 1, null, generateProcessData1()));
@@ -117,27 +77,29 @@ public class SparkImporterKafkaApplicationIntegrationTest {
         list.add(new ConsumerRecord<>(topic1, 2, 3, null, generateActivityData()));
         list.add(new ConsumerRecord<>(topic2, 3, 4, null, generateVariableUpdateData()));
 
-        Queue<JavaRDD<ConsumerRecord<String, String>>> rddQueue = new LinkedList<>();
-        rddQueue.add(jssc.sparkContext().parallelize(list));
-        JavaDStream<ConsumerRecord<String, String>> dStream = jssc.queueStream(rddQueue);
+        // list of host:port pairs used for establishing the initial connections to the Kafka cluster
+        final Map<String, Object> kafkaConsumerConfig  = new HashMap<>();
+        kafkaConsumerConfig.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, consumerProps.get("bootstrap.servers"));
+        kafkaConsumerConfig.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        kafkaConsumerConfig.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        // allows a pool of processes to divide the work of consuming and processing records
+        kafkaConsumerConfig.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString());
+        // automatically reset the offset to the earliest offset
+        kafkaConsumerConfig.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        PowerMockito.mockStatic(KafkaUtils.class);
+        // Create context with a x seconds batch interval
+        JavaSparkContext jsc = new JavaSparkContext(sparkSession.sparkContext());
+        JavaStreamingContext jssc = new JavaStreamingContext(jsc, Duration.apply(10000));
 
-        ConstantInputDStream<ConsumerRecord<String, String>> constantInputDStream = new ConstantInputDStream(jssc.ssc(), jssc.sparkContext().parallelize(list).rdd(), scala.reflect.ClassTag$.MODULE$.apply(ConsumerRecord.class));
-
-        PowerMockito.when(KafkaUtils.createDirectStream(any(JavaStreamingContext.class), any(LocationStrategy.class), any(ConsumerStrategy.class)))
-                .thenReturn(new JavaInputDStream(constantInputDStream, scala.reflect.ClassTag$.MODULE$.apply(ConsumerRecord.class)));
-
-        JavaInputDStream<ConsumerRecord<String, String>> stream =
-                KafkaUtils.createDirectStream(
-                        streamingContext,
-                        LocationStrategies.PreferConsistent(),
-                        ConsumerStrategies.<String, String>Subscribe(topics, null)
-                );
-
+        // Create direct kafka stream with brokers and topics
+        JavaInputDStream<ConsumerRecord<String, String>> stream = KafkaUtils.createDirectStream(
+                jssc,
+                LocationStrategies.PreferConsistent(),
+                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{"processInstance"}), kafkaConsumerConfig));
         stream
-                .map(r -> (r.value().toString()))
+                .map(r -> (r.value()))
                 .print();
+
 
         // Start the computation
         jssc.start();

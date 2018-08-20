@@ -1,16 +1,8 @@
 package de.viadee.ki.sparkimporter;
 
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariablesColumnsStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateVariableUpdatesStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.GetVariablesTypesOccurenceStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
-import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
-import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
 import org.junit.BeforeClass;
 import org.junit.Test;
