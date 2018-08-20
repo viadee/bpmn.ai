@@ -2,7 +2,7 @@ package de.viadee.ki.sparkimporter;
 
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariablesColumnsStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateToProcessInstanceaStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateVariableUpdatesStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.GetVariablesTypesOccurenceStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
@@ -46,7 +46,7 @@ public class SparkImporterCSVApplicationIntegrationTest {
                         JavaSparkContext.jarOfClass(GetVariablesTypesOccurenceStep.class.getClass()),
                         JavaSparkContext.jarOfClass(VariablesTypeEscalationStep.class.getClass()),
                         JavaSparkContext.jarOfClass(AddVariablesColumnsStep.class.getClass()),
-                        JavaSparkContext.jarOfClass(AggregateToProcessInstanceaStep.class.getClass()),
+                        JavaSparkContext.jarOfClass(AggregateVariableUpdatesStep.class.getClass()),
                         JavaSparkContext.jarOfClass(SparkBroadcastHelper.class.getClass()),
                         JavaSparkContext.jarOfClass(SparkBroadcastHelper.BROADCAST_VARIABLE.class.getClass()),
                         JavaSparkContext.jarOfClass(PreprocessingRunner.class.getClass())
@@ -143,11 +143,16 @@ public class SparkImporterCSVApplicationIntegrationTest {
     @Test
     public void testLineValuesHashes() {
         //check if hashes of line values are correct
-        assertEquals(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase(), "5F68A8A24163FC2008B6B6FE7173041C");
-        assertEquals(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase(), "D13A43B2847C26CE8AB37CA1861F85FA");
-        assertEquals(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase(), "D85A58A88D4BEAC0FE772A054374171B");
-        assertEquals(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase(), "E447D25D78942334884BB4E1EFB1EBC6");
-        assertEquals(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase(), "9547A401AF96BAC7D033CDA5FE76F679");
+        System.out.println(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        assertEquals(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase(), "5E0E0F6757CD494C79350D65D02A76E3");
+        assertEquals(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase(), "BF81F2A31E15ECB35164ABAE306411C8");
+        assertEquals(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase(), "167BE6C759696772C15B1E193D378E02");
+        assertEquals(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase(), "5F89D623F24B334B943281F4E7CD080B");
+        assertEquals(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase(), "C0134C1E1C328C5A8DF6EC63E88FEA81");
     }
 
     private static String[] combine(String[] a, String[]... b){

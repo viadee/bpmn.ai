@@ -2,10 +2,8 @@ package de.viadee.ki.sparkimporter.runner;
 
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariablesColumnsStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateToProcessInstanceaStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.GetVariablesTypesOccurenceStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
+import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.DropColumnsStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.TypeCastStep;
@@ -43,29 +41,24 @@ public class CSVImportRunner implements ImportRunnerInterface {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
         }
 
-        // remove duplicated columns created at CSV import step
-        dataset = SparkImporterUtils.getInstance().removeDuplicatedColumns(dataset);
-        dataset = SparkImporterUtils.getInstance().removeEmptyLinesAfterImport(dataset);
-
-        // write imported unique column CSV structure to file for debugging
-        if (SparkImporterArguments.getInstance().isWriteStepResultsToCSV()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_unique_columns_result");
-        }
-
         Configuration config= new Configuration();
         config.createConfigFile(dataset);
+
+        InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
+        dataset = initialCleanupStep.runPreprocessingStep(dataset, false);
+
 
         // Define processing steps to run
         final PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
 
         // it's faster if we do not reduce the dataset columns in the beginning and
         // rejoin the dataset later, left steps in commented if required later
-        // preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
+        //preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
-        preprocessingRunner.addPreprocessorStep(new AggregateToProcessInstanceaStep());
-        // preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
+        //preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
+        preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
         preprocessingRunner.addPreprocessorStep(new DropColumnsStep());
         preprocessingRunner.addPreprocessorStep(new TypeCastStep());
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());

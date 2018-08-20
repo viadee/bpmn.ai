@@ -32,9 +32,9 @@ public class KafkaDataProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
-        //preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
+        preprocessingRunner.addPreprocessorStep(new AggregateVariableUpdatesStep());
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
-        preprocessingRunner.addPreprocessorStep(new AggregateToProcessInstanceaStep());
+        preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
         preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 

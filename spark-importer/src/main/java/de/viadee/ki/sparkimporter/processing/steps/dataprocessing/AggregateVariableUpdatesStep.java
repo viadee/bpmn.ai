@@ -15,8 +15,9 @@ import java.util.regex.Pattern;
 
 import static org.apache.spark.sql.functions.desc;
 import static org.apache.spark.sql.functions.isnull;
+import static org.apache.spark.sql.functions.not;
 
-public class AggregateToProcessInstanceaStep implements PreprocessingStepInterface {
+public class AggregateVariableUpdatesStep implements PreprocessingStepInterface {
 
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
@@ -44,13 +45,13 @@ public class AggregateToProcessInstanceaStep implements PreprocessingStepInterfa
 
         if(Arrays.asList(dataset.columns()).contains("timestamp_")) {
             datasetVUAgg = dataset
-                    .filter(isnull(dataset.col("state_")))
+                    .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
                     .orderBy(desc("timestamp_"))
                     .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
                     .agg(aggregationMap);
         } else {
             datasetVUAgg = dataset
-                    .filter(isnull(dataset.col("state_")))
+                    .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
                     .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
                     .agg(aggregationMap);
         }
@@ -61,31 +62,12 @@ public class AggregateToProcessInstanceaStep implements PreprocessingStepInterfa
 
         //union again with processInstance rows
         dataset = dataset
-                .filter(isnull(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)))
+                .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_STATE))))
                 .union(datasetVUAgg);
 
 
         String pattern = "(first|max|allbutemptystring|processstate)\\((.+)\\)";
         Pattern r = Pattern.compile(pattern);
-
-        for(String columnName : dataset.columns()) {
-            Matcher m = r.matcher(columnName);
-            if(m.find()) {
-                String newColumnName = m.group(2);
-                dataset = dataset.withColumnRenamed(columnName, newColumnName);
-            }
-        }
-
-
-        //second aggregation
-        dataset = dataset
-                //.orderBy(asc(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID), asc(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME), desc("timestamp_"))
-                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
-                .agg(aggregationMap);
-
-        //cleanup again, so renaming columns and dropping not used ones
-        dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
-        dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
         for(String columnName : dataset.columns()) {
             Matcher m = r.matcher(columnName);
