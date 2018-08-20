@@ -40,19 +40,7 @@ public class SparkImporterCSVApplicationIntegrationTest {
     public static void setUpBeforeClass() throws IOException {
         String args[] = {"-fs", TEST_INPUT_FILE_NAME, "-fd", TEST_OUTPUT_FILE_PATH, "-d", ";", "-sr", "false"};
         SparkConf sparkConf = new SparkConf();
-        sparkConf.setJars(
-                combine(
-                        JavaSparkContext.jarOfClass(SparkImporterUtils.class.getClass()),
-                        JavaSparkContext.jarOfClass(GetVariablesTypesOccurenceStep.class.getClass()),
-                        JavaSparkContext.jarOfClass(VariablesTypeEscalationStep.class.getClass()),
-                        JavaSparkContext.jarOfClass(AddVariablesColumnsStep.class.getClass()),
-                        JavaSparkContext.jarOfClass(AggregateVariableUpdatesStep.class.getClass()),
-                        JavaSparkContext.jarOfClass(SparkBroadcastHelper.class.getClass()),
-                        JavaSparkContext.jarOfClass(SparkBroadcastHelper.BROADCAST_VARIABLE.class.getClass()),
-                        JavaSparkContext.jarOfClass(PreprocessingRunner.class.getClass())
-                )
-        );
-        sparkConf.setMaster("local[1]");
+        sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
 
         // run main class
@@ -143,11 +131,6 @@ public class SparkImporterCSVApplicationIntegrationTest {
     @Test
     public void testLineValuesHashes() {
         //check if hashes of line values are correct
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
         assertEquals(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase(), "5E0E0F6757CD494C79350D65D02A76E3");
         assertEquals(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase(), "BF81F2A31E15ECB35164ABAE306411C8");
         assertEquals(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase(), "167BE6C759696772C15B1E193D378E02");
