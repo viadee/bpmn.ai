@@ -26,7 +26,7 @@ node {
         stage('SonarQube analysis') {
             dir('spark-importer')
 			{
-                withSonarQubeEnv('sonarqube viadee') {
+                withEnv(buildEnvironment)  {
                     sh 'mvn sonar:sonar'
                 }
                 timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
