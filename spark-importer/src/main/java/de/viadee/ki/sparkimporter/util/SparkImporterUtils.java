@@ -76,7 +76,7 @@ public class SparkImporterUtils {
                 .mode(SaveMode.Overwrite)
                 .csv(SparkImporterVariables.getTargetFolder()+"/"+ String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory);
 
-        if(aggreateCSVToOneFile)
+        if(aggreateCSVToOneFile && subDirectory.equals("result"))
             renameResultFile();
     }
 

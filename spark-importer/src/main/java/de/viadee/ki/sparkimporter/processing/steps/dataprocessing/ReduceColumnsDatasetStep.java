@@ -17,6 +17,7 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
                 SparkImporterVariables.VAR_STATE,
                 SparkImporterVariables.VAR_LONG,
+                SparkImporterVariables.VAR_DOUBLE,
                 SparkImporterVariables.VAR_TEXT,
                 SparkImporterVariables.VAR_TEXT2)
                 .filter(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID + " <> 'null'");
