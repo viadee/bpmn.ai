@@ -2,7 +2,10 @@ package de.viadee.ki.sparkimporter.runner;
 
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariablesColumnsStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateProcessInstancesStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.GetVariablesTypesOccurenceStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.DropColumnsStep;

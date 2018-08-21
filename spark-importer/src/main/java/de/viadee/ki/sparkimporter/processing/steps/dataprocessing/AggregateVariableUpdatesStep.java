@@ -13,9 +13,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.spark.sql.functions.desc;
-import static org.apache.spark.sql.functions.isnull;
-import static org.apache.spark.sql.functions.not;
+import static org.apache.spark.sql.functions.*;
 
 public class AggregateVariableUpdatesStep implements PreprocessingStepInterface {
 

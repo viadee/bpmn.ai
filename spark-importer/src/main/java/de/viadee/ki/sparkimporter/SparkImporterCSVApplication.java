@@ -4,7 +4,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
-import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.runner.CSVImportRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 import org.apache.commons.io.FileUtils;
