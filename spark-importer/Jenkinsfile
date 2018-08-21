@@ -23,6 +23,18 @@ node {
 			}
         }
 
+        stage('SonarQube analysis') {
+            dir('spark-importer')
+			{
+                withSonarQubeEnv('sonarqube viadee') {
+                    sh 'mvn sonar:sonar'
+                }
+                timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                    waitForQualityGate abortPipeline: true
+                }
+           }
+        } 
+
        
     } catch (error) {
 
