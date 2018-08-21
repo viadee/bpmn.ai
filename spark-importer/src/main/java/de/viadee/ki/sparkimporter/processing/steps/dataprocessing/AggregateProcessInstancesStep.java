@@ -24,6 +24,8 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         for(String column : dataset.columns()) {
             if(column.equals(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)) {
                 continue;
+            } else if(column.equals(SparkImporterVariables.VAR_DURATION)) {
+                aggregationMap.put(column, "max");
             } else if(column.equals(SparkImporterVariables.VAR_STATE)) {
                 aggregationMap.put(column, "ProcessState");
             } else {
@@ -43,7 +45,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         datasetPIAgg = datasetPIAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
         //rename back columns after aggregation
-        String pattern = "(allbutemptystring|processstate)\\((.+)\\)";
+        String pattern = "(max|allbutemptystring|processstate)\\((.+)\\)";
         Pattern r = Pattern.compile(pattern);
 
         for(String columnName : dataset.columns()) {

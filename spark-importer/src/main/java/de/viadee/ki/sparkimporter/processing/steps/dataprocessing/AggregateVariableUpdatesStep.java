@@ -29,8 +29,6 @@ public class AggregateVariableUpdatesStep implements PreprocessingStepInterface 
                 aggregationMap.put(column, "max");
             } else if(dateFormatColumns.contains(column)) {
                 aggregationMap.put(column, "first");
-            } else if(column.equals(SparkImporterVariables.VAR_STATE)) {
-                aggregationMap.put(column, "ProcessState");
             } else {
                 aggregationMap.put(column, "AllButEmptyString");
             }
@@ -58,7 +56,7 @@ public class AggregateVariableUpdatesStep implements PreprocessingStepInterface 
         datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
         datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
-        String pattern = "(first|max|allbutemptystring|processstate)\\((.+)\\)";
+        String pattern = "(first|max|allbutemptystring)\\((.+)\\)";
         Pattern r = Pattern.compile(pattern);
 
         for(String columnName : datasetVUAgg.columns()) {
