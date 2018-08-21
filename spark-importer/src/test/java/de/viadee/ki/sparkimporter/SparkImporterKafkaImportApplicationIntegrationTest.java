@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter;
 
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import kafka.admin.AdminUtils;
 import kafka.admin.RackAwareMode;
 import kafka.server.KafkaConfig;
@@ -10,35 +11,29 @@ import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
 import kafka.zk.EmbeddedZookeeper;
 import org.I0Itec.zkclient.ZkClient;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.utils.Time;
-import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.SparkConf;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.streaming.Duration;
-import org.apache.spark.streaming.api.java.JavaInputDStream;
-import org.apache.spark.streaming.api.java.JavaStreamingContext;
-import org.apache.spark.streaming.kafka010.ConsumerStrategies;
-import org.apache.spark.streaming.kafka010.KafkaUtils;
-import org.apache.spark.streaming.kafka010.LocationStrategies;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.Properties;
 import java.util.stream.Stream;
+
+import static org.junit.Assert.assertEquals;
 
 public class SparkImporterKafkaImportApplicationIntegrationTest {
 
     private final static String FILE_STREAM_INPUT_PROCESS_INSTANCE = "./src/test/resources/integration_test_file_kafka_stream_processInstance.json";
     private final static String FILE_STREAM_INPUT_VARIABLE_UPDATE = "./src/test/resources/integration_test_file_kafka_stream_variableUpdate.json";
+    private final static String TEST_OUTPUT_DIRECTORY = "integration-test-result-kafka-import";
 
     private final static String TOPIC_PROCESS_INSTANCE = "processInstance";
     private final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
@@ -52,7 +47,7 @@ public class SparkImporterKafkaImportApplicationIntegrationTest {
     private static KafkaServer kafkaServer;
 
     @BeforeClass
-    public static void setupKafkaMock() throws Exception {
+    public static void setupBeforeClass() throws Exception {
 
         // setup Zookeeper
         zkServer = new EmbeddedZookeeper();
@@ -92,49 +87,30 @@ public class SparkImporterKafkaImportApplicationIntegrationTest {
         }
     }
 
-
     @Test
-    public void testKafKaStreamingImport() throws Exception {
+    public void testKafkaStreamingImport() throws Exception {
+        //run main class
+        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", TEST_OUTPUT_DIRECTORY, "-bm", "true", "-sr", "false"};
+        SparkConf sparkConf = new SparkConf();
+        sparkConf.setMaster("local[*]");
+        SparkSession.builder().config(sparkConf).getOrCreate();
+        SparkImporterKafkaImportApplication.main(args);
 
-        // create SparkSession
+        //start Spark session
         SparkSession sparkSession = SparkSession.builder()
                 .master("local[*]")
-                .appName(this.getClass().getSimpleName())
+                .appName("IntegrationTest")
                 .getOrCreate();
 
-        //configuration of Kafka Consumer
-        final Map<String, Object> kafkaConsumerConfig  = new HashMap<>();
-        kafkaConsumerConfig.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_HOST + ":" + KAFKA_PORT);
-        kafkaConsumerConfig.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        kafkaConsumerConfig.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        // allows a pool of processes to divide the work of consuming and processing records
-        kafkaConsumerConfig.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString());
-        // automatically reset the offset to the earliest offset
-        kafkaConsumerConfig.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        //generate Dataset and create hash to compare
+        Dataset<Row> importedDataset = sparkSession.read().load(TEST_OUTPUT_DIRECTORY);
+        String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
 
-        // Create context with a x seconds batch interval
-        JavaSparkContext jsc = new JavaSparkContext(sparkSession.sparkContext());
-        JavaStreamingContext jssc = new JavaStreamingContext(jsc, Duration.apply(10000));
+        //check content of output directory by comparing hash
+        assertEquals(hash, "C81E4F98670F38F7E0EFD904B742F0FC");
 
-        // Create direct kafka stream with brokers and topics
-        JavaInputDStream<ConsumerRecord<String, String>> stream = KafkaUtils.createDirectStream(
-                jssc,
-                LocationStrategies.PreferConsistent(),
-                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{TOPIC_PROCESS_INSTANCE}), kafkaConsumerConfig));
-
-        stream
-                .map(r -> r.value())
-                .print();
-
-
-        // Start the computation
-        jssc.start();
-
-
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        boolean completed = countDownLatch.await(10L, TimeUnit.SECONDS);
-        jssc.stop(true);
-
+        //close Spark session
+        sparkSession.close();
     }
 
     @AfterClass

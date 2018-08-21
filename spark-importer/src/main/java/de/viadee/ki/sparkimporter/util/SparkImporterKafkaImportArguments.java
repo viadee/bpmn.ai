@@ -21,6 +21,10 @@ public class SparkImporterKafkaImportArguments {
 			"-sr" }, description = "Should intermediate results be written into CSV files?", arity = 1)
 	private boolean writeStepResultsToCSV = false;
 
+	@Parameter(names = { "--batch-mode",
+			"-bm" }, required = true, description = "Should application run in batch mode? It then stops after all pulled queues have returned zero entries at least once", arity = 1)
+	private boolean batchMode = false;
+
 	/**
 	 * Singleton.
 	 */
@@ -40,6 +44,10 @@ public class SparkImporterKafkaImportArguments {
 		return writeStepResultsToCSV;
 	}
 
+	public boolean isBatchMode() {
+		return batchMode;
+	}
+
 	/**
 	 * @return SparkImporterKafkaImportArguments instance
 	 */
@@ -53,6 +61,7 @@ public class SparkImporterKafkaImportArguments {
 	@Override
 	public String toString() {
 		return "SparkImporterKafkaImportArguments{" + "kafkaBroker='" + kafkaBroker + '\'' + ", fileDestination='" + fileDestination
-				+ '\'' + ", writeStepResultsToCSV=" + writeStepResultsToCSV + '}';
+				+ '\'' + ", writeStepResultsToCSV=" + writeStepResultsToCSV + '}'
+				+ '\'' + ", batchMode=" + batchMode + '}';
 	}
 }

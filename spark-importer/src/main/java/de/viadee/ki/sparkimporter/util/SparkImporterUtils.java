@@ -1,6 +1,8 @@
 package de.viadee.ki.sparkimporter.util;
 
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -8,9 +10,13 @@ import org.apache.spark.sql.SaveMode;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -29,6 +35,25 @@ public class SparkImporterUtils {
             instance = new SparkImporterUtils();
         }
         return instance;
+    }
+
+    public String md5CecksumOfObject(Object obj) throws IOException, NoSuchAlgorithmException {
+        if (obj == null) {
+            return "";
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(obj);
+        oos.close();
+
+        MessageDigest m = MessageDigest.getInstance("MD5");
+        m.update(baos.toByteArray());
+
+        Base64 codec = new Base64();
+        byte[] encoded = codec.encode(m.digest());
+
+        return DigestUtils.md5Hex(new String(encoded)).toUpperCase();
     }
 
     public void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory) {

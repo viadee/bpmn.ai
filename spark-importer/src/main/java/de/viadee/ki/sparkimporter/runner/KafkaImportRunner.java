@@ -23,6 +23,7 @@ import org.apache.spark.streaming.kafka010.KafkaUtils;
 import org.apache.spark.streaming.kafka010.LocationStrategies;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 import static de.viadee.ki.sparkimporter.SparkImporterKafkaImportApplication.ARGS;
 
@@ -40,10 +41,22 @@ public class KafkaImportRunner implements ImportRunnerInterface {
 
     private List<String> receivedQueues = new ArrayList<>();
 
+    private List<String> emptyQueues = new ArrayList<>();
+    private CountDownLatch countDownLatch;
+
+    //how many queues are we querying and expecting to be empty in batch mode
+    private int EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = 2;
+
     @Override
     public void run(SparkSession sc) {
         sparkSession = sc;
         masterRdd = sparkSession.emptyDataset(Encoders.STRING()).javaRDD();
+
+        // if we are in batch mode we create the countdown latch so we can shutdown the streaming
+        // context once the number of queues (EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) are empty.
+        if(ARGS.isBatchMode()) {
+            countDownLatch = new CountDownLatch(1);
+        }
 
         int duration = 5000;
 
@@ -98,10 +111,21 @@ public class KafkaImportRunner implements ImportRunnerInterface {
 
         // Start the computation
         jssc.start();
-        try {
-            jssc.awaitTermination();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+
+        if(ARGS.isBatchMode()) {
+            try {
+                // wait until countdown latch has counted down
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            jssc.stop(true);
+        } else {
+            try {
+                jssc.awaitTermination();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -109,6 +133,12 @@ public class KafkaImportRunner implements ImportRunnerInterface {
 //        System.out.println("============= RECEIVED RDD contains " + newRDD.count() + " entries.");
 
         if (newRDD.count() == 0) {
+            if (!emptyQueues.contains(queue)) {
+                emptyQueues.add(queue);
+            }
+            if(emptyQueues.size() == EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) {
+                countDownLatch.countDown();
+            }
             return;
         }
 
