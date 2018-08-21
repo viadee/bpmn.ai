@@ -24,8 +24,6 @@ import java.util.regex.Pattern;
 
 public class SparkImporterUtils {
 
-    private SparkImporterArguments args = SparkImporterArguments.getInstance();
-
     private static SparkImporterUtils instance;
 
     private SparkImporterUtils(){}
@@ -76,7 +74,7 @@ public class SparkImporterUtils {
                 .option("ignoreLeadingWhiteSpace", "false")
                 .option("ignoreTrailingWhiteSpace", "false")
                 .mode(SaveMode.Overwrite)
-                .csv(args.getFileDestination()+"/"+ String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory);
+                .csv(SparkImporterVariables.getTargetFolder()+"/"+ String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory);
 
         if(aggreateCSVToOneFile)
             renameResultFile();
@@ -84,8 +82,7 @@ public class SparkImporterUtils {
 
     private void renameResultFile() {
         //rename result file to deterministic name
-        SparkImporterArguments args = SparkImporterArguments.getInstance();
-        File dir = new File(args.getFileDestination()+"/"+ String.format("%02d", PreprocessingRunner.getCounter()) + "_result");
+        File dir = new File(SparkImporterVariables.getTargetFolder()+"/"+ String.format("%02d", PreprocessingRunner.getCounter()) + "_result");
         if(!dir.isDirectory()) throw new IllegalStateException("Cannot find result folder!");
         for(File file : dir.listFiles()) {
             if(file.getName().startsWith("part-0000")) {

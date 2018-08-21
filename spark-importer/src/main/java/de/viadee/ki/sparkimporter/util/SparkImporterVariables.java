@@ -37,4 +37,13 @@ public final class SparkImporterVariables {
     public static final String PROCESS_STATE_ACTIVE = "ACTIVE";
     public static final String PROCESS_STATE_COMPLETED = "COMPLETED";
 
+    public static String targetFolder = "";
+
+    public static String getTargetFolder() {
+        return targetFolder;
+    }
+
+    public static void setTargetFolder(String targetFolder) {
+        SparkImporterVariables.targetFolder = targetFolder;
+    }
 }

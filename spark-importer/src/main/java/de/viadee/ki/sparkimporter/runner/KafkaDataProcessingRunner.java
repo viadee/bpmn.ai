@@ -16,10 +16,10 @@ public class KafkaDataProcessingRunner implements ImportRunnerInterface {
     @Override
     public void run(SparkSession sparkSession) {
 
-        //Load source CSV file
+        //Load source parquet file
         Dataset<Row> dataset = sparkSession.read()
                 .option("inferSchema", "true")
-                .load("file:///Users/mim/Desktop/spark_sink");
+                .load(ARGS.getFileSource());
 
         System.out.println("================ STARTING PROCESSING DATA ================");
 

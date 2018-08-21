@@ -33,7 +33,9 @@ public class SparkImporterKafkaImportApplicationIntegrationTest {
 
     private final static String FILE_STREAM_INPUT_PROCESS_INSTANCE = "./src/test/resources/integration_test_file_kafka_stream_processInstance.json";
     private final static String FILE_STREAM_INPUT_VARIABLE_UPDATE = "./src/test/resources/integration_test_file_kafka_stream_variableUpdate.json";
-    private final static String TEST_OUTPUT_DIRECTORY = "integration-test-result-kafka-import";
+    private final static String IMPORT_TEST_OUTPUT_DIRECTORY = "integration-test-result-kafka-import";
+    private final static String DATA_PROCESSING_TEST_OUTPUT_DIRECTORY = "integration-test-result-kafka-processing";
+    private final static String DATA_PROCESSING_TEST_INPUT_DIRECTORY = "./src/test/resources/integration_test_kafka_processing_data";
 
     private final static String TOPIC_PROCESS_INSTANCE = "processInstance";
     private final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
@@ -90,7 +92,7 @@ public class SparkImporterKafkaImportApplicationIntegrationTest {
     @Test
     public void testKafkaStreamingImport() throws Exception {
         //run main class
-        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", TEST_OUTPUT_DIRECTORY, "-bm", "true", "-sr", "false"};
+        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", IMPORT_TEST_OUTPUT_DIRECTORY, "-bm", "true", "-sr", "false"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -103,14 +105,29 @@ public class SparkImporterKafkaImportApplicationIntegrationTest {
                 .getOrCreate();
 
         //generate Dataset and create hash to compare
-        Dataset<Row> importedDataset = sparkSession.read().load(TEST_OUTPUT_DIRECTORY);
-        String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
+        Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY);
 
-        //check content of output directory by comparing hash
+        //check that dataset contains 21 lines
+        assertEquals(importedDataset.count(), 21);
+
+        //check hash of dataset
+        String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
         assertEquals(hash, "C81E4F98670F38F7E0EFD904B742F0FC");
 
         //close Spark session
         sparkSession.close();
+    }
+
+    @Test
+    public void testKafkaDataProcessingImport() throws Exception {
+        //run main class
+        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY, "-d", "|", "-sr", "false"};
+        SparkConf sparkConf = new SparkConf();
+        sparkConf.setMaster("local[*]");
+        SparkSession.builder().config(sparkConf).getOrCreate();
+
+        // run main class
+        SparkImporterKafkaDataProcessingApplication.main(args);
     }
 
     @AfterClass
