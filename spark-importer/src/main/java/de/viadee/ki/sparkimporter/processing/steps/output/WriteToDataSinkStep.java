@@ -6,6 +6,8 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
 
+import static de.viadee.ki.sparkimporter.SparkImporterKafkaImportApplication.ARGS;
+
 public class WriteToDataSinkStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
@@ -14,7 +16,7 @@ public class WriteToDataSinkStep implements PreprocessingStepInterface {
                 .repartition(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID))
                 .write()
                 .mode(SaveMode.Append)
-                .save("file:///Users/mim/Desktop/spark_sink");
+                .save(ARGS.getFileDestination());
 
         return dataset;
     }

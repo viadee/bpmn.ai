@@ -54,6 +54,8 @@ public class CSVImportRunner implements ImportRunnerInterface {
         // Define processing steps to run
         final PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
 
+        PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
+
         // it's faster if we do not reduce the dataset columns in the beginning and
         // rejoin the dataset later, left steps in commented if required later
         //preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
@@ -67,7 +69,7 @@ public class CSVImportRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 
         // Run processing runner
-        preprocessingRunner.run(dataset, SparkImporterArguments.getInstance().isWriteStepResultsToCSV());
+        preprocessingRunner.run(dataset);
 
         // Cleanup
         sparkSession.close();

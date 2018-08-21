@@ -35,14 +35,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-public class SparkImporterKafkaApplicationIntegrationTest {
+public class SparkImporterKafkaImportApplicationIntegrationTest {
 
     private final static String FILE_STREAM_INPUT_PROCESS_INSTANCE = "./src/test/resources/integration_test_file_kafka_stream_processInstance.json";
     private final static String FILE_STREAM_INPUT_VARIABLE_UPDATE = "./src/test/resources/integration_test_file_kafka_stream_variableUpdate.json";
 
     private final static String TOPIC_PROCESS_INSTANCE = "processInstance";
     private final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
-
 
     private final static String ZOOKEEPER_HOST = "127.0.0.1";
     private final static String KAFKA_HOST = "127.0.0.1";
@@ -122,8 +121,9 @@ public class SparkImporterKafkaApplicationIntegrationTest {
                 jssc,
                 LocationStrategies.PreferConsistent(),
                 ConsumerStrategies.Subscribe(Arrays.asList(new String[]{TOPIC_PROCESS_INSTANCE}), kafkaConsumerConfig));
+
         stream
-                .map(r -> (r.value()))
+                .map(r -> r.value())
                 .print();
 
 

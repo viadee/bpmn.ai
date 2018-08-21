@@ -24,12 +24,15 @@ import org.apache.spark.streaming.kafka010.LocationStrategies;
 
 import java.util.*;
 
+import static de.viadee.ki.sparkimporter.SparkImporterKafkaImportApplication.ARGS;
+
 public class KafkaImportRunner implements ImportRunnerInterface {
+
+    private final static String TOPIC_PROCESS_INSTANCE = "processInstance";
+    private final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
 
     private final Map<String, Object> kafkaConsumerConfigPI  = new HashMap<>();
     private final Map<String, Object> kafkaConsumerConfigVU  = new HashMap<>();
-
-    private String bootstrapServers = "localhost:9092";
 
     private JavaRDD<String> masterRdd = null;
     private Dataset<Row> masterDataset = null;
@@ -42,10 +45,10 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         sparkSession = sc;
         masterRdd = sparkSession.emptyDataset(Encoders.STRING()).javaRDD();
 
-        int duration = 10000;
+        int duration = 5000;
 
         // list of host:port pairs used for establishing the initial connections to the Kafka cluster
-        kafkaConsumerConfigPI.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        kafkaConsumerConfigPI.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, ARGS.getKafkaBroker());
         kafkaConsumerConfigPI.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         kafkaConsumerConfigPI.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         // allows a pool of processes to divide the work of consuming and processing records
@@ -54,7 +57,7 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         kafkaConsumerConfigPI.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         // list of host:port pairs used for establishing the initial connections to the Kafka cluster
-        kafkaConsumerConfigVU.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        kafkaConsumerConfigVU.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, ARGS.getKafkaBroker());
         kafkaConsumerConfigVU.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         kafkaConsumerConfigVU.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         // allows a pool of processes to divide the work of consuming and processing records
@@ -70,13 +73,13 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         JavaInputDStream<ConsumerRecord<String, String>> processInstances = KafkaUtils.createDirectStream(
                 jssc,
                 LocationStrategies.PreferConsistent(),
-                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{"processInstance"}), kafkaConsumerConfigPI));
+                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{TOPIC_PROCESS_INSTANCE}), kafkaConsumerConfigPI));
 
         //go through pipe elements
         processInstances
                 .map(record -> record.value())
                 .foreachRDD((VoidFunction<JavaRDD<String>>) stringJavaRDD -> {
-                    processMasterRDD(stringJavaRDD, "processInstance");
+                    processMasterRDD(stringJavaRDD, TOPIC_PROCESS_INSTANCE);
                 });
 
 
@@ -84,13 +87,13 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         JavaInputDStream<ConsumerRecord<String, String>> variableUpdates = KafkaUtils.createDirectStream(
                 jssc,
                 LocationStrategies.PreferConsistent(),
-                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{"variableUpdate"}), kafkaConsumerConfigVU));
+                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{TOPIC_VARIABLE_UPDATE}), kafkaConsumerConfigVU));
 
         //go through pipe elements
         variableUpdates
                 .map(record -> record.value())
                 .foreachRDD((VoidFunction<JavaRDD<String>>) stringJavaRDD -> {
-                    processMasterRDD(stringJavaRDD, "variableUpdate");
+                    processMasterRDD(stringJavaRDD, TOPIC_VARIABLE_UPDATE);
                 });
 
         // Start the computation
@@ -103,7 +106,7 @@ public class KafkaImportRunner implements ImportRunnerInterface {
     }
 
     private synchronized void processMasterRDD(JavaRDD<String> newRDD, String queue) {
-        System.out.println("============= RECEIVED RDD contains " + newRDD.count() + " entries.");
+//        System.out.println("============= RECEIVED RDD contains " + newRDD.count() + " entries.");
 
         if (newRDD.count() == 0) {
             return;
@@ -139,6 +142,8 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         // Define processing steps to run
         final PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
 
+        PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
+
         // it's faster if we do not reduce the dataset columns in the beginning and
         // rejoin the dataset later, left steps in commented if required later
         preprocessingRunner.addPreprocessorStep(new KafkaImportStep());
@@ -146,7 +151,7 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new WriteToDataSinkStep());
 
         // Run processing runner
-        preprocessingRunner.run(masterDataset, false);
+        preprocessingRunner.run(masterDataset);
 
     }
 }

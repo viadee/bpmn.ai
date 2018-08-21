@@ -3,7 +3,7 @@ package de.viadee.ki.sparkimporter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.runner.KafkaImportRunner;
-import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterKafkaImportArguments;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
@@ -11,20 +11,20 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-public class SparkImporterKafkaApplication {
+public class SparkImporterKafkaImportApplication {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SparkImporterKafkaApplication.class);
-	public static SparkImporterArguments ARGS;
+	private static final Logger LOG = LoggerFactory.getLogger(SparkImporterKafkaImportApplication.class);
+	public static SparkImporterKafkaImportArguments ARGS;
 
 	public static void main(String[] arguments) {
 
 		final long startMillis = System.currentTimeMillis();
 
-		ARGS = SparkImporterArguments.getInstance();
+		ARGS = SparkImporterKafkaImportArguments.getInstance();
 
 		// instantiate JCommander
 		// Use JCommander for flexible usage of Parameters
-		final JCommander jCommander = JCommander.newBuilder().addObject(SparkImporterArguments.getInstance()).build();
+		final JCommander jCommander = JCommander.newBuilder().addObject(SparkImporterKafkaImportArguments.getInstance()).build();
 		try {
 			jCommander.parse(arguments);
 		} catch (final ParameterException e) {

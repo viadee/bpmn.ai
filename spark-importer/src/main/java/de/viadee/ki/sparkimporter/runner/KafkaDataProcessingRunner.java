@@ -5,10 +5,11 @@ import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.output.DataSinkFilterStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+
+import static de.viadee.ki.sparkimporter.SparkImporterKafkaDataProcessingApplication.ARGS;
 
 public class KafkaDataProcessingRunner implements ImportRunnerInterface {
 
@@ -26,6 +27,8 @@ public class KafkaDataProcessingRunner implements ImportRunnerInterface {
         // Define processing steps to run
         final PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
 
+        PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
+
         // it's faster if we do not reduce the dataset columns in the beginning and
         // rejoin the dataset later, left steps in commented if required later
         preprocessingRunner.addPreprocessorStep(new DataSinkFilterStep());
@@ -39,7 +42,7 @@ public class KafkaDataProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 
         // Run processing runner
-        preprocessingRunner.run(dataset, SparkImporterArguments.getInstance().isWriteStepResultsToCSV());
+        preprocessingRunner.run(dataset);
 
         // Cleanup
         sparkSession.close();

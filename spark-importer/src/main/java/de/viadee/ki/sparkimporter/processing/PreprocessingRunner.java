@@ -21,6 +21,8 @@ public class PreprocessingRunner {
 
     private static PreprocessingRunner instance;
 
+    public static boolean writeStepResultsIntoFile = false;
+
     private PreprocessingRunner(){}
 
     public static synchronized PreprocessingRunner getInstance(){
@@ -30,7 +32,7 @@ public class PreprocessingRunner {
         return instance;
     }
 
-    public void run(Dataset<Row> dataset, boolean writeStepResultsIntoFile) {
+    public void run(Dataset<Row> dataset) {
         helper_datasets.clear();
         helper_datasets.put(DATASET_INITIAL, dataset);
 

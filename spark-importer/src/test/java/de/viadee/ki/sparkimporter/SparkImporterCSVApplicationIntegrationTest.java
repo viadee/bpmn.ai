@@ -20,9 +20,9 @@ public class SparkImporterCSVApplicationIntegrationTest {
 
     private static final String TEST_INPUT_FILE_NAME = "./src/test/resources/integration_test_file.csv";
 
-    private static final String TEST_OUTPUT_FILE_PATH = "integration-test-result/";
+    private static final String TEST_OUTPUT_FILE_PATH = "integration-test-result-kafka/";
 
-    private static final String TEST_OUTPUT_FILE_NAME = "integration-test-result/result.csv";
+    private static final String TEST_OUTPUT_FILE_NAME = "integration-test-result-kafka/result.csv";
 
     private static final String RESULT_FILE_DELIMITER = "\\|";
 

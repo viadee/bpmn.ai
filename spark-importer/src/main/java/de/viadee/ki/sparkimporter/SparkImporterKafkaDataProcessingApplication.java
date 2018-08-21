@@ -5,7 +5,7 @@ import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.runner.KafkaDataProcessingRunner;
-import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterKafkaDataProcessingArguments;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
@@ -16,15 +16,15 @@ import java.io.File;
 public class SparkImporterKafkaDataProcessingApplication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SparkImporterKafkaDataProcessingApplication.class);
-	public static SparkImporterArguments ARGS;
+	public static SparkImporterKafkaDataProcessingArguments ARGS;
 
 	public static void main(String[] arguments) {
 
-		ARGS = SparkImporterArguments.getInstance();
+		ARGS = SparkImporterKafkaDataProcessingArguments.getInstance();
 
 		// instantiate JCommander
 		// Use JCommander for flexible usage of Parameters
-		final JCommander jCommander = JCommander.newBuilder().addObject(SparkImporterArguments.getInstance()).build();
+		final JCommander jCommander = JCommander.newBuilder().addObject(SparkImporterKafkaDataProcessingArguments.getInstance()).build();
 		try {
 			jCommander.parse(arguments);
 		} catch (final ParameterException e) {
