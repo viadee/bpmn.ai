@@ -23,14 +23,7 @@ public class PreprocessingRunner {
 
     public static boolean writeStepResultsIntoFile = false;
 
-    private PreprocessingRunner(){}
-
-    public static synchronized PreprocessingRunner getInstance(){
-        if(instance == null){
-            instance = new PreprocessingRunner();
-        }
-        return instance;
-    }
+    public PreprocessingRunner(){}
 
     public void run(Dataset<Row> dataset) {
         helper_datasets.clear();
@@ -46,11 +39,11 @@ public class PreprocessingRunner {
         this.preprocessorSteps.add(step);
     }
 
-    public synchronized int getNextCounter() {
+    public static synchronized int getNextCounter() {
         return ++stepCounter;
     }
 
-    public synchronized int getCounter() {
+    public static synchronized int getCounter() {
         return stepCounter;
     }
 }

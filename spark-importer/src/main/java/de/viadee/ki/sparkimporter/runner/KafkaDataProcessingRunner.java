@@ -25,7 +25,7 @@ public class KafkaDataProcessingRunner implements ImportRunnerInterface {
 
         //go through pipe elements
         // Define processing steps to run
-        final PreprocessingRunner preprocessingRunner = PreprocessingRunner.getInstance();
+        final PreprocessingRunner preprocessingRunner = new PreprocessingRunner();
 
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 
