@@ -142,6 +142,8 @@
                                     <include>com.beust:jcommander</include>
                                     <include>org.apache.ignite:ignite-core</include>
                                     <include>javax.cache:**</include>
+                                    <include>org.apache.kafka:kafka-clients</include>
+                                    <include>org.apache.spark:spark-streaming-kafka-0-10_${spark-scala.version}</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
