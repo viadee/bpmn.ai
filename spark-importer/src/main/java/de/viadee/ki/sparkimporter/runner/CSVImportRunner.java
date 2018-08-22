@@ -1,12 +1,9 @@
 package de.viadee.ki.sparkimporter.runner;
 
-import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.DropColumnsStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.TypeCastStep;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -41,9 +38,6 @@ public class CSVImportRunner implements ImportRunnerInterface {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
         }
 
-        Configuration config= new Configuration();
-        config.createConfigFile(dataset);
-
         InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
         dataset = initialCleanupStep.runPreprocessingStep(dataset, false);
 
@@ -59,8 +53,6 @@ public class CSVImportRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
         preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
         preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
-        preprocessingRunner.addPreprocessorStep(new DropColumnsStep());
-        preprocessingRunner.addPreprocessorStep(new TypeCastStep());
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 
         // Run processing runner
