@@ -148,7 +148,56 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>3.3.1</version>
+				<configuration>
+					<failBuildOnCVSS>7</failBuildOnCVSS>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
     </build>
 
+    <organization>
+    	<name>viadee Unternehmensberatung GmbH</name>
+    	<url>www.viadee.de</url>
+    </organization>
+    <ciManagement>
+    	<url>https://portal.intern.viadee.de/jenkins/view/KI/job/KI/job/bpmn.ai%20spark%20importer/</url>
+    	<system>Jenkins</system>
+    </ciManagement>
+    <issueManagement>
+    	<url>https://jira.intern.viadee.de/secure/RapidBoard.jspa?rapidView=156</url>
+    	<system>Jira</system>
+    </issueManagement>
+    <scm>
+    	<connection>https://portal.intern.viadee.de/gitlab/viadee/bpmn.ai</connection>
+    	<url>Gitlab</url>
+    </scm>
+    <description>Tooling to feed Camunda logs into a data mining pipeline.</description>
+    <inceptionYear>2018</inceptionYear>
+    <name>bpmn.ai</name>
+    
+    <developers>
+		<developer>
+			<name>Mario Micudaj</name>
+			<email>Mario.Micudaj@viadee.de</email>
+			<organization>viadee Unternehmensberatung AG</organization>
+			<organizationUrl>http://www.viadee.de</organizationUrl>
+		</developer>
+		<developer>
+			<name>Frank Koehne</name>
+			<email>Frank.Koehne@viadee.de</email>
+			<organization>viadee Unternehmensberatung AG</organization>
+			<organizationUrl>http://www.viadee.de</organizationUrl>
+		</developer>
+	</developers>
 </project>
