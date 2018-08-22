@@ -119,7 +119,7 @@ public class SparkImporterKafkaImportApplicationIntegrationTest {
     }
 
     @Test
-    public void testKafkaDataProcessingImport() throws Exception {
+    public void testKafkaDataProcessing() throws Exception {
         //run main class
         String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY, "-d", "|", "-sr", "false"};
         SparkConf sparkConf = new SparkConf();
@@ -128,6 +128,30 @@ public class SparkImporterKafkaImportApplicationIntegrationTest {
 
         // run main class
         SparkImporterKafkaDataProcessingApplication.main(args);
+
+        //start Spark session
+        SparkSession sparkSession = SparkSession.builder()
+                .master("local[*]")
+                .appName("IntegrationTest")
+                .getOrCreate();
+
+        //generate Dataset and create hash to compare
+        Dataset<Row> importedDataset = sparkSession.read()
+                .option("inferSchema", "true")
+                .option("delimiter","|")
+                .option("header", "true")
+                .csv(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY + "/result.csv");
+
+        //check that dataset contains 4 lines
+        assertEquals(4, importedDataset.count());
+
+        //check that dataset contains 41 columns
+        assertEquals(41, importedDataset.columns().length);
+
+        //check hash of dataset
+        String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
+        assertEquals("8F9553CD52558F61C128E132D1240DFF", hash);
+
     }
 
     @AfterClass

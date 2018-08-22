@@ -31,9 +31,11 @@ public final class SparkImporterVariables {
     public static final String VAR_TEXT = "text_";
     public static final String VAR_TEXT2 = "text2_";
     public static final String VAR_PROCESS_INSTANCE_VARIABLE_NAME = "name_";
+    public static final String VAR_PROCESS_INSTANCE_VARIABLE_INSTANCE_ID = "variable_instance_id_";
     public static final String VAR_PROCESS_INSTANCE_VARIABLE_TYPE = "var_type_";
     public static final String VAR_PROCESS_INSTANCE_VARIABLE_REVISION = "rev_";
     public static final String VAR_TIMESTAMP = "timestamp_";
+    public static final String VAR_SEQUENCE_COUNTER = "sequence_counter_";
 
     public static final String PROCESS_STATE_ACTIVE = "ACTIVE";
     public static final String PROCESS_STATE_COMPLETED = "COMPLETED";

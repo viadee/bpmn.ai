@@ -7,6 +7,7 @@ import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
+import scala.collection.JavaConversions;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
@@ -18,6 +19,7 @@ import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -143,5 +145,15 @@ public class SparkImporterUtils {
     public Dataset<Row> removeEmptyLinesAfterImport(Dataset<Row> dataset) {
         return dataset.filter(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID + " <> 'null'")
                 .filter(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID + " <> ''");
+    }
+
+    /**
+     * implemented help method as per https://stackoverflow.com/questions/40741459/scala-collection-seq-doesnt-work-on-java
+     * @param values List to be convert to Scala Seq
+     * @param <T> Type of objects to be converted
+     * @return the Scala Seq
+     */
+    public <T> Seq<T> asSeq(List<T> values) {
+        return JavaConversions.asScalaBuffer(values);
     }
 }

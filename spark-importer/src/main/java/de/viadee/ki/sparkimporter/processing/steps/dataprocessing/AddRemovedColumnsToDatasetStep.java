@@ -4,71 +4,78 @@ import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import scala.collection.Seq;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.apache.spark.sql.functions.col;
-import static org.apache.spark.sql.functions.first;
 
 public class AddRemovedColumnsToDatasetStep implements PreprocessingStepInterface {
 
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
 
-        Dataset<Row> initialDataset = PreprocessingRunner.helper_datasets.get(PreprocessingRunner.DATASET_INITIAL).select(
-                SparkImporterVariables.VAR_ID,
-                SparkImporterVariables.VAR_SUPER_PROCESS_INSTANCE_ID,
-                SparkImporterVariables.VAR_SUPER_CASE_INSTANCE_ID,
-                SparkImporterVariables.VAR_PROCESS_INSTANCE_ID,
-                SparkImporterVariables.VAR_EXCEUTION_ID,
-                SparkImporterVariables.VAR_BUSINESS_KEY,
-                SparkImporterVariables.VAR_PROCESS_DEF_KEY,
-                SparkImporterVariables.VAR_PROCESS_DEF_ID,
-                SparkImporterVariables.VAR_START_TIME,
-                SparkImporterVariables.VAR_END_TIME,
-                SparkImporterVariables.VAR_DURATION,
-                SparkImporterVariables.VAR_START_USER_ID,
-                SparkImporterVariables.VAR_ACT_INST_ID,
-                //SparkImporterVariables.VAR_START_ACT_ID,
-                //SparkImporterVariables.VAR_END_ACT_ID,
-                //SparkImporterVariables.VAR_CASE_INST_ID,
-                //SparkImporterVariables.VAR_CASE_EXECUTION_ID,
-                //SparkImporterVariables.VAR_CASE_DEF_ID,
-                //SparkImporterVariables.VAR_CASE_DEF_KEY,
-                SparkImporterVariables.VAR_TASK_ID,
-                SparkImporterVariables.VAR_DELETE_REASON,
-                SparkImporterVariables.VAR_TENANT_ID
-                //SparkImporterVariables.VAR_STATE
-                //SparkImporterVariables.VAR_BYTEARRAY_ID
-        )
-                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
-                .agg(
-                        first(SparkImporterVariables.VAR_ID).as(SparkImporterVariables.VAR_ID),
-                        first(SparkImporterVariables.VAR_SUPER_PROCESS_INSTANCE_ID).as(SparkImporterVariables.VAR_SUPER_PROCESS_INSTANCE_ID),
-                        first(SparkImporterVariables.VAR_SUPER_CASE_INSTANCE_ID).as(SparkImporterVariables.VAR_SUPER_CASE_INSTANCE_ID),
-                        first(SparkImporterVariables.VAR_EXCEUTION_ID).as(SparkImporterVariables.VAR_EXCEUTION_ID),
-                        first(SparkImporterVariables.VAR_BUSINESS_KEY).as(SparkImporterVariables.VAR_BUSINESS_KEY),
-                        first(SparkImporterVariables.VAR_PROCESS_DEF_KEY).as(SparkImporterVariables.VAR_PROCESS_DEF_KEY),
-                        first(SparkImporterVariables.VAR_PROCESS_DEF_ID).as(SparkImporterVariables.VAR_PROCESS_DEF_ID),
-                        first(SparkImporterVariables.VAR_START_TIME).as(SparkImporterVariables.VAR_START_TIME),
-                        first(SparkImporterVariables.VAR_END_TIME).as(SparkImporterVariables.VAR_END_TIME),
-                        first(SparkImporterVariables.VAR_DURATION).as(SparkImporterVariables.VAR_DURATION),
-                        first(SparkImporterVariables.VAR_START_USER_ID).as(SparkImporterVariables.VAR_START_USER_ID),
-                        first(SparkImporterVariables.VAR_ACT_INST_ID).as(SparkImporterVariables.VAR_ACT_INST_ID),
-                        //first(SparkImporterVariables.VAR_START_ACT_ID).as(SparkImporterVariables.VAR_START_ACT_ID),
-                        //first(SparkImporterVariables.VAR_END_ACT_ID).as(SparkImporterVariables.VAR_END_ACT_ID),
-                        //first(SparkImporterVariables.VAR_CASE_INST_ID).as(SparkImporterVariables.VAR_CASE_INST_ID),
-                        //first(SparkImporterVariables.VAR_CASE_EXECUTION_ID).as(SparkImporterVariables.VAR_CASE_EXECUTION_ID),
-                        //first(SparkImporterVariables.VAR_CASE_DEF_ID).as(SparkImporterVariables.VAR_CASE_DEF_ID),
-                        //first(SparkImporterVariables.VAR_CASE_DEF_KEY).as(SparkImporterVariables.VAR_CASE_DEF_KEY),
-                        first(SparkImporterVariables.VAR_TASK_ID).as(SparkImporterVariables.VAR_TASK_ID),
-                        first(SparkImporterVariables.VAR_DELETE_REASON).as(SparkImporterVariables.VAR_DELETE_REASON),
-                        first(SparkImporterVariables.VAR_TENANT_ID).as(SparkImporterVariables.VAR_TENANT_ID)
-                        //first(SparkImporterVariables.VAR_STATE).as(SparkImporterVariables.VAR_STATE)
-                        //first(SparkImporterVariables.VAR_BYTEARRAY_ID).as(SparkImporterVariables.VAR_BYTEARRAY_ID)
-                ).withColumnRenamed(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
 
+        // take columns available initially from helper dataset and select the ones to be added back again
+        List<String> existingColumns = Arrays.asList(dataset.columns());
+        Dataset<Row> startColumns = PreprocessingRunner.helper_datasets.get("startColumns");
+        List<String> columnNamesString = new ArrayList<>();
+        List<Column> columnNames = new ArrayList<>();
+        List<String> columnsNotBeAddedAgain = Arrays.asList(new String[]{
+                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
+                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
+                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
+                SparkImporterVariables.VAR_LONG,
+                SparkImporterVariables.VAR_DOUBLE,
+                SparkImporterVariables.VAR_TEXT,
+                SparkImporterVariables.VAR_TEXT2,
+                SparkImporterVariables.VAR_TIMESTAMP,
+                SparkImporterVariables.VAR_SEQUENCE_COUNTER,
+                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_INSTANCE_ID
+        });
+        columnNames.add(new Column(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID));
+        for(Row row : startColumns.collectAsList()) {
+            String column = row.getString(0);
+            if(!existingColumns.contains(column) && !columnsNotBeAddedAgain.contains(column)) {
+                columnNamesString.add(column);
+                columnNames.add(new Column(column));
+            }
+        }
+        Seq<Column> selectionColumns = SparkImporterUtils.getInstance().asSeq(columnNames);
+
+        //get relevant data from initial dataset to be added back again
+        Dataset<Row> initialDataset = PreprocessingRunner.helper_datasets.get(PreprocessingRunner.DATASET_INITIAL);
+        Map<String, String> aggregationMap = new HashMap<>();
+        for(String column : columnNamesString) {
+            aggregationMap.put(column, "first");
+        }
+
+        initialDataset = initialDataset
+                .select(selectionColumns).toDF()
+                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
+                .agg(aggregationMap)
+                .withColumnRenamed(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
+
+        //rename back columns after aggregation
+        String pattern = "(first)\\((.+)\\)";
+        Pattern r = Pattern.compile(pattern);
+
+        for(String columnName : initialDataset.columns()) {
+            Matcher m = r.matcher(columnName);
+            if(m.find()) {
+                String newColumnName = m.group(2);
+                initialDataset = initialDataset.withColumnRenamed(columnName, newColumnName);
+            }
+        }
+
+        // rejoin removed columns to dataset
         dataset = dataset.join(initialDataset, col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).equalTo(col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right")), "left");
+        dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "joined_columns");
