@@ -11,11 +11,11 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.viadee.ki.sparkimporter.SparkImporterKafkaDataProcessingApplication.ARGS;
+import static de.viadee.ki.sparkimporter.KafkaProcessingApplication.ARGS;
 
-public class KafkaDataProcessingRunner implements ImportRunnerInterface {
+public class KafkaProcessingRunner implements ImportRunnerInterface {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KafkaDataProcessingRunner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaProcessingRunner.class);
 
     @Override
     public void run(SparkSession sparkSession) {

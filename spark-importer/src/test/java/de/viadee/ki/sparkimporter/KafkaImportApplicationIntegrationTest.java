@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
-public class SparkImporterKafkaImportApplicationIntegrationTest {
+public class KafkaImportApplicationIntegrationTest {
 
     private final static String FILE_STREAM_INPUT_PROCESS_INSTANCE = "./src/test/resources/integration_test_file_kafka_stream_processInstance.json";
     private final static String FILE_STREAM_INPUT_VARIABLE_UPDATE = "./src/test/resources/integration_test_file_kafka_stream_variableUpdate.json";
@@ -96,7 +96,7 @@ public class SparkImporterKafkaImportApplicationIntegrationTest {
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
-        SparkImporterKafkaImportApplication.main(args);
+        KafkaImportApplication.main(args);
 
         //start Spark session
         SparkSession sparkSession = SparkSession.builder()
@@ -127,7 +127,7 @@ public class SparkImporterKafkaImportApplicationIntegrationTest {
         SparkSession.builder().config(sparkConf).getOrCreate();
 
         // run main class
-        SparkImporterKafkaDataProcessingApplication.main(args);
+        KafkaProcessingApplication.main(args);
 
         //start Spark session
         SparkSession sparkSession = SparkSession.builder()

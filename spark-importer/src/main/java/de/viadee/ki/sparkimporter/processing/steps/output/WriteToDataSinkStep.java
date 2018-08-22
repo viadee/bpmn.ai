@@ -6,7 +6,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
 
-import static de.viadee.ki.sparkimporter.SparkImporterKafkaImportApplication.ARGS;
+import static de.viadee.ki.sparkimporter.KafkaImportApplication.ARGS;
 
 public class WriteToDataSinkStep implements PreprocessingStepInterface {
     @Override

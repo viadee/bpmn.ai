@@ -25,7 +25,7 @@ import org.apache.spark.streaming.kafka010.LocationStrategies;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
-import static de.viadee.ki.sparkimporter.SparkImporterKafkaImportApplication.ARGS;
+import static de.viadee.ki.sparkimporter.KafkaImportApplication.ARGS;
 
 public class KafkaImportRunner implements ImportRunnerInterface {
 

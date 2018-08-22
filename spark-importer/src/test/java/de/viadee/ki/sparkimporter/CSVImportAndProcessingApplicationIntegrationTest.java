@@ -16,7 +16,7 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class SparkImporterCSVApplicationIntegrationTest {
+public class CSVImportAndProcessingApplicationIntegrationTest {
 
     private static final String TEST_INPUT_FILE_NAME = "./src/test/resources/integration_test_file.csv";
 
@@ -36,7 +36,7 @@ public class SparkImporterCSVApplicationIntegrationTest {
         SparkSession.builder().config(sparkConf).getOrCreate();
 
         // run main class
-        SparkImporterCSVApplication.main(args);
+        CSVImportAndProcessingApplication.main(args);
 
         //read result csv
         BufferedReader resultFileReader = new BufferedReader(new FileReader(new File(TEST_OUTPUT_FILE_NAME)));

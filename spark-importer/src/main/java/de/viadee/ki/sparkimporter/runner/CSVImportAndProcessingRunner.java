@@ -13,11 +13,11 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.viadee.ki.sparkimporter.SparkImporterCSVApplication.ARGS;
+import static de.viadee.ki.sparkimporter.CSVImportAndProcessingApplication.ARGS;
 
-public class CSVImportRunner implements ImportRunnerInterface {
+public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CSVImportRunner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CSVImportAndProcessingRunner.class);
 
     @Override
     public void run(SparkSession sparkSession) {

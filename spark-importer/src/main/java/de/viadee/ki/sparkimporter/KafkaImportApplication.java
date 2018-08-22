@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-public class SparkImporterKafkaImportApplication {
+public class KafkaImportApplication {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SparkImporterKafkaImportApplication.class);
+	private static final Logger LOG = LoggerFactory.getLogger(KafkaImportApplication.class);
 	public static SparkImporterKafkaImportArguments ARGS;
 
 	public static void main(String[] arguments) {
