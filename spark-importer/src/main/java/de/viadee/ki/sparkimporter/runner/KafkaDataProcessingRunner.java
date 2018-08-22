@@ -8,10 +8,14 @@ import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.viadee.ki.sparkimporter.SparkImporterKafkaDataProcessingApplication.ARGS;
 
 public class KafkaDataProcessingRunner implements ImportRunnerInterface {
+
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaDataProcessingRunner.class);
 
     @Override
     public void run(SparkSession sparkSession) {
@@ -21,7 +25,8 @@ public class KafkaDataProcessingRunner implements ImportRunnerInterface {
                 .option("inferSchema", "true")
                 .load(ARGS.getFileSource());
 
-        System.out.println("================ STARTING PROCESSING DATA ================");
+        //TODO: change to Log
+        LOG.info("================ STARTING PROCESSING DATA ================");
 
         //go through pipe elements
         // Define processing steps to run

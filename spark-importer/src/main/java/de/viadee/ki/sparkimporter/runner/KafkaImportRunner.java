@@ -130,8 +130,6 @@ public class KafkaImportRunner implements ImportRunnerInterface {
     }
 
     private synchronized void processMasterRDD(JavaRDD<String> newRDD, String queue) {
-//        System.out.println("============= RECEIVED RDD contains " + newRDD.count() + " entries.");
-
         if (newRDD.count() == 0) {
             if (!emptyQueues.contains(queue)) {
                 emptyQueues.add(queue);
