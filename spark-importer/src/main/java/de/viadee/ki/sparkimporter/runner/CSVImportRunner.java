@@ -2,10 +2,7 @@ package de.viadee.ki.sparkimporter.runner;
 
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariablesColumnsStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateProcessInstancesStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.GetVariablesTypesOccurenceStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.DropColumnsStep;
@@ -56,14 +53,12 @@ public class CSVImportRunner implements ImportRunnerInterface {
 
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 
-        // it's faster if we do not reduce the dataset columns in the beginning and
-        // rejoin the dataset later, left steps in commented if required later
-        //preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
+        preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
-        //preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
         preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
+        preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
         preprocessingRunner.addPreprocessorStep(new DropColumnsStep());
         preprocessingRunner.addPreprocessorStep(new TypeCastStep());
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());

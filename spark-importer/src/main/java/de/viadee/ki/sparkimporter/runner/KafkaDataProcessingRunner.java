@@ -25,7 +25,6 @@ public class KafkaDataProcessingRunner implements ImportRunnerInterface {
                 .option("inferSchema", "true")
                 .load(ARGS.getFileSource());
 
-        //TODO: change to Log
         LOG.info("================ STARTING PROCESSING DATA ================");
 
         //go through pipe elements

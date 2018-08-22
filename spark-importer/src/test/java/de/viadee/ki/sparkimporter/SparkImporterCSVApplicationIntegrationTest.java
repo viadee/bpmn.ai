@@ -123,11 +123,11 @@ public class SparkImporterCSVApplicationIntegrationTest {
     @Test
     public void testLineValuesHashes() {
         //check if hashes of line values are correct
-        assertEquals(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase(), "5E0E0F6757CD494C79350D65D02A76E3");
-        assertEquals(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase(), "BF81F2A31E15ECB35164ABAE306411C8");
-        assertEquals(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase(), "167BE6C759696772C15B1E193D378E02");
-        assertEquals(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase(), "5F89D623F24B334B943281F4E7CD080B");
-        assertEquals(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase(), "C0134C1E1C328C5A8DF6EC63E88FEA81");
+        assertEquals("E34E753635B7074DC7A0F94FF4B761EC", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+        assertEquals("417E5A1D562D811AF8F77C62080893C7", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+        assertEquals("7AB1533611FB1477A551B0CCDD6CDF3F", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+        assertEquals("21109B1043CB0591912B204308C60017", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+        assertEquals("0DC8B75014A143F4A4E98A8D79C8DF4B", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
     }
 
     private static String[] combine(String[] a, String[]... b){
