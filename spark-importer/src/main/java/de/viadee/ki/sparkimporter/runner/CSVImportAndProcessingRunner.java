@@ -4,6 +4,7 @@ import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
+import de.viadee.ki.sparkimporter.processing.steps.userconfig.DataFilterStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.FilterVariablesStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableNameMappingStep;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
@@ -48,10 +49,14 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
 
         // Define processing steps to run
         final PreprocessingRunner preprocessingRunner = new PreprocessingRunner();
-
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 
+        //add steps
+        // spark shows exception with correct result when this step is placed after data filter step, which would be better. therefore it stays here
         preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
+
+        // user configuration step
+        preprocessingRunner.addPreprocessorStep(new DataFilterStep());
 
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new FilterVariablesStep());

@@ -67,6 +67,7 @@ public class ConfigurationUtils {
         }
 
         DataExtractionConfiguration dataExtractionConfiguration = new DataExtractionConfiguration();
+        dataExtractionConfiguration.setFilterQuery("");
 
         ModelLearningConfiguration modelLearningConfiguration = new ModelLearningConfiguration();
 

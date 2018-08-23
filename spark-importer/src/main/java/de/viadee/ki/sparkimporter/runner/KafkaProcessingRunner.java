@@ -2,7 +2,7 @@ package de.viadee.ki.sparkimporter.runner;
 
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
-import de.viadee.ki.sparkimporter.processing.steps.output.DataSinkFilterStep;
+import de.viadee.ki.sparkimporter.processing.steps.userconfig.DataFilterStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.FilterVariablesStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableNameMappingStep;
@@ -36,8 +36,12 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
 
         // it's faster if we do not reduce the dataset columns in the beginning and
         // rejoin the dataset later, left steps in commented if required later
-        preprocessingRunner.addPreprocessorStep(new DataSinkFilterStep());
+
+        // spark shows exception with correct result when this step is placed after data filter step, which would be better. therefore it stays here
         preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
+
+        // user configuration step
+        preprocessingRunner.addPreprocessorStep(new DataFilterStep());
 
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new FilterVariablesStep());
