@@ -30,8 +30,12 @@ public class SparkImporterKafkaDataProcessingArguments {
 	private boolean writeStepResultsToCSV = false;
 
 	@Parameter(names = { "--working-directory",
-			"-wd" }, required = false, description = "Folder where the configuration and log files are stored or should be stored.")
+			"-wd" }, required = false, description = "Folder where the configuration files are stored or should be stored.")
 	private String workingDirectory = "./";
+
+	@Parameter(names = { "--log-directory",
+			"-ld" }, required = false, description = "Folder where the log files should be stored.")
+	private String logDirectory = "./";
 
 	/**
 	 * Singleton.
@@ -63,6 +67,10 @@ public class SparkImporterKafkaDataProcessingArguments {
 		return workingDirectory;
 	}
 
+	public String getLogDirectory() {
+		return logDirectory;
+	}
+
 	/**
 	 * @return SparkImporterKafkaDataProcessingArguments instance
 	 */
@@ -78,6 +86,7 @@ public class SparkImporterKafkaDataProcessingArguments {
 		return "SparkImporterKafkaDataProcessingArguments{" + "fileSource='" + fileSource + '\'' + ", delimiter='" + delimiter
 				+ '\'' + ", fileDestination='" + fileDestination + '\'' + ", revisionCount=" + revisionCount
 				+ '\'' + ", writeStepResultsToCSV='" + writeStepResultsToCSV
-				+ '\'' + ", workingDirectory=" + workingDirectory + '}';
+				+ '\'' + ", workingDirectory=" + workingDirectory
+				+ '\'' + ", logDirectory=" + logDirectory + '}';
 	}
 }

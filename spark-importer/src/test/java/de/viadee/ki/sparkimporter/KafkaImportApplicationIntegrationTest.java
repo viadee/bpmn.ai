@@ -34,8 +34,6 @@ public class KafkaImportApplicationIntegrationTest {
     private final static String FILE_STREAM_INPUT_PROCESS_INSTANCE = "./src/test/resources/integration_test_file_kafka_stream_processInstance.json";
     private final static String FILE_STREAM_INPUT_VARIABLE_UPDATE = "./src/test/resources/integration_test_file_kafka_stream_variableUpdate.json";
     private final static String IMPORT_TEST_OUTPUT_DIRECTORY = "integration-test-result-kafka-import";
-    private final static String DATA_PROCESSING_TEST_OUTPUT_DIRECTORY = "integration-test-result-kafka-processing";
-    private final static String DATA_PROCESSING_TEST_INPUT_DIRECTORY = "./src/test/resources/integration_test_kafka_processing_data";
 
     private final static String TOPIC_PROCESS_INSTANCE = "processInstance";
     private final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
@@ -107,51 +105,15 @@ public class KafkaImportApplicationIntegrationTest {
         //generate Dataset and create hash to compare
         Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY);
 
-        //check that dataset contains 20 lines
-        assertEquals(20, importedDataset.count());
+        //check that dataset contains 21 lines
+        assertEquals(21, importedDataset.count());
 
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("7E3AEBA63A6A95C083FB386F6A2D79B2", hash);
+        assertEquals("43A9D66E77A12E62C8805760CE58EC76", hash);
 
         //close Spark session
         sparkSession.close();
-    }
-
-    @Test
-    public void testKafkaDataProcessing() throws Exception {
-        //run main class
-        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY, "-d", "|", "-sr", "false"};
-        SparkConf sparkConf = new SparkConf();
-        sparkConf.setMaster("local[*]");
-        SparkSession.builder().config(sparkConf).getOrCreate();
-
-        // run main class
-        KafkaProcessingApplication.main(args);
-
-        //start Spark session
-        SparkSession sparkSession = SparkSession.builder()
-                .master("local[*]")
-                .appName("IntegrationTest")
-                .getOrCreate();
-
-        //generate Dataset and create hash to compare
-        Dataset<Row> importedDataset = sparkSession.read()
-                .option("inferSchema", "true")
-                .option("delimiter","|")
-                .option("header", "true")
-                .csv(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY + "/result.csv");
-
-        //check that dataset contains 4 lines
-        assertEquals(4, importedDataset.count());
-
-        //check that dataset contains 41 columns
-        assertEquals(41, importedDataset.columns().length);
-
-        //check hash of dataset
-        String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("AAC5C9150EFDD8C244C41ECDD1E5C55A", hash);
-
     }
 
     @AfterClass

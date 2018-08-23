@@ -14,11 +14,13 @@ public class SparkImporterLogger {
 
     private final String LOG_FILE_NAME = "spark-importer.log";
 
+    private static String logDirectory = ".";
+
     private static SparkImporterLogger instance;
 
     private SparkImporterLogger(){
         try {
-            logFileHandler = new FileHandler(SparkImporterUtils.getWorkingDirectory()+"/"+LOG_FILE_NAME);
+            logFileHandler = new FileHandler(getLogDirectory()+"/"+LOG_FILE_NAME);
 
             logFileHandler.setFormatter(new SimpleFormatter() {
                 private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
@@ -46,6 +48,14 @@ public class SparkImporterLogger {
             instance = new SparkImporterLogger();
         }
         return instance;
+    }
+
+    public static String getLogDirectory() {
+        return logDirectory;
+    }
+
+    public static void setLogDirectory(String logDirectory) {
+        SparkImporterLogger.logDirectory = logDirectory;
     }
 
     public void writeInfo(String message) {

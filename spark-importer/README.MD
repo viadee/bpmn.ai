@@ -10,13 +10,14 @@ The following applications three applications are available:
 
 Each of those applications serves a different purpose.
 
-## SparkImporterCSVApplication
+## CSV Import and Processing
 
-This application takes data from an CSV export of Camunda history database tables and aggreates them to a data mining table. The result is also a CSV file containing the data mining table structure.
+This application ( takes data from an CSV export of Camunda history database tables and aggreates them to a data mining table. The result is also a CSV file containing the data mining table structure.
 
 The SQL statement for exporting the data from Camunda is as follows:
 
 	SELECT * FROM ACT_HI_PROCINST a JOIN ACT_HI_VARINST v ON a.PROC_INST_ID_ = v.PROC_INST_ID_ AND a.proc_def_key_ = 'XYZ'
+
 	
 ### Parameters
 
@@ -27,6 +28,8 @@ Parameter                 | Description                | mandatory
 -d or --delimiter         | Character or string that separates fields such as [ ;, &#124; or &#124;&#124;&#124; ]. Please make sure that these are not contained in your data. | yes
 -rc or --revision-count   | Boolean toggle to enable the counting of changes to a variable. It results in a number of columns named <VARIABLE_NAME>_rev. | no (default is true)
 -sr or --step-results     | Defines if intermediate results be written into CSV files. | no (default is false)
+-wd or --working-directory| Folder where the configuration files are stored or should be stored. | no (default is the current directory)
+-ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
 
 
 ## SparkImporterKafkaImportApplication
@@ -45,6 +48,8 @@ Parameter                 | Description	                | mandatory
 -fd or --file-destination | The name of the target folder, where the received data should be stored to (e.g. a local folder or a hdfs target). | yes
 -bm or --batch-mode.      | in batch mode the application stops receiving data, once every queue has returned zero entries at least aonce during the stream. Otherwise it keeps the stream running until it is aborted. | no (default is false)
 -sr or --step-results     | Defines if intermediate results be written into CSV files. | no (default is false)
+-wd or --working-directory| Folder where the configuration files are stored or should be stored. | no (default is the current directory)
+-ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
 
 ## SparkImporterKafkaDataProcessingApplication
 
@@ -59,6 +64,8 @@ Parameter                 | Description                | mandatory
 -d or --delimiter         | Character or string that should be used in the resulting CSV file as a separator for fields such as [ ;, &#124; or &#124;&#124;&#124; ]. Please make sure that these are not contained in your data. | yes
 -rc or --revision-count   | Boolean toggle to enable the counting of changes to a variable. It results in a number of columns named <VARIABLE_NAME>_rev. | no (default is true)
 -sr or --step-results     | Defines if intermediate results be written into CSV files. | no (default is false)
+-wd or --working-directory| Folder where the configuration files are stored or should be stored. | no (default is the current directory)
+-ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
 
 ## Setup and run in IntelliJ / Eclipse
 In order for the SparkImporterApplications to run in IntelliJ the run configuration needs to be amended.
@@ -67,7 +74,7 @@ Try to run the Applicaiton once as a Java Application and the add the following 
 ### VM arguments
 
 #### mandatory
-This defines that Spark should run in local standalone mode and utilise all CPUs
+This defines that Spark should run in local standalone mode and utilise all CPUs.
 
 	-Dspark.master=local[*]
 
@@ -89,5 +96,5 @@ In order to run the application with spark-submit you first need to package the 
 	
 Then you can run the spark-submit command from the bin folder of your Apache Spark installation by referencing the created JAR file and the Spark application class you would like to run including its parameters.
 
-	bin/spark-submit --class de.viadee.ki.sparkimporter.SparkImporterCSVApplication --master "local" --deploy-mode client --name ViadeeSparkImporter <path_to_packaged_jar> -fs <path_to_input_csv> -fd <path_to_target_folder_for_results> -d <field_delimiter>
+	bin/spark-submit --class de.viadee.ki.sparkimporter.SparkImporterCSVApplication --master "local[*]" --deploy-mode client --name ViadeeSparkImporter <path_to_packaged_jar> -fs <path_to_input_csv> -fd <path_to_target_folder_for_results> -d <field_delimiter>
 

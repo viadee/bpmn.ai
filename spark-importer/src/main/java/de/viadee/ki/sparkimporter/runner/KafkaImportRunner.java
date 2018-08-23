@@ -25,6 +25,7 @@ import org.apache.spark.streaming.kafka010.LocationStrategies;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 import static de.viadee.ki.sparkimporter.KafkaImportApplication.ARGS;
 
@@ -141,12 +142,22 @@ public class KafkaImportRunner implements ImportRunnerInterface {
 
     private synchronized void processMasterRDD(JavaRDD<String> newRDD, String queue) {
         if (newRDD.count() == 0) {
-            if (!emptyQueues.contains(queue)) {
-                emptyQueues.add(queue);
+            if(ARGS.isBatchMode()) {
+                SparkImporterLogger.getInstance().writeInfo("Kafka queue '" + queue + "' returned zero entries.");
+
+                if (!emptyQueues.contains(queue)) {
+                    emptyQueues.add(queue);
+                }
+                if(emptyQueues.size() == EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) {
+                    SparkImporterLogger.getInstance().writeInfo("All Kafka queues ("
+                            + emptyQueues.stream().collect(Collectors.joining(","))
+                            + ") returned zero entries once. Stopping as running in batch mode");
+                    countDownLatch.countDown();
+                }
             }
-            if(emptyQueues.size() == EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) {
-                countDownLatch.countDown();
-            }
+
+
+
             return;
         }
 

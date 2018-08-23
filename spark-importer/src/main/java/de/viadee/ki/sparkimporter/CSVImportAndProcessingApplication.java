@@ -6,6 +6,7 @@ import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggreg
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.runner.CSVImportAndProcessingRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.commons.io.FileUtils;
@@ -37,6 +38,7 @@ public class CSVImportAndProcessingApplication {
 		//workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
 		SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
 		SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
+		SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
 
 		// SparkImporter code starts here
 

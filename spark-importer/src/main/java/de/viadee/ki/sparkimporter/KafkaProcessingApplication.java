@@ -6,6 +6,7 @@ import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggreg
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.runner.KafkaProcessingRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterKafkaDataProcessingArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.commons.io.FileUtils;
@@ -38,6 +39,7 @@ public class KafkaProcessingApplication {
 		//workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
 		SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
 		SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
+		SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
 
 		final long startMillis = System.currentTimeMillis();
 

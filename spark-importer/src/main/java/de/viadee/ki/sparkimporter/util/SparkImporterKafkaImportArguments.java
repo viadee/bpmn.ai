@@ -26,8 +26,12 @@ public class SparkImporterKafkaImportArguments {
 	private boolean batchMode = false;
 
 	@Parameter(names = { "--working-directory",
-			"-wd" }, required = false, description = "Folder where the configuration and log files are stored or should be stored.")
+			"-wd" }, required = false, description = "Folder where the configuration files are stored or should be stored.")
 	private String workingDirectory = "./";
+
+	@Parameter(names = { "--log-directory",
+			"-ld" }, required = false, description = "Folder where the log files should be stored.")
+	private String logDirectory = "./";
 
 	/**
 	 * Singleton.
@@ -56,6 +60,10 @@ public class SparkImporterKafkaImportArguments {
 		return workingDirectory;
 	}
 
+	public String getLogDirectory() {
+		return logDirectory;
+	}
+
 	/**
 	 * @return SparkImporterKafkaImportArguments instance
 	 */
@@ -71,6 +79,7 @@ public class SparkImporterKafkaImportArguments {
 		return "SparkImporterKafkaImportArguments{" + "kafkaBroker='" + kafkaBroker + '\'' + ", fileDestination='" + fileDestination
 				+ '\'' + ", writeStepResultsToCSV=" + writeStepResultsToCSV + '}'
 				+ '\'' + ", batchMode=" + batchMode
-				+ '\'' + ", workingDirectory=" + workingDirectory + '}';
+				+ '\'' + ", workingDirectory=" + workingDirectory
+				+ '\'' + ", logDirectory=" + logDirectory + '}';
 	}
 }
