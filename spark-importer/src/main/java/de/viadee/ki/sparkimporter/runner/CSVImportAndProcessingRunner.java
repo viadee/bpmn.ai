@@ -50,6 +50,11 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
+
+        // Start of user configuration steps
+        // End of user configuration steps
+
+        preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
         preprocessingRunner.addPreprocessorStep(new AggregateVariableUpdatesStep());
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
         preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());

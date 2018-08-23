@@ -31,6 +31,10 @@ public class SparkImporterArguments {
 			"-sr" }, description = "Should intermediate results be written into CSV files?", arity = 1)
 	private boolean writeStepResultsToCSV = false;
 
+	@Parameter(names = { "--config-path",
+			"-cp" }, required = false, description = "Folder where the configuration files are stored or should be stored.")
+	private String configurationPath = "./";
+
 	/**
 	 * Singleton.
 	 */
@@ -57,6 +61,10 @@ public class SparkImporterArguments {
 		return writeStepResultsToCSV;
 	}
 
+	public String getConfigurationPath() {
+		return configurationPath;
+	}
+
 	/**
 	 * @return DataExtractorArguments-Instanz as Singleton
 	 */
@@ -70,6 +78,7 @@ public class SparkImporterArguments {
 	@Override
 	public String toString() {
 		return "SpringImporterArguments{" + "fileSource='" + fileSource + '\'' + ", delimiter='" + delimiter
-				+ '\'' + ", fileDestination='" + fileDestination + '\'' + ", revisionCount=" + revisionCount + '}';
+				+ '\'' + ", fileDestination='" + fileDestination + '\'' + ", revisionCount=" + revisionCount
+				+ '\'' + ", configurationPath=" + configurationPath + '}';
 	}
 }

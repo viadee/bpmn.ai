@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.configuration.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -58,6 +59,11 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
 
         for (String key : variables.keySet()) {
             filteredVariablesRows.add(RowFactory.create(key, variables.get(key)));
+        }
+
+        //if there is no configuration file yet, write one
+        if(ConfigurationUtils.getInstance().getConfiguration() == null) {
+            ConfigurationUtils.getInstance().writeConfiguration(variables);
         }
 
         StructType schema = new StructType(new StructField[] {

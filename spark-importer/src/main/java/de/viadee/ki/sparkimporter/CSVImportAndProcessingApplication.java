@@ -2,6 +2,7 @@ package de.viadee.ki.sparkimporter;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import de.viadee.ki.sparkimporter.configuration.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.runner.CSVImportAndProcessingRunner;
@@ -35,6 +36,7 @@ public class CSVImportAndProcessingApplication {
 
 		//workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
 		SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
+		ConfigurationUtils.getInstance().setConfigurationFilePath(ARGS.getConfigurationPath());
 
 		// SparkImporter code starts here
 
