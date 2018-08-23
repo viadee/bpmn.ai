@@ -34,14 +34,14 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
 
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 
-        // it's faster if we do not reduce the dataset columns in the beginning and
-        // rejoin the dataset later, left steps in commented if required later
 
-        // spark shows exception with correct result when this step is placed after data filter step, which would be better. therefore it stays here
-        preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
-
+        // add steps
+        
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new DataFilterStep());
+
+        //generic step
+        preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
 
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new VariableFilterStep());
@@ -49,6 +49,7 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new VariableNameMappingStep());
 
+        //generic steps
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
         preprocessingRunner.addPreprocessorStep(new AggregateVariableUpdatesStep());

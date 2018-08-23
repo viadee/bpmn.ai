@@ -52,11 +52,12 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 
         //add steps
-        // spark shows exception with correct result when this step is placed after data filter step, which would be better. therefore it stays here
-        preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
 
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new DataFilterStep());
+
+        //generic step
+        preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
 
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new VariableFilterStep());
@@ -64,6 +65,7 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new VariableNameMappingStep());
 
+        //generic steps
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());

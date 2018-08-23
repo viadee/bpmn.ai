@@ -78,8 +78,8 @@ When data runs through the processing, there are multiple steps involved. They d
 
 Step							| Step type
 --------------------------|------------
-ReduceColumns 				| generic
-DataFilter					| user config	 
+DataFilter					| user config
+ReduceColumns 				| generic	 
 VariableFilter				| user config	 
 VariableNameMapping			| user config	
 GetVariablesTypesOccurence	| generic
@@ -90,11 +90,12 @@ AggregateProcessInstances	| generic
 AddRemovedColumnsToDataset	| generic
 WriteToCSV					| generic
 
-### ReduceColumns
-The columns of the input data is reduced to the minimum required for the processing to speed up the processing. The removed columns are added back in the end.
 
 ### DataFilter
 If the configuration contains a filter query (e.g. by limiting the processing only to one process definition id, it is applied in this step to reduce the input data.
+
+### ReduceColumns
+The columns of the input data is reduced to the minimum required for the processing to speed up the processing. The removed columns are added back in the end.
 
 ### VariableFilter
 If the configuration contains variable that should not be processed then they are filtered out during this step.
