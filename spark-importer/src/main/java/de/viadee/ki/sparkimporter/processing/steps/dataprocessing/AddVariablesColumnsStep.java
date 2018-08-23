@@ -42,6 +42,7 @@ public class AddVariablesColumnsStep implements PreprocessingStepInterface {
 
         //drop unnecesssary columns
         dataset = dataset.drop(
+                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
                 SparkImporterVariables.VAR_DOUBLE,

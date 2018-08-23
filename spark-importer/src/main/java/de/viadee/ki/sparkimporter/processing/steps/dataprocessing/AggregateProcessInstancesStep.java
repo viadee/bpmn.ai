@@ -39,11 +39,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
                 .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_STATE))))
                 .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
                 .agg(aggregationMap);
-
-        //cleanup, so renaming columns and dropping not used ones
-        //datasetPIAgg = datasetPIAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
-        datasetPIAgg = datasetPIAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
-
+        
         //rename back columns after aggregation
         String pattern = "(max|allbutemptystring|processstate)\\((.+)\\)";
         Pattern r = Pattern.compile(pattern);

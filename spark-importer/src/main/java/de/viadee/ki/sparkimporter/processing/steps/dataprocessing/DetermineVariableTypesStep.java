@@ -13,7 +13,7 @@ import java.util.Map;
 
 import static org.apache.spark.sql.functions.max;
 
-public class GetVariablesTypesOccurenceStep implements PreprocessingStepInterface {
+public class DetermineVariableTypesStep implements PreprocessingStepInterface {
 
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
