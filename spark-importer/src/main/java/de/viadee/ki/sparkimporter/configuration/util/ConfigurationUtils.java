@@ -1,7 +1,13 @@
-package de.viadee.ki.sparkimporter.configuration;
+package de.viadee.ki.sparkimporter.configuration.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import de.viadee.ki.sparkimporter.configuration.Configuration;
+import de.viadee.ki.sparkimporter.configuration.dataextraction.DataExtractionConfiguration;
+import de.viadee.ki.sparkimporter.configuration.modellearning.ModelLearningConfiguration;
+import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
+import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
+import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableNameMapping;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 
@@ -44,6 +50,11 @@ public class ConfigurationUtils {
 
     public void writeConfiguration(Map<String, String> variables) {
         PreprocessingConfiguration preprocessingConfiguration = new PreprocessingConfiguration();
+
+        VariableNameMapping variableNameMapping = new VariableNameMapping();
+        variableNameMapping.setOldName("");
+        variableNameMapping.setNewName("");
+        preprocessingConfiguration.getVariableNameMappings().add(variableNameMapping);
 
         for(String key : variables.keySet()) {
             VariableConfiguration variableConfiguration = new VariableConfiguration();

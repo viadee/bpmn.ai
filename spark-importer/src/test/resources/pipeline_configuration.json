@@ -8,6 +8,16 @@
         "use_variable": false,
         "comment": ""
       }
+    ],
+    "variable_name_mapping": [
+      {
+        "old_name": "b",
+        "new_name": "f"
+      },
+      {
+        "old_name": "a",
+        "new_name": ""
+      }
     ]
   },
   "model_learning": {}

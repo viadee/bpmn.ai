@@ -1,4 +1,4 @@
-package de.viadee.ki.sparkimporter.configuration;
+package de.viadee.ki.sparkimporter.configuration.preprocessing;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -47,5 +47,4 @@ public class VariableConfiguration {
     public void setComment(String comment) {
         this.comment = comment;
     }
-
 }

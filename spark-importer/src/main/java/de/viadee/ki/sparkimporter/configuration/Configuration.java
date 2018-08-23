@@ -1,6 +1,9 @@
 package de.viadee.ki.sparkimporter.configuration;
 
 import com.google.gson.annotations.SerializedName;
+import de.viadee.ki.sparkimporter.configuration.dataextraction.DataExtractionConfiguration;
+import de.viadee.ki.sparkimporter.configuration.modellearning.ModelLearningConfiguration;
+import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 
 public class Configuration {
 

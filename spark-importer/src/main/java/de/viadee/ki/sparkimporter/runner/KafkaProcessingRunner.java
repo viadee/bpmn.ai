@@ -5,6 +5,7 @@ import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.output.DataSinkFilterStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.FilterVariablesStep;
+import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableNameMappingStep;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import org.apache.spark.sql.Dataset;
@@ -40,6 +41,9 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
 
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new FilterVariablesStep());
+
+        // user configuration step
+        preprocessingRunner.addPreprocessorStep(new VariableNameMappingStep());
 
         preprocessingRunner.addPreprocessorStep(new GetVariablesTypesOccurenceStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());

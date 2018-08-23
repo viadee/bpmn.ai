@@ -1,4 +1,4 @@
-package de.viadee.ki.sparkimporter.configuration;
+package de.viadee.ki.sparkimporter.configuration.preprocessing;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -10,11 +10,14 @@ public class PreprocessingConfiguration {
     @SerializedName("variable_configuration")
     List<VariableConfiguration> variableConfiguration = new ArrayList<>();
 
+    @SerializedName("variable_name_mapping")
+    List<VariableNameMapping> variableNameMappings = new ArrayList<>();
+
     public List<VariableConfiguration> getVariableConfiguration() {
         return variableConfiguration;
     }
 
-    public void setVariableConfiguration(List<VariableConfiguration> variableConfiguration) {
-        this.variableConfiguration = variableConfiguration;
+    public List<VariableNameMapping> getVariableNameMappings() {
+        return variableNameMappings;
     }
 }

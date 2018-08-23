@@ -1,6 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
-import de.viadee.ki.sparkimporter.configuration.ConfigurationUtils;
+import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;

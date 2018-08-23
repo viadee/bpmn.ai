@@ -105,12 +105,12 @@ public class KafkaImportApplicationIntegrationTest {
         //generate Dataset and create hash to compare
         Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY);
 
-        //check that dataset contains 21 lines
-        assertEquals(21, importedDataset.count());
+        //check that dataset contains 22 lines
+        assertEquals(22, importedDataset.count());
 
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("43A9D66E77A12E62C8805760CE58EC76", hash);
+        assertEquals("ED39DC24084D27A3B0FC405BDA93ADFE", hash);
 
         //close Spark session
         sparkSession.close();

@@ -1,9 +1,9 @@
 package de.viadee.ki.sparkimporter.processing.steps.userconfig;
 
 import de.viadee.ki.sparkimporter.configuration.Configuration;
-import de.viadee.ki.sparkimporter.configuration.ConfigurationUtils;
-import de.viadee.ki.sparkimporter.configuration.PreprocessingConfiguration;
-import de.viadee.ki.sparkimporter.configuration.VariableConfiguration;
+import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
+import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
+import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
