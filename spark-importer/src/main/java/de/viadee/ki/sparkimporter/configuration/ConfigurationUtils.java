@@ -2,6 +2,7 @@ package de.viadee.ki.sparkimporter.configuration;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 
 import java.io.*;
@@ -33,7 +34,7 @@ public class ConfigurationUtils {
                 try (Reader reader = new FileReader(SparkImporterUtils.getWorkingDirectory()+"/"+CONFIGURATION_FILE_NAME)) {
                     configuration = gson.fromJson(reader, Configuration.class);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    SparkImporterLogger.getInstance().writeError("An error occurred while reading the configuration file: " + e.getMessage());
                 }
             }
         }
@@ -66,7 +67,7 @@ public class ConfigurationUtils {
         try (Writer writer = new FileWriter(SparkImporterUtils.getWorkingDirectory()+"/"+CONFIGURATION_FILE_NAME)) {
             gson.toJson(configuration, writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            SparkImporterLogger.getInstance().writeError("An error occurred while writing the configuration file: " + e.getMessage());
         }
     }
 }

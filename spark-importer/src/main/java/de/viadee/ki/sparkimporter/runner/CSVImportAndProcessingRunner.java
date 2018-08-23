@@ -7,23 +7,23 @@ import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.FilterVariablesStep;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static de.viadee.ki.sparkimporter.CSVImportAndProcessingApplication.ARGS;
 
 public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CSVImportAndProcessingRunner.class);
-
     @Override
     public void run(SparkSession sparkSession) {
 
         final long startMillis = System.currentTimeMillis();
+
+        SparkImporterLogger.getInstance().writeInfo("Starting CSV import and processing");
+        SparkImporterLogger.getInstance().writeInfo("Importing CSV file: " + ARGS.getFileSource());
 
         //Load source CSV file
         Dataset<Row> dataset = sparkSession.read()
@@ -38,6 +38,8 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         if (SparkImporterArguments.getInstance().isWriteStepResultsToCSV()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
         }
+
+        SparkImporterLogger.getInstance().writeInfo("Starting data processing");
 
         InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
         dataset = initialCleanupStep.runPreprocessingStep(dataset, false);
@@ -70,6 +72,6 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
 
         final long endMillis = System.currentTimeMillis();
 
-        LOG.info("Job ran for " + ((endMillis - startMillis) / 1000) + " seconds in total.");
+        SparkImporterLogger.getInstance().writeInfo("CSV import and processing finished (took " + ((endMillis - startMillis) / 1000) + " seconds in total)");
     }
 }

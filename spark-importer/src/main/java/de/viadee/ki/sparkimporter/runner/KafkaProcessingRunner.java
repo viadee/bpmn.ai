@@ -6,27 +6,26 @@ import de.viadee.ki.sparkimporter.processing.steps.output.DataSinkFilterStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.FilterVariablesStep;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static de.viadee.ki.sparkimporter.KafkaProcessingApplication.ARGS;
 
 public class KafkaProcessingRunner implements ImportRunnerInterface {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KafkaProcessingRunner.class);
-
     @Override
     public void run(SparkSession sparkSession) {
+
+        SparkImporterLogger.getInstance().writeInfo("Starting data processing with data from: " + ARGS.getFileSource());
+
+        final long startMillis = System.currentTimeMillis();
 
         //Load source parquet file
         Dataset<Row> dataset = sparkSession.read()
                 .option("inferSchema", "true")
                 .load(ARGS.getFileSource());
-
-        LOG.info("================ STARTING PROCESSING DATA ================");
 
         //go through pipe elements
         // Define processing steps to run
@@ -52,6 +51,9 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
 
         // Run processing runner
         preprocessingRunner.run(dataset);
+
+        final long endMillis = System.currentTimeMillis();
+        SparkImporterLogger.getInstance().writeInfo("Kafka processing finished (took " + ((endMillis - startMillis) / 1000) + " seconds in total)");
 
         // Cleanup
         sparkSession.close();

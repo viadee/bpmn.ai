@@ -5,6 +5,7 @@ import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.KafkaImportStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -49,6 +50,11 @@ public class KafkaImportRunner implements ImportRunnerInterface {
 
     @Override
     public void run(SparkSession sc) {
+
+        SparkImporterLogger.getInstance().writeInfo("Starting Kafka import "+ (ARGS.isBatchMode() ? "in batch mode " : "") +"from: " + ARGS.getKafkaBroker());
+
+        final long startMillis = System.currentTimeMillis();
+
         sparkSession = sc;
         masterRdd = sparkSession.emptyDataset(Encoders.STRING()).javaRDD();
 
@@ -119,10 +125,14 @@ public class KafkaImportRunner implements ImportRunnerInterface {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            final long endMillis = System.currentTimeMillis();
+            SparkImporterLogger.getInstance().writeInfo("Kafka import finished (took " + ((endMillis - startMillis) / 1000) + " seconds in total)");
             jssc.stop(true);
         } else {
             try {
                 jssc.awaitTermination();
+                final long endMillis = System.currentTimeMillis();
+                SparkImporterLogger.getInstance().writeInfo("Kafka import finished (took " + ((endMillis - startMillis) / 1000) + " seconds in total)");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
