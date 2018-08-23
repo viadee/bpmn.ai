@@ -1,5 +1,7 @@
 {
-  "data_extraction": {},
+  "data_extraction": {
+    "filter_query": ""
+  },
   "preprocessing": {
     "variable_configuration": [
       {

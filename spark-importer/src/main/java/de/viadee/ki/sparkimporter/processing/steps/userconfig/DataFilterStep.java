@@ -27,6 +27,8 @@ public class DataFilterStep implements PreprocessingStepInterface {
                         SparkImporterLogger.getInstance().writeInfo("Filtering resulted in zero lines of data. Aborting. Please check your filter query.");
                         System.exit(1);
                     }
+                } else {
+                    SparkImporterLogger.getInstance().writeWarn("Ignoring empty filter query.");
                 }
             }
 
