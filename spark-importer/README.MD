@@ -74,7 +74,111 @@ Parameter                 | Description                | mandatory
 -ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
 
 ## Configuration
-TODO
+Some steps in the processing can be controlled by the user (see chapter "Data processing steps" for details). The configuration is done in a file named "pipeline_configuration.json" which should be located in the working-directory. If there is no configuration file the applications will create one, filled the variables found in the data and default configurations for them, which would result is no change if run again with this configuration.
+
+The configuration file has the following structure:
+
+	{
+  		"data_extraction": {
+	  		"filter_query": ""
+  		},
+  		"preprocessing": {
+    		"variable_configuration": [
+      			{
+        			"variable_name": "",
+        			"variable_type": "",
+        			"use_variable": true,
+        			"comment": ""
+        		}
+        	],
+        	"variable_name_mapping": [
+      			{
+        			"old_name": "",
+        			"new_name": ""
+      			}
+    		]
+      },
+      "model_learning": {}
+	}
+
+It contains three sections:
+
+	* Data extraction
+	* Preprocessing
+	* Model learning
+	
+### Data extraction
+This section contains configuration applied to the data during loading it for processing.
+
+#### filter_query
+By setting a filter query the data is filtered by this filter before it is run through the processing.
+
+It takes a SQL expression as an input which is applied to the filter method as defined in the [Spark documentation](https://spark.apache.org/docs/2.3.1/api/java/org/apache/spark/sql/Dataset.html#filter-java.lang.String-)
+
+Example:
+
+	processDefinitionId == 'p1'
+	
+### Preprocessing
+This section contains configuration applied to the data during processing.
+
+### variable_configuration
+After the first run this array is filled with all variables found in the data and can be amended by the user for the following runs.
+
+Property      |  Description
+--------------|-------------
+variable_name | The name of the variable
+variable_type | Which type the variable should be casted to after the data mining table has been created. In the processing all variables are handled as strings.
+use_variable  | Should the variable be considered during the run. If set to false it will fitlered out before the processing runs through.
+comment       | A comment if changes have been done to this variable, which will be written into the application log during processing.
+
+Example:
+
+	...
+	"variable_configuration": [
+		{
+			"variable_name": "a",
+			"variable_type": "string",
+			"use_variable": true,
+			"comment": ""
+		},
+		{
+			"variable_name": "b",
+			"variable_type": "boolean",
+			"use_variable": false,
+			"comment": "Not required"
+		},
+		{
+			"variable_name": "c",
+			"variable_type": "double",
+			"use_variable": true,
+			"comment": ""
+		}
+	],
+	...
+
+### variable\_name\_mapping
+
+In case variable names have changed in the dataset (e.g. in a new process version) a mapping can be added in this section which old variable name should be renamed to which new variable name.
+
+Property      |  Description
+--------------|-------------
+old_value     | The (old) name of the variable to be renamed
+new_value     | The (new) name of the variable to be renamed to
+
+Example:
+
+	...
+	"variable_name_mapping": [
+      {
+        "old_name": "amount",
+        "new_name": "amountInEUR"
+      }
+    ],
+    ...
+    
+### Model learning
+Section reserved for settings related to the machine learning model.
 
 ## Data processing steps
 When data runs through the processing, there are multiple steps involved. They differ in user configuration and generic processing steps. The following list show the steps from top to bottom the data is passing through:
