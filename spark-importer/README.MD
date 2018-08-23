@@ -10,14 +10,18 @@ The following applications three applications are available:
 
 Each of those applications serves a different purpose.
 
+## Data pipeline
+The picture below shows the pipeline through which the data flows from Camunda to the Machine Learning engine. Each of the three application serves a specific purpose and use cases around importing into, data aggregation and transformation inside and exporting data from Apache Spark. 
+![alt text](./doc/SparkImporterApplicationFlow.png "SparkImporterCSVApplication Pipeline")
+
+
 ## CSV Import and Processing
 
-This application ( takes data from an CSV export of Camunda history database tables and aggreates them to a data mining table. The result is also a CSV file containing the data mining table structure.
+This application (application class: CSVImportAndProcessingApplication) takes data from a CSV export of Camunda history database tables and aggreates them to a data mining table. The result is also a CSV file containing the data mining table structure.
 
 The SQL statement for exporting the data from Camunda is as follows:
 
 	SELECT * FROM ACT_HI_PROCINST a JOIN ACT_HI_VARINST v ON a.PROC_INST_ID_ = v.PROC_INST_ID_ AND a.proc_def_key_ = 'XYZ'
-
 	
 ### Parameters
 
@@ -32,13 +36,15 @@ Parameter                 | Description                | mandatory
 -ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
 
 
-## SparkImporterKafkaImportApplication
+## Kafka Import
 
-This application retrieves data from Kafka in which three queues have been made available and are filled by data from the history event handler of Camunda:
+This application (application class: KafkaImportApplication) retrieves data from Kafka in which three queues have been made available and are filled with data from the history event handler of Camunda:
 
 * **processInstance**: filled by events on the process instance level
 * **activityInstance**: filled by events on the activity instance level
 * **variableUpdate**: filled by events happening when a variable gets updated in any way
+
+It then stores the retrieved data in a defined location as parquet files. No data processing is happening by this application as it can run as a Spark application constantly receiving data from Kafka streams.
 
 ### Parameters
 
@@ -51,9 +57,9 @@ Parameter                 | Description	                | mandatory
 -wd or --working-directory| Folder where the configuration files are stored or should be stored. | no (default is the current directory)
 -ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
 
-## SparkImporterKafkaDataProcessingApplication
+## Kafka Processing
 
-This application retrieves data from the SparkImporterKafkaImportApplication. The --file-source parameter should match the --file-destination parameter of a SparkImporterKafkaImportApplication run.
+This application (application class: KafkaImportApplication) retrieves data from a Kafka Import. The --file-source parameter should match the --file-destination parameter of a Kafka Import run. The data runs through the same steps as in the CSV Import and Processing application, it is just a separate application as it has a different input than the CSV case.
 
 ### Parameters
 
@@ -66,6 +72,28 @@ Parameter                 | Description                | mandatory
 -sr or --step-results     | Defines if intermediate results be written into CSV files. | no (default is false)
 -wd or --working-directory| Folder where the configuration files are stored or should be stored. | no (default is the current directory)
 -ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
+
+## Data processing example
+This (to a minimum reduced) example should show what happens to the data that goes through the processing steps.
+
+Let's assume the following (simplified) data coming from Camunda.
+
+processInstanceId  	|  variableName 	|  serializer | text | long |  double  |  revision
+--------------------|---------------	|-------------|------|------|----------|------------
+1						| a					| string      | hello|      |          | 0
+1						| b					| boolean     |      | 1    |          | 1
+1						| c		     		| double      |      |      | 1.5      | 0
+2						| a					| string      | hi   |      |          | 0
+2						| b					| boolean     |      | 0    |          | 2
+2						| c		     		| double      |      |      | 12.5     | 1
+
+After procesing the data the following data mining table is produced which can be used to train a machine learning algorithm.
+
+processInstanceId  	|  a    |  b | c    | a_rev | b_rev | c_rev
+--------------------|-------|----|------|-------|-------|------
+1						| hello | 1  | 1.5  | 0     | 1     | 0
+1						| hi    | 0  | 12.5 | 0     | 2     | 1
+
 
 ## Setup and run in IntelliJ / Eclipse
 In order for the SparkImporterApplications to run in IntelliJ the run configuration needs to be amended.
