@@ -2,6 +2,7 @@ package de.viadee.ki.sparkimporter.configuration;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 
 import java.io.*;
 import java.util.Map;
@@ -9,8 +10,7 @@ import java.util.Map;
 public class ConfigurationUtils {
 
     private final Gson gson;
-    private String configurationFilePath = ".";
-    private String configurationFileName = "pipeline_configuration.json";
+    private final String CONFIGURATION_FILE_NAME = "pipeline_configuration.json";
     private Configuration configuration = null;
 
     private static ConfigurationUtils instance;
@@ -26,15 +26,11 @@ public class ConfigurationUtils {
         return instance;
     }
 
-    public void setConfigurationFilePath(String configurationFilePath) {
-        this.configurationFilePath = configurationFilePath;
-    }
-
     public Configuration getConfiguration() {
 
         if(this.configuration == null) {
-            if (new File(configurationFilePath+"/"+configurationFileName).exists()){
-                try (Reader reader = new FileReader(configurationFilePath+"/"+configurationFileName)) {
+            if (new File(SparkImporterUtils.getWorkingDirectory() +"/"+CONFIGURATION_FILE_NAME).exists()){
+                try (Reader reader = new FileReader(SparkImporterUtils.getWorkingDirectory()+"/"+CONFIGURATION_FILE_NAME)) {
                     configuration = gson.fromJson(reader, Configuration.class);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -67,7 +63,7 @@ public class ConfigurationUtils {
         configuration.setPreprocessingConfiguration(preprocessingConfiguration);
         configuration.setModelLearningConfiguration(modelLearningConfiguration);
 
-        try (Writer writer = new FileWriter(configurationFilePath+"/"+configurationFileName)) {
+        try (Writer writer = new FileWriter(SparkImporterUtils.getWorkingDirectory()+"/"+CONFIGURATION_FILE_NAME)) {
             gson.toJson(configuration, writer);
         } catch (IOException e) {
             e.printStackTrace();

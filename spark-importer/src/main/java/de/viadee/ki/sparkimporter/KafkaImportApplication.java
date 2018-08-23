@@ -2,9 +2,9 @@ package de.viadee.ki.sparkimporter;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import de.viadee.ki.sparkimporter.configuration.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.runner.KafkaImportRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterKafkaImportArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.SparkSession;
@@ -37,7 +37,7 @@ public class KafkaImportApplication {
 
 		//workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
 		SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
-		ConfigurationUtils.getInstance().setConfigurationFilePath(ARGS.getConfigurationPath());
+		SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
 
 		// SparkImporter code starts here
 

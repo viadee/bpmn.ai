@@ -25,9 +25,9 @@ public class SparkImporterKafkaImportArguments {
 			"-bm" }, required = true, description = "Should application run in batch mode? It then stops after all pulled queues have returned zero entries at least once", arity = 1)
 	private boolean batchMode = false;
 
-	@Parameter(names = { "--config-path",
-			"-cp" }, required = false, description = "Folder where the configuration files are stored or should be stored.")
-	private String configurationPath = "./";
+	@Parameter(names = { "--working-directory",
+			"-wd" }, required = false, description = "Folder where the configuration and log files are stored or should be stored.")
+	private String workingDirectory = "./";
 
 	/**
 	 * Singleton.
@@ -52,8 +52,8 @@ public class SparkImporterKafkaImportArguments {
 		return batchMode;
 	}
 
-	public String getConfigurationPath() {
-		return configurationPath;
+	public String getWorkingDirectory() {
+		return workingDirectory;
 	}
 
 	/**
@@ -71,6 +71,6 @@ public class SparkImporterKafkaImportArguments {
 		return "SparkImporterKafkaImportArguments{" + "kafkaBroker='" + kafkaBroker + '\'' + ", fileDestination='" + fileDestination
 				+ '\'' + ", writeStepResultsToCSV=" + writeStepResultsToCSV + '}'
 				+ '\'' + ", batchMode=" + batchMode
-				+ '\'' + ", configurationPath=" + configurationPath + '}';
+				+ '\'' + ", workingDirectory=" + workingDirectory + '}';
 	}
 }

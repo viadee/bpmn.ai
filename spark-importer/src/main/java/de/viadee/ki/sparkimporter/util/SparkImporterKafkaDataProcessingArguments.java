@@ -29,9 +29,9 @@ public class SparkImporterKafkaDataProcessingArguments {
 			"-sr" }, description = "Should intermediate results be written into CSV files?", arity = 1)
 	private boolean writeStepResultsToCSV = false;
 
-	@Parameter(names = { "--config-path",
-			"-cp" }, required = false, description = "Folder where the configuration files are stored or should be stored.")
-	private String configurationPath = "./";
+	@Parameter(names = { "--working-directory",
+			"-wd" }, required = false, description = "Folder where the configuration and log files are stored or should be stored.")
+	private String workingDirectory = "./";
 
 	/**
 	 * Singleton.
@@ -59,8 +59,8 @@ public class SparkImporterKafkaDataProcessingArguments {
 		return writeStepResultsToCSV;
 	}
 
-	public String getConfigurationPath() {
-		return configurationPath;
+	public String getWorkingDirectory() {
+		return workingDirectory;
 	}
 
 	/**
@@ -78,6 +78,6 @@ public class SparkImporterKafkaDataProcessingArguments {
 		return "SparkImporterKafkaDataProcessingArguments{" + "fileSource='" + fileSource + '\'' + ", delimiter='" + delimiter
 				+ '\'' + ", fileDestination='" + fileDestination + '\'' + ", revisionCount=" + revisionCount
 				+ '\'' + ", writeStepResultsToCSV='" + writeStepResultsToCSV
-				+ '\'' + ", configurationPath=" + configurationPath + '}';
+				+ '\'' + ", workingDirectory=" + workingDirectory + '}';
 	}
 }
