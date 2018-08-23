@@ -5,7 +5,7 @@ import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.DataFilterStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.FilterVariablesStep;
+import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableFilterStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableNameMappingStep;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
@@ -59,7 +59,7 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new DataFilterStep());
 
         // user configuration step
-        preprocessingRunner.addPreprocessorStep(new FilterVariablesStep());
+        preprocessingRunner.addPreprocessorStep(new VariableFilterStep());
 
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new VariableNameMappingStep());
