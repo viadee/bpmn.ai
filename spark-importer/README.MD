@@ -73,6 +73,56 @@ Parameter                 | Description                | mandatory
 -wd or --working-directory| Folder where the configuration files are stored or should be stored. | no (default is the current directory)
 -ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
 
+## Data processing steps
+When data runs through the processing, there are multiple steps involved. They differ in user configuration and generic processing steps. The following list show the steps from top to bottom the data is passing through. Each step is described in more detail below.
+
+Step							| Step type
+--------------------------|------------
+ReduceColumns 				| generic
+DataFilter					| user config	 
+VariableFilter				| user config	 
+VariableNameMapping			| user config	
+GetVariablesTypesOccurence	| generic
+VariablesTypeEscalation		| generic
+AggregateVariableUpdates	| generic
+AddVariablesColumns			| generic
+AggregateProcessInstances	| generic
+AddRemovedColumnsToDataset	| generic
+WriteToCSV					| generic
+
+### ReduceColumns
+The columns of the input data is reduced to the minimum required for the processing to speed up the processing. The removed columns are added back in the end.
+
+### DataFilter
+If the configuration contains a filter query (e.g. by limiting the processing only to one process definition id, it is applied in this step to reduce the input data.
+
+### VariableFilter
+If the configuration contains variable that should not be processed then they are filtered out during this step.
+
+### VariableNameMapping
+If a variable name changed (e.g. in a new process version) the user can configure a mapping in the configuration file so that they are handled as the same variable. These mappings are applied in this step.
+
+### GetVariablesTypesOccurence
+All process variables and their data types are detemined here.
+
+### VariablesTypeEscalation
+If a variable type changed (e.g. in a new process version from long to double) then it needs to be determined which type this variable should ultimately have. This is done in this step by escalalting the variable type to one that fits data from all types the variable had in the different process versions.
+
+### AggregateVariableUpdates
+This is the first aggregation step. In this step all variable updates are aggregated per process instance and variable. So if one variable value changed during a process instance it is aggregated to the last value the variable had in the process instance.
+
+### AddVariablesColumns
+At this point we determined the last value of each variable for each process instance. Now for each variable a respective column is added and the data for each process instance is filled accordingly.
+
+### AggregateProcessInstances
+In this step the data is aggregated in a way so that there is only one line per process instance in the dataset. In this step the process state for each process instance is also aggregated to the last state the process instance had in the underlying dataset.
+
+### AddRemovedColumnsToDataset
+In the beginning the non relevant columns where removed to speed up the processing. These columns are now added back to the dataset.
+
+### WriteToCSV
+The resulting dataset is written into a CSV file. It could e.g. also be written to a HDFS filesystem.
+
 ## Data processing example
 This (to a minimum reduced) example should show what happens to the data that goes through the processing steps.
 
@@ -87,7 +137,7 @@ processInstanceId  	|  variableName 	|  serializer | text | long |  double  |  r
 2						| b					| boolean     |      | 0    |          | 2
 2						| c		     		| double      |      |      | 12.5     | 1
 
-After procesing the data the following data mining table is produced which can be used to train a machine learning algorithm.
+After procesing the data the following data mining table is produced which can be used as an input to train a machine learning algorithm.
 
 processInstanceId  	|  a    |  b | c    | a_rev | b_rev | c_rev
 --------------------|-------|----|------|-------|-------|------
