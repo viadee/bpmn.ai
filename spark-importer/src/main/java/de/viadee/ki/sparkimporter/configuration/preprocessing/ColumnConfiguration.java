@@ -17,16 +17,16 @@ public class ColumnConfiguration {
         return columnName;
     }
 
-    public void setColumnName(String variableName) {
-        this.columnName = variableName;
+    public void setColumnName(String columnName) {
+        this.columnName = columnName;
     }
 
     public boolean isUseColumn() {
         return useColumn;
     }
 
-    public void setUseVariable(boolean useVariable) {
-        this.useColumn = useVariable;
+    public void setUseColumn(boolean useColumn) {
+        this.useColumn = useColumn;
     }
 
     public String getComment() {
