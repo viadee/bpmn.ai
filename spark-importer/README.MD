@@ -129,7 +129,7 @@ Property      |  Description
 --------------|-------------
 variable_name | The name of the variable
 variable_type | Which type the variable should be casted to after the data mining table has been created. In the processing all variables are handled as strings.
-use_variable  | Should the variable be considered during the run. If set to false it will fitlered out before the processing runs through.
+use_variable  | Should the variable be considered during the run. If set to false it will filtered out before the processing runs through.
 comment       | A comment if changes have been done to this variable, which will be written into the application log during processing.
 
 Example:
@@ -177,6 +177,52 @@ Example:
     ],
     ...
     
+### column\_configuration
+
+After the first run this array is filled with all columns found in the data and can be amended by the user for the following runs. Works analogous to the variableConfiguration.
+
+Property      |  Description
+--------------|-------------
+column_name | The name of the column
+use_column  | Should the column be considered during the run. If set to false it will filtered out before the processing runs through.
+comment       | A comment if changes have been done to this column, which will be written into the application log during processing.
+
+Example: 
+
+    ...
+    "column_configuration": [
+      {
+        "column_name": "case_execution_id_",
+        "use_column": false,
+        "comment": ""
+      }
+    ],
+    ...
+
+### column\_hash\_configuration
+
+Before writing the final result into a CSV-File, columns of data can be selected to make them unrecognisable to protect personal data. Using sha1 at the moment.
+
+Property      |  Description
+--------------|-------------
+column_name | The name of the column
+hash_column  | Should the column be hashed. If set to true, the column will be hashed.
+comment       | A comment if changes have been done to this variable, which will be written into the application log during processing.
+
+Example: 
+
+    ...
+    "column_hash_configuration": [
+      {
+        "column_name": "state_",
+        "hash_column": true,
+        "comment": ""
+      }
+    ]
+    ...
+
+
+
 ### Model learning
 Section reserved for settings related to the machine learning model.
 
