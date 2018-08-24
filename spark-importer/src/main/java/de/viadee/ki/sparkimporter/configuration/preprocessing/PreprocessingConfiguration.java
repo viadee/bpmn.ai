@@ -8,13 +8,16 @@ import java.util.List;
 public class PreprocessingConfiguration {
 
     @SerializedName("variable_configuration")
-    List<VariableConfiguration> variableConfiguration = new ArrayList<>();
+    private List<VariableConfiguration> variableConfiguration = new ArrayList<>();
 
     @SerializedName("variable_name_mapping")
-    List<VariableNameMapping> variableNameMappings = new ArrayList<>();
+    private List<VariableNameMapping> variableNameMappings = new ArrayList<>();
 
     @SerializedName("column_configuration")
-    List<ColumnConfiguration> columnConfiguration = new ArrayList<>();
+    private List<ColumnConfiguration> columnConfiguration = new ArrayList<>();
+
+    @SerializedName("column_hash_configuration")
+    private List<ColumnHashConfiguration> columnHashConfiguration = new ArrayList<>();
 
     public List<VariableConfiguration> getVariableConfiguration() {
         return variableConfiguration;
@@ -25,4 +28,6 @@ public class PreprocessingConfiguration {
     }
 
     public List<ColumnConfiguration> getColumnConfiguration() { return columnConfiguration; }
+
+    public List<ColumnHashConfiguration> getColumnHashConfiguration() { return columnHashConfiguration; }
 }

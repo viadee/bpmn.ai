@@ -27,6 +27,13 @@
         "use_column": false,
         "comment": ""
       }
+    ],
+    "column_hash_configuration": [
+      {
+        "column_name": "state_",
+        "hash_column": true,
+        "comment": ""
+      }
     ]
 
 
