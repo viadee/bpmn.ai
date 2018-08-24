@@ -29,6 +29,7 @@ public class VariableFilterStep implements PreprocessingStepInterface {
                 for(VariableConfiguration vc : preprocessingConfiguration.getVariableConfiguration()) {
                     if(!vc.isUseVariable()) {
                         variablesToFilter.add(vc.getVariableName());
+                        SparkImporterLogger.getInstance().writeWarn("The variable '" + vc.getVariableName() + "' will be filtered out. Comment: " + vc.getComment());
                     }
                 }
             }
