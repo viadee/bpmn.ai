@@ -73,7 +73,11 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
         preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
         preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
+
+        // user configuration step
         preprocessingRunner.addPreprocessorStep(new ColumnHashStep());
+
+        //generic step
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 
         // Run processing runner
