@@ -30,7 +30,7 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws IOException {
-        System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
+        //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
                 String args[] = {"-fs", TEST_INPUT_FILE_NAME, "-fd", TEST_OUTPUT_FILE_PATH, "-d", ";", "-sr", "false", "-wd", "./src/test/resources/"};
         SparkConf sparkConf = new SparkConf();

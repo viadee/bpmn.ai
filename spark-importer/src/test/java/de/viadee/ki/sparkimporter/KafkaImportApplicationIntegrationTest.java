@@ -49,7 +49,7 @@ public class KafkaImportApplicationIntegrationTest {
 
     @BeforeClass
     public static void setupBeforeClass() throws Exception {
-        System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
+        //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
         // setup Zookeeper
         zkServer = new EmbeddedZookeeper();
