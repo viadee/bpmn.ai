@@ -13,6 +13,9 @@ public class PreprocessingConfiguration {
     @SerializedName("variable_name_mapping")
     List<VariableNameMapping> variableNameMappings = new ArrayList<>();
 
+    @SerializedName("column_configuration")
+    List<ColumnConfiguration> columnConfiguration = new ArrayList<>();
+
     public List<VariableConfiguration> getVariableConfiguration() {
         return variableConfiguration;
     }
@@ -20,4 +23,6 @@ public class PreprocessingConfiguration {
     public List<VariableNameMapping> getVariableNameMappings() {
         return variableNameMappings;
     }
+
+    public List<ColumnConfiguration> getColumnConfiguration() { return columnConfiguration; }
 }

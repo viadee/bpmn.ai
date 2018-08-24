@@ -16,6 +16,8 @@ public class KafkaProcessingApplicationIntegrationTest {
 
     @Test
     public void testKafkaDataProcessing() throws Exception {
+        System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
+
         //run main class
         String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY, "-d", "|", "-sr", "false", "-wd", "./src/test/resources/"};
         SparkConf sparkConf = new SparkConf();
@@ -42,11 +44,11 @@ public class KafkaProcessingApplicationIntegrationTest {
         assertEquals(4, importedDataset.count());
 
         //check that dataset contains 41 columns
-        assertEquals(41, importedDataset.columns().length);
+        assertEquals(40, importedDataset.columns().length);
 
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("39497FCD0CE218F5EA46E3B96545D560", hash);
+        assertEquals("B82C07B08CFA4982FC8F40A165263F12", hash);
 
     }
 }

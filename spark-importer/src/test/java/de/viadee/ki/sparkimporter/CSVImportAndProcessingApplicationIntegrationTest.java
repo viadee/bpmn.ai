@@ -30,7 +30,9 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws IOException {
-        String args[] = {"-fs", TEST_INPUT_FILE_NAME, "-fd", TEST_OUTPUT_FILE_PATH, "-d", ";", "-sr", "false", "-wd", "./src/test/resources/"};
+        System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
+
+                String args[] = {"-fs", TEST_INPUT_FILE_NAME, "-fd", TEST_OUTPUT_FILE_PATH, "-d", ";", "-sr", "false", "-wd", "./src/test/resources/"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -65,8 +67,9 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     @Test
     public void testColumnHeaders() throws IOException {
-        //check if result contains 34 columns as variable g is filtered out and b renamed to f via the user config
-        assertEquals(34, headerValues.length);
+        //check if result contains 33 columns as variable g is filtered out and b renamed to f via the user config
+        //+ case_execution_id_ is removed by ColumnRemoveStep
+        assertEquals(33, headerValues.length);
 
         //check if the following columns exist
         assertTrue(ArrayUtils.contains(headerValues, "id_"));
@@ -90,7 +93,6 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
         assertTrue(ArrayUtils.contains(headerValues, "case_def_key_"));
         assertTrue(ArrayUtils.contains(headerValues, "case_def_id_"));
         assertTrue(ArrayUtils.contains(headerValues, "case_inst_id_"));
-        assertTrue(ArrayUtils.contains(headerValues, "case_execution_id_"));
         assertTrue(ArrayUtils.contains(headerValues, "task_id_"));
         assertTrue(ArrayUtils.contains(headerValues, "bytearray_id_"));
 
@@ -122,6 +124,10 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
         //check if b b_rev columns are missing as they are renamed to f by configuration
         assertTrue(!ArrayUtils.contains(headerValues, "b"));
         assertTrue(!ArrayUtils.contains(headerValues, "b_rev"));
+
+        //check if case_execution_id_ has been removed by configuration
+        assertTrue(!ArrayUtils.contains(headerValues, "case_execution_id_"));
+
     }
 
     @Test
@@ -133,11 +139,11 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
-        assertEquals("84E7E42C5DFBECD3F42AEECC28221CB1", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        assertEquals("7FABD4D252249136167692046ADA04A3", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        assertEquals("49062F95A1D108A3DFC261D6EC7C8071", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
-        assertEquals("40A378F4F49FFFCD203F14EF27A27B03", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        assertEquals("87F036691D612F2B53E4EC2ADAA6088D", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        assertEquals("49263C348D9C22554F6C2557001AEA41", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+        assertEquals("8F66B6E3F9E55A9059DDC4C8A344A73A", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+        assertEquals("0AEFCEDD85B62567DF7AB401EA647FE1", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+        assertEquals("28D4595FD57626B0AC87AD2A4B10117C", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+        assertEquals("70050D8F0D98EEBCEA3FE48B438FA93E", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
     }
 
     private static String[] combine(String[] a, String[]... b){

@@ -66,6 +66,8 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "reduced_columns");
         }
 
+
+
         //return preprocessed data
         return dataset;
     }

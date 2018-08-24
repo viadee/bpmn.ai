@@ -22,6 +22,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -48,6 +49,7 @@ public class KafkaImportApplicationIntegrationTest {
 
     @BeforeClass
     public static void setupBeforeClass() throws Exception {
+        System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
         // setup Zookeeper
         zkServer = new EmbeddedZookeeper();
@@ -123,7 +125,7 @@ public class KafkaImportApplicationIntegrationTest {
             kafkaServer.shutdown();
             zkClient.close();
             zkServer.shutdown();
-        } catch (NoSuchMethodError e) {}
+        } catch (Exception e) {}
 
     }
 }
