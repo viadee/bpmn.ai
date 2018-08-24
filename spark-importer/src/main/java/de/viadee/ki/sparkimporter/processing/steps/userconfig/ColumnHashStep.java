@@ -13,10 +13,8 @@ import org.apache.spark.sql.Row;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static org.apache.spark.sql.functions.sha1;
-import static org.apache.spark.sql.functions.sha2;
 
 public class ColumnHashStep implements PreprocessingStepInterface {
     @Override

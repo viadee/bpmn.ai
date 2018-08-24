@@ -3,10 +3,7 @@ package de.viadee.ki.sparkimporter.runner;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.ColumnRemoveStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.DataFilterStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableFilterStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableNameMappingStep;
+import de.viadee.ki.sparkimporter.processing.steps.userconfig.*;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import org.apache.spark.sql.Dataset;
@@ -41,7 +38,7 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new DataFilterStep());
 
-        // ..
+        // user configuration step
         preprocessingRunner.addPreprocessorStep(new ColumnRemoveStep());
 
         //generic step
@@ -60,6 +57,7 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
         preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
         preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
+        preprocessingRunner.addPreprocessorStep(new ColumnHashStep());
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 
         // Run processing runner

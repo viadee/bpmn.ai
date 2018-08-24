@@ -54,7 +54,7 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new DataFilterStep());
 
-        // ..
+        // user configuration step
         preprocessingRunner.addPreprocessorStep(new ColumnRemoveStep());
 
         //generic step
