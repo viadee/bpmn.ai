@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.runner;
 
+import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
@@ -20,6 +21,12 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         SparkImporterLogger.getInstance().writeInfo("Starting data processing with data from: " + ARGS.getFileSource());
 
         final long startMillis = System.currentTimeMillis();
+
+        //if there is no configuration file yet, write one in the next steps
+        if(ConfigurationUtils.getInstance().getConfiguration() == null) {
+            PreprocessingRunner.initialConfigToBeWritten = true;
+            ConfigurationUtils.getInstance().createEmptyConfig();
+        }
 
         //Load source parquet file
         Dataset<Row> dataset = sparkSession.read()
@@ -66,6 +73,11 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
 
         // Run processing runner
         preprocessingRunner.run(dataset);
+
+        //write initial config file
+        if(PreprocessingRunner.initialConfigToBeWritten) {
+            ConfigurationUtils.getInstance().writeConfigurationToFile();
+        }
 
         final long endMillis = System.currentTimeMillis();
         SparkImporterLogger.getInstance().writeInfo("Kafka processing finished (took " + ((endMillis - startMillis) / 1000) + " seconds in total)");

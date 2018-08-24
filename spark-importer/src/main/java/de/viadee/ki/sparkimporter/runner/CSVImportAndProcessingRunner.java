@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.runner;
 
+import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
@@ -21,6 +22,12 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
     public void run(SparkSession sparkSession) {
 
         final long startMillis = System.currentTimeMillis();
+
+        //if there is no configuration file yet, write one in the next steps
+        if(ConfigurationUtils.getInstance().getConfiguration() == null) {
+            PreprocessingRunner.initialConfigToBeWritten = true;
+            ConfigurationUtils.getInstance().createEmptyConfig();
+        }
 
         SparkImporterLogger.getInstance().writeInfo("Starting CSV import and processing");
         SparkImporterLogger.getInstance().writeInfo("Importing CSV file: " + ARGS.getFileSource());
@@ -85,6 +92,11 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
 
         // Cleanup
         sparkSession.close();
+
+        //write initial config file
+        if(PreprocessingRunner.initialConfigToBeWritten) {
+            ConfigurationUtils.getInstance().writeConfigurationToFile();
+        }
 
         final long endMillis = System.currentTimeMillis();
 

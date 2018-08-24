@@ -1,5 +1,8 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.configuration.Configuration;
+import de.viadee.ki.sparkimporter.configuration.preprocessing.ColumnConfiguration;
+import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -22,6 +25,33 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
 
         // write initial column set into a new dataset to be able add them back again later
         List<String> startColumnsString = Arrays.asList(dataset.columns());
+
+        //these columns have to stay in in order to do the processing
+        List<String> columnsToKeep = new ArrayList<>();
+        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
+        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE);
+        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION);
+        columnsToKeep.add(SparkImporterVariables.VAR_STATE);
+        columnsToKeep.add(SparkImporterVariables.VAR_LONG);
+        columnsToKeep.add(SparkImporterVariables.VAR_DOUBLE);
+        columnsToKeep.add(SparkImporterVariables.VAR_TEXT);
+        columnsToKeep.add(SparkImporterVariables.VAR_TEXT2);
+
+        //if there is no configuration file yet, write columns into the empty one
+        if(PreprocessingRunner.initialConfigToBeWritten) {
+            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+            for(String column : startColumnsString) {
+                if(!columnsToKeep.contains(column)) {
+                    ColumnConfiguration columnConfiguration = new ColumnConfiguration();
+                    columnConfiguration.setColumnName(column);
+                    columnConfiguration.setUseColumn(true);
+                    columnConfiguration.setComment("");
+                    configuration.getPreprocessingConfiguration().getColumnConfiguration().add(columnConfiguration);
+                }
+            }
+        }
+
         List<Row> startColumns = new ArrayList<>();
 
         for(String column : startColumnsString) {
