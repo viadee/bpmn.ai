@@ -134,16 +134,16 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
     public void testLineValuesHashes() {
         //check if hashes of line values are correct
         //kept in for easier amendment after test case change
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
-        assertEquals("E6081483A6725361A332A7BFD947FE16", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        assertEquals("A8908D380A57666966D7A7EF013B87A7", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        assertEquals("34F3ECB78BB29EB8A20194FCDB12A48B", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        assertEquals("CBA1AB6855518F9B51098351DF167A6B", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+        assertEquals("F1EAFF6A1C2CF3B10A86D5EDD18FA5B6", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+        assertEquals("2C16A2F93F7DC038C93E4008840A38E5", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
         assertEquals("B0FE7FB4D5FB8BAA093DE7955AE72439", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        assertEquals("317B52522236A775C8109378F3492925", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        assertEquals("9C6929A2479D69AEDABE74C2C960DFF2", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
     }
 
     private static String[] combine(String[] a, String[]... b){

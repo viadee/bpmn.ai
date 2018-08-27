@@ -5,10 +5,40 @@
   "preprocessing": {
     "variable_configuration": [
       {
+        "variable_name": "a",
+        "variable_type": "string",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "c",
+        "variable_type": "boolean",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "d",
+        "variable_type": "long",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "e",
+        "variable_type": "serializable",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "f",
+        "variable_type": "string",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
         "variable_name": "g",
         "variable_type": "string",
         "use_variable": false,
-        "comment": ""
+        "comment": "Not required"
       }
     ],
     "variable_name_mapping": [
@@ -25,7 +55,7 @@
       {
         "column_name": "case_execution_id_",
         "use_column": false,
-        "comment": ""
+        "comment": "Not required anymore"
       }
     ],
     "column_hash_configuration": [
