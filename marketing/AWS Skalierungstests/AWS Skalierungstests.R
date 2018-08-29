@@ -6,7 +6,7 @@ if(!eval(parse(text="require(pacman)")))
 
 pacman::p_load(
   ggplot2, # Charts
-  ggthemes, # Nice charts
+  ggthemes # Nice charts
 )
 
 #our own tools for visualization, h2o handling, and datetime functionalities
