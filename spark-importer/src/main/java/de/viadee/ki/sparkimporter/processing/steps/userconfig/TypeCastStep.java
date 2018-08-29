@@ -26,8 +26,6 @@ public class TypeCastStep implements PreprocessingStepInterface {
 
         List<StructField> datasetFields = Arrays.asList(dataset.schema().fields());
 
-        dataset.printSchema();
-
         //List<ColumnConfiguration> columnConfigurations = null;
         List<VariableConfiguration> variableConfigurations = null;
 
@@ -63,8 +61,6 @@ public class TypeCastStep implements PreprocessingStepInterface {
                 //mapDataType(dataset, datasetFields, columnn, null);
             }
         }
-
-        dataset.printSchema();
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "cast_columns");
