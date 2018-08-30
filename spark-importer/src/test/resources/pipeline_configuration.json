@@ -39,6 +39,20 @@
         "variable_type": "string",
         "use_variable": false,
         "comment": "Not required"
+      },
+      {
+        "variable_name": "i",
+        "variable_type": "date",
+        "parse_format": "yyyy-MM",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "j",
+        "variable_type": "timestamp",
+        "parse_format": "yyyy-MM-dd HH:mm",
+        "use_variable": true,
+        "comment": ""
       }
     ],
     "variable_name_mapping": [

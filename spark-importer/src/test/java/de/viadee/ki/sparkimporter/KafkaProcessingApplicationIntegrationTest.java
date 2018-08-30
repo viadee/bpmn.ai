@@ -43,12 +43,12 @@ public class KafkaProcessingApplicationIntegrationTest {
         //check that dataset contains 4 lines
         assertEquals(4, importedDataset.count());
 
-        //check that dataset contains 40 columns
-        assertEquals(40, importedDataset.columns().length);
+        //check that dataset contains 44 columns
+        assertEquals(44, importedDataset.columns().length);
 
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("ECFD0F1C54084FEE6244C08739D66DD7", hash);
+        assertEquals("8766C0492167D51A22B530DDFFC866DE", hash);
 
     }
 }

@@ -111,8 +111,8 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
         for(StructField sf : datasetFields) {
             if(sf.name().equals(column)) {
                 currentDatatype = sf.dataType();
+                break;
             }
-            break;
         }
 
         //determine string representation

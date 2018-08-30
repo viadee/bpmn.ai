@@ -20,9 +20,9 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     private static final String TEST_INPUT_FILE_NAME = "./src/test/resources/integration_test_file.csv";
 
-    private static final String TEST_OUTPUT_FILE_PATH = "integration-test-result-kafka/";
+    private static final String TEST_OUTPUT_FILE_PATH = "integration-test-result-csv/";
 
-    private static final String TEST_OUTPUT_FILE_NAME = "integration-test-result-kafka/result.csv";
+    private static final String TEST_OUTPUT_FILE_NAME = "integration-test-result-csv/result.csv";
 
     private static final String RESULT_FILE_DELIMITER = "\\|";
 
@@ -67,9 +67,9 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     @Test
     public void testColumnHeaders() throws IOException {
-        //check if result contains 33 columns as variable g is filtered out and b renamed to f via the user config
+        //check if result contains 37 columns as variable g is filtered out and b renamed to f via the user config
         //+ case_execution_id_ is removed by ColumnRemoveStep
-        assertEquals(33, headerValues.length);
+        assertEquals(37, headerValues.length);
 
         //check if the following columns exist
         assertTrue(ArrayUtils.contains(headerValues, "id_"));
@@ -116,6 +116,10 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
         assertTrue(ArrayUtils.contains(headerValues, "e_rev"));
         assertTrue(ArrayUtils.contains(headerValues, "f"));
         assertTrue(ArrayUtils.contains(headerValues, "f_rev"));
+        assertTrue(ArrayUtils.contains(headerValues, "i"));
+        assertTrue(ArrayUtils.contains(headerValues, "i_rev"));
+        assertTrue(ArrayUtils.contains(headerValues, "j"));
+        assertTrue(ArrayUtils.contains(headerValues, "j_rev"));
 
         //check if g and g_rev columns are missing as they are taken out by configuration
         assertTrue(!ArrayUtils.contains(headerValues, "g"));
@@ -139,11 +143,11 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
-        assertEquals("CBA1AB6855518F9B51098351DF167A6B", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        assertEquals("F1EAFF6A1C2CF3B10A86D5EDD18FA5B6", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        assertEquals("2C16A2F93F7DC038C93E4008840A38E5", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
-        assertEquals("B0FE7FB4D5FB8BAA093DE7955AE72439", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        assertEquals("9C6929A2479D69AEDABE74C2C960DFF2", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        assertEquals("B53D5802012947FF268E7553CFC76E8B", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+        assertEquals("062B07EEAF1F5D7ECBC74D2615FE567B", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+        assertEquals("E2FA6ABB6DDBAB1C4606195B9452994E", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+        assertEquals("F9F11A8AF86576C3CE236B141D39F0FD", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+        assertEquals("24CE318FD9EAB1AC04599642BB12BB1F", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
     }
 
     private static String[] combine(String[] a, String[]... b){
