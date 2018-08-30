@@ -5,9 +5,9 @@ import com.beust.jcommander.Parameter;
 /**
  * Configures command line parameters of the import application.
  */
-public class SparkImporterArguments {
+public class SparkImporterCSVArguments {
 
-	private static SparkImporterArguments sparkImporterArguments = null;
+	private static SparkImporterCSVArguments sparkImporterCSVArguments = null;
 
 	@Parameter(names = { "--file-source",
 			"-fs" }, required = true, description = "Path an name of the CSV-File to be processed. You can generate the file with a query such as this one: SELECT *\r\n"
@@ -46,7 +46,7 @@ public class SparkImporterArguments {
 	/**
 	 * Singleton.
 	 */
-	private SparkImporterArguments() {
+	private SparkImporterCSVArguments() {
 	}
 
 	public boolean isRevisionCount() {
@@ -84,11 +84,11 @@ public class SparkImporterArguments {
 	/**
 	 * @return DataExtractorArguments-Instanz as Singleton
 	 */
-	public static SparkImporterArguments getInstance() {
-		if (sparkImporterArguments == null) {
-			sparkImporterArguments = new SparkImporterArguments();
+	public static SparkImporterCSVArguments getInstance() {
+		if (sparkImporterCSVArguments == null) {
+			sparkImporterCSVArguments = new SparkImporterCSVArguments();
 		}
-		return sparkImporterArguments;
+		return sparkImporterCSVArguments;
 	}
 
 	@Override

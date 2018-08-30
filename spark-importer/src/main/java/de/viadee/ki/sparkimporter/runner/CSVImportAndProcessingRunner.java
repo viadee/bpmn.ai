@@ -7,7 +7,7 @@ import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.*;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
@@ -42,7 +42,7 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
                 .csv(ARGS.getFileSource());
 
         // write imported CSV structure to file for debugging
-        if (SparkImporterArguments.getInstance().isWriteStepResultsToCSV()) {
+        if (SparkImporterCSVArguments.getInstance().isWriteStepResultsToCSV()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
         }
 

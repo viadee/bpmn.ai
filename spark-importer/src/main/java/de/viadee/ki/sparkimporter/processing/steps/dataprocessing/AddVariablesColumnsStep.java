@@ -2,7 +2,7 @@ package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
-import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
@@ -33,7 +33,7 @@ public class AddVariablesColumnsStep implements PreprocessingStepInterface {
                             .otherwise(dataset.col(SparkImporterVariables.VAR_TEXT2)))
                     .otherwise(""));
 
-            if(SparkImporterArguments.getInstance().isRevisionCount()) {
+            if(SparkImporterCSVArguments.getInstance().isRevisionCount()) {
                 dataset = dataset.withColumn(v+"_rev",
                         when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).equalTo(v), dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION))
                         .otherwise("0"));

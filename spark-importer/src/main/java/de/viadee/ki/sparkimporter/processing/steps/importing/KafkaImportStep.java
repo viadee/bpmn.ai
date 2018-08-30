@@ -1,7 +1,7 @@
 package de.viadee.ki.sparkimporter.processing.steps.importing;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -36,7 +36,7 @@ public class KafkaImportStep implements PreprocessingStepInterface {
         }
 
         // write imported CSV structure to file for debugging
-        if (SparkImporterArguments.getInstance().isWriteStepResultsToCSV()) {
+        if (SparkImporterCSVArguments.getInstance().isWriteStepResultsToCSV()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
         }
         
