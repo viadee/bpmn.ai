@@ -7,19 +7,19 @@ When data runs through the processing, there are multiple steps involved. They d
 
 Step							| Step type
 --------------------------|------------
-[DataFilter](#datafilter-user-coonfig)					| user config
+[DataFilter](#datafilter-user-config)					| user config
 [ColumnRemove](#columnremove-user-config)					| user config
-ReduceColumns 				| generic	 
-VariableFilter				| user config	 
-VariableNameMapping			| user config	
-DetermineVariableTypes   	| generic
-VariablesTypeEscalation		| generic
-AggregateVariableUpdates	| generic
-AddVariablesColumns			| generic
-AggregateProcessInstances	| generic
-AddRemovedColumnsToDataset	| generic
-ColumnHash 			      	| user config
-WriteToCSV					| generic
+[ReduceColumns](#columnremove-generic) 				| generic	 
+[VariableFilter](#columnremove-user-config)				| user config	 
+[VariableNameMapping](#columnremove-user-config)			| user config	
+[DetermineVariableTypes](#columnremove-generic)   	| generic
+[VariablesTypeEscalation](#columnremove-generic)		| generic
+[AggregateVariableUpdates](#columnremove-generic)	| generic
+[AddVariablesColumns](#columnremove-generic)			| generic
+[AggregateProcessInstances](#columnremove-generic)	| generic
+[AddRemovedColumnsToDataset](#columnremove-generic)	| generic
+[ColumnHash](#columnremove-user-config) 			      	| user config
+[WriteToCSV](#columnremove-generic)					| generic
 
 Each step is now described in more detail and a (to a minimum reduced) example is used to better illustrate it.
 
@@ -50,7 +50,7 @@ processInstanceId  	| processDefinitionId | variableName  |  serializer | text |
 1						| p1                  | b             | boolean     |      | 1    |          | 1
 1						| p1                  | c             | double      |      |      | 1.5      | 0
 
-### ColumnRemove
+### ColumnRemove (user config)
 
 In this step input columns are removed accoording to the configuration before the processing to the data is done.
 
