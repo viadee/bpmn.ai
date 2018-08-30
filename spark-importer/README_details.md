@@ -9,17 +9,17 @@ Step							| Step type
 --------------------------|------------
 [DataFilter](#datafilter-user-config)					| user config
 [ColumnRemove](#columnremove-user-config)					| user config
-[ReduceColumns](#columnremove-generic) 				| generic	 
-[VariableFilter](#columnremove-user-config)				| user config	 
-[VariableNameMapping](#columnremove-user-config)			| user config	
-[DetermineVariableTypes](#columnremove-generic)   	| generic
-[VariablesTypeEscalation](#columnremove-generic)		| generic
-[AggregateVariableUpdates](#columnremove-generic)	| generic
-[AddVariablesColumns](#columnremove-generic)			| generic
-[AggregateProcessInstances](#columnremove-generic)	| generic
-[AddRemovedColumnsToDataset](#columnremove-generic)	| generic
-[ColumnHash](#columnremove-user-config) 			      	| user config
-[WriteToCSV](#columnremove-generic)					| generic
+[ReduceColumns](#reducecolumns-generic) 				| generic	 
+[VariableFilter](#variablefilter-user-config)				| user config	 
+[VariableNameMapping](#variablenamemapping-user-config)			| user config	
+[DetermineVariableTypes](#determinevariabletypes-generic)   	| generic
+[VariablesTypeEscalation](#variablestypesescalation-generic)		| generic
+[AggregateVariableUpdates](#aggregatevariableupdates-generic)	| generic
+[AddVariablesColumns](#addvariablescolumns-generic)			| generic
+[AggregateProcessInstances](#aggregateprocessinstances-generic)	| generic
+[AddRemovedColumnsToDataset](#addremovedcolumnstodataset-generic)	| generic
+[ColumnHash](#columnhash-user-config) 			      	| user config
+[WriteToCSV](#writetocsv-generic)					| generic
 
 Each step is now described in more detail and a (to a minimum reduced) example is used to better illustrate it.
 
