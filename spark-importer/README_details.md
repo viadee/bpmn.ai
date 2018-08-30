@@ -7,8 +7,8 @@ When data runs through the processing, there are multiple steps involved. They d
 
 Step							| Step type
 --------------------------|------------
-DataFilter					| user config
-ColumnRemove					| user config
+[DataFilter](#datafilter-(user-coonfig))					| user config
+[ColumnRemove](#columnremove-(user-config))					| user config
 ReduceColumns 				| generic	 
 VariableFilter				| user config	 
 VariableNameMapping			| user config	
@@ -50,7 +50,7 @@ processInstanceId  	| processDefinitionId | variableName  |  serializer | text |
 1						| p1                  | b             | boolean     |      | 1    |          | 1
 1						| p1                  | c             | double      |      |      | 1.5      | 0
 
-### ColumnRemove (user config)
+### ColumnRemove
 
 In this step input columns are removed accoording to the configuration before the processing to the data is done.
 
