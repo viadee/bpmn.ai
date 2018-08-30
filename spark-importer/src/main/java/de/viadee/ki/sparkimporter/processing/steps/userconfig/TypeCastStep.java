@@ -15,9 +15,7 @@ import org.apache.spark.sql.types.*;
 import java.util.*;
 
 import static java.util.Arrays.asList;
-import static org.apache.spark.sql.functions.max;
-import static org.apache.spark.sql.functions.sha1;
-import static org.apache.spark.sql.functions.when;
+import static org.apache.spark.sql.functions.*;
 
 public class TypeCastStep implements PreprocessingStepInterface {
 
@@ -26,18 +24,24 @@ public class TypeCastStep implements PreprocessingStepInterface {
 
         List<StructField> datasetFields = Arrays.asList(dataset.schema().fields());
 
-        //List<ColumnConfiguration> columnConfigurations = null;
+        List<ColumnConfiguration> columnConfigurations = null;
         List<VariableConfiguration> variableConfigurations = null;
 
         Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
         if(configuration != null) {
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
-            //columnConfigurations = preprocessingConfiguration.getColumnConfiguration();
+            columnConfigurations = preprocessingConfiguration.getColumnConfiguration();
             variableConfigurations = preprocessingConfiguration.getVariableConfiguration();
         }
 
         Map<String, String> columnTypeConfigMap = new HashMap<>();
         Map<String, String> variableTypeConfigMap = new HashMap<>();
+
+        if(columnConfigurations != null) {
+            for(ColumnConfiguration cc : columnConfigurations) {
+                columnTypeConfigMap.put(cc.getColumnName(), cc.getColumnType());
+            }
+        }
 
         if(variableConfigurations != null) {
             for(VariableConfiguration vc : variableConfigurations) {
@@ -46,60 +50,100 @@ public class TypeCastStep implements PreprocessingStepInterface {
         }
 
         for(String column : dataset.columns()) {
+
+            // skip revision columns as they are handled for each variable column
+            if(column.endsWith("_rev")) {
+                continue;
+            }
+
+            DataType newDataType = null;
+            boolean isVariableColumn  = false;
+            String configurationDataType = null;
+
             if(variableTypeConfigMap.keySet().contains(column)) {
                 // was initially a variable
-                DataType newDataType = mapDataType(dataset, datasetFields, column, variableTypeConfigMap.get(column));
-
-                dataset = dataset.withColumn(column, dataset.col(column).cast(newDataType).as(column));
-
-                if(SparkImporterArguments.getInstance().isRevisionCount()) {
-                    dataset = dataset.withColumn(column+"_rev", dataset.col(column+"_rev").cast("integer").as(column+"_rev"));
-                }
-
+                configurationDataType = variableTypeConfigMap.get(column);
+                isVariableColumn = true;
             } else {
                 // was initially a column
-                //mapDataType(dataset, datasetFields, columnn, null);
+                configurationDataType = columnTypeConfigMap.get(column);
+            }
+
+            newDataType = mapDataType(datasetFields, column, configurationDataType);
+
+            // only check for cast errors if dev feature is enabled and if a change in the datatype has been done
+            if(SparkImporterVariables.isDevTypeCastCheckEnabled() && !newDataType.equals(getCurrentDataType(datasetFields, column))) {
+                // add a column with casted value to be able to check the cast results
+                dataset = dataset.withColumn(column+"_casted", dataset.col(column).cast(newDataType));
+
+                // add a column for cast results and write CAST_ERROR? in it if there might be a cast error
+                dataset = dataset.withColumn(column+"_castresult",
+                        when(dataset.col(column).isNotNull().and(dataset.col(column).notEqual(lit(""))),
+                                when(dataset.col(column+"_casted").isNull(), lit("CAST_ERROR?"))
+                                        .otherwise(lit(""))
+                        ).otherwise(lit(""))
+                );
+
+                // check for cast errors and write warning to application log
+                if(dataset.filter(column+"_castresult == 'CAST_ERROR?'").count() > 0) {
+                    SparkImporterLogger.getInstance().writeWarn("Column '" + column + "' seems to have cast errors. Please check the data type (is defined as '" + configurationDataType + "')");
+                } else {
+                    // drop help columns as there are no cast errors for this column and rename casted column to actual column name
+                    dataset = dataset.drop(column, column+"_castresult").withColumnRenamed(column+"_casted", column);
+                }
+            } else {
+                // cast without checking the cast result, entries are null is spark can't cast it
+                dataset = dataset.withColumn(column, dataset.col(column).cast(newDataType));
+            }
+
+            // cast revision columns for former variables
+            if(SparkImporterArguments.getInstance().isRevisionCount() && isVariableColumn) {
+                dataset = dataset.withColumn(column+"_rev", dataset.col(column+"_rev").cast("integer"));
             }
         }
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "cast_columns");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "type_cast_columns");
         }
 
         //return preprocessed data
         return dataset;
     }
 
-    private DataType mapDataType(Dataset<Row> dataset, List<StructField> datasetFields, String column, String typeConfig) {
-
-        DataType currentDatatype = DataTypes.StringType;
+    private DataType getCurrentDataType(List<StructField> datasetFields, String column) {
 
         // search current datatype
         for(StructField sf : datasetFields) {
             if(sf.name().equals(column)) {
-                currentDatatype = sf.dataType();
+                return sf.dataType();
             }
-            break;
         }
 
+        return null;
+    }
 
-        if(currentDatatype.equals(DataTypes.StringType)) {
-            switch (typeConfig) {
-                case "integer":
-                    return DataTypes.IntegerType;
-                case "long":
-                    return DataTypes.LongType;
-                case "double":
-                    return DataTypes.DoubleType;
-                case "boolean":
-                    return DataTypes.BooleanType;
-                case "date":
-                    return DataTypes.TimestampType;
-                default:
-                    return DataTypes.StringType;
-            }
-        } else {
+    private DataType mapDataType(List<StructField> datasetFields, String column, String typeConfig) {
+
+        DataType currentDatatype = getCurrentDataType(datasetFields, column);
+
+        // when typeConfig is null (no config for this column), return the current DataType
+        if(typeConfig == null) {
             return currentDatatype;
+        }
+
+        switch (typeConfig) {
+            case "integer":
+                return DataTypes.IntegerType;
+            case "long":
+                return DataTypes.LongType;
+            case "double":
+                return DataTypes.DoubleType;
+            case "boolean":
+                return DataTypes.BooleanType;
+            case "date":
+                return DataTypes.TimestampType;
+            default:
+                return DataTypes.StringType;
         }
     }
 }

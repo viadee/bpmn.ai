@@ -39,6 +39,10 @@ public class SparkImporterArguments {
 			"-ld" }, required = false, description = "Folder where the log files should be stored.")
 	private String logDirectory = "./";
 
+	@Parameter(names = { "--dev-type-cast-check",
+			"-devtcc" }, required = false, description = "Development feature: Check for type casting errors of columns.", arity = 1)
+	private boolean devTypeCastCheckEnabled = false;
+
 	/**
 	 * Singleton.
 	 */
@@ -73,6 +77,10 @@ public class SparkImporterArguments {
 		return logDirectory;
 	}
 
+	public boolean isDevTypeCastCheckEnabled() {
+		return devTypeCastCheckEnabled;
+	}
+
 	/**
 	 * @return DataExtractorArguments-Instanz as Singleton
 	 */
@@ -88,6 +96,7 @@ public class SparkImporterArguments {
 		return "SpringImporterArguments{" + "fileSource='" + fileSource + '\'' + ", delimiter='" + delimiter
 				+ '\'' + ", fileDestination='" + fileDestination + '\'' + ", revisionCount=" + revisionCount
 				+ '\'' + ", workingDirectory=" + workingDirectory
+				+ '\'' + ", devTypeCastCheckEnabled=" + devTypeCastCheckEnabled
 				+ '\'' + ", logDirectory=" + logDirectory + '}';
 	}
 }

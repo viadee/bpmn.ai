@@ -44,7 +44,7 @@ public class ColumnRemoveStep implements PreprocessingStepInterface {
                             SparkImporterLogger.getInstance().writeWarn("The column '" + cc.getColumnName() + "' has to stay in in order to do the processing. It will not be removed. Comment: " + cc.getComment());
                         } else {
                             columnsToRemove.add(cc.getColumnName());
-                            SparkImporterLogger.getInstance().writeWarn("The column '" + cc.getColumnName() + "' will be removed. Comment: " + cc.getComment());
+                            SparkImporterLogger.getInstance().writeInfo("The column '" + cc.getColumnName() + "' will be removed. Comment: " + cc.getComment());
                         }
                     }
                 }

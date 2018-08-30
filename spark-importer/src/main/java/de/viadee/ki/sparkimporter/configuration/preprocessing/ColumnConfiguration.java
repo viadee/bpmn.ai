@@ -7,6 +7,9 @@ public class ColumnConfiguration {
     @SerializedName("column_name")
     private String columnName;
 
+    @SerializedName("column_type")
+    private String columnType;
+
     @SerializedName("use_column")
     private boolean useColumn;
 
@@ -19,6 +22,14 @@ public class ColumnConfiguration {
 
     public void setColumnName(String columnName) {
         this.columnName = columnName;
+    }
+
+    public String getColumnType() {
+        return columnType;
+    }
+
+    public void setColumnType(String columnType) {
+        this.columnType = columnType;
     }
 
     public boolean isUseColumn() {

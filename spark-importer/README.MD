@@ -34,7 +34,7 @@ Parameter                 | Description                | mandatory
 -sr or --step-results     | Defines if intermediate results be written into CSV files. | no (default is false)
 -wd or --working-directory| Folder where the configuration files are stored or should be stored. | no (default is the current directory)
 -ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
-
+-devtcc or --dev-type-cast-check | Development feature: Check for type casting errors of columns. | no (default is false)
 
 ## Kafka Import
 
@@ -72,6 +72,7 @@ Parameter                 | Description                | mandatory
 -sr or --step-results     | Defines if intermediate results be written into CSV files. | no (default is false)
 -wd or --working-directory| Folder where the configuration files are stored or should be stored. | no (default is the current directory)
 -ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
+-devtcc or --dev-type-cast-check | Development feature: Check for type casting errors of columns. | no (default is false)
 
 ## Configuration
 Some steps in the processing can be controlled by the user (see chapter "Data processing steps" for details). The configuration is done in a file named "pipeline_configuration.json" which should be located in the working-directory. If there is no configuration file the applications will create one, filled the variables found in the data and default configurations for them, which would result is no change if run again with this configuration.

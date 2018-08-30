@@ -6,6 +6,7 @@ import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -90,6 +91,8 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
 
         SparkSession sparkSession = SparkSession.builder().getOrCreate();
         Dataset<Row> helpDataSet = sparkSession.createDataFrame(filteredVariablesRows, schema).toDF().orderBy(VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+
+        SparkImporterLogger.getInstance().writeInfo("Found " + helpDataSet.count() + " variables.");
 
         SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_escalated");
 

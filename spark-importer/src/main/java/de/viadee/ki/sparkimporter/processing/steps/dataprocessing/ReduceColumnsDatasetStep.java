@@ -8,10 +8,7 @@ import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterfa
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.Metadata;
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
+import org.apache.spark.sql.types.*;
 import scala.collection.Seq;
 
 import java.util.ArrayList;
@@ -22,6 +19,9 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
 
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+
+        // get dataset structure for type determination
+        List<StructField> datasetFields = Arrays.asList(dataset.schema().fields());
 
         // write initial column set into a new dataset to be able add them back again later
         List<String> startColumnsString = Arrays.asList(dataset.columns());
@@ -45,6 +45,7 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
                 if(!columnsToKeep.contains(column)) {
                     ColumnConfiguration columnConfiguration = new ColumnConfiguration();
                     columnConfiguration.setColumnName(column);
+                    columnConfiguration.setColumnType(getColumnTypeString(datasetFields, column));
                     columnConfiguration.setUseColumn(true);
                     columnConfiguration.setComment("");
                     configuration.getPreprocessingConfiguration().getColumnConfiguration().add(columnConfiguration);
@@ -100,5 +101,37 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
 
         //return preprocessed data
         return dataset;
+    }
+
+    private String getColumnTypeString(List<StructField> datasetFields, String column) {
+
+        DataType currentDatatype = DataTypes.StringType;
+
+        // search current datatype
+        for(StructField sf : datasetFields) {
+            if(sf.name().equals(column)) {
+                currentDatatype = sf.dataType();
+            }
+            break;
+        }
+
+        //determine string representation
+        if(currentDatatype.equals(DataTypes.IntegerType)) {
+            return "integer";
+        } else if(currentDatatype.equals(DataTypes.LongType)) {
+            return "long";
+        } else if(currentDatatype.equals(DataTypes.DoubleType)) {
+            return "double";
+        } else if(currentDatatype.equals(DataTypes.BooleanType)) {
+            return "boolean";
+        } else if(currentDatatype.equals(DataTypes.TimestampType)) {
+            return "timestamp";
+        } else if(currentDatatype.equals(DataTypes.DateType)) {
+            return "date";
+        } else if(currentDatatype.equals(DataTypes.FloatType)) {
+            return "float";
+        } else {
+            return "string";
+        }
     }
 }
