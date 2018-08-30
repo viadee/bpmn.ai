@@ -1,5 +1,5 @@
-# How to use flintrock
-This document describes how to use Flintrock to run the Spark Importer in AWS and get the resuts. Flintrock is a tool for managing Spark and Hadoop clusters in Amazons AWS. It can be found in 
+# How to run a Spark cluster on AWS
+This document describes how to use Flintrock to run the Spark Importer in an AWS cluster and get the resuts. Flintrock is a tool for managing Spark and Hadoop clusters in Amazons AWS. It can be found under 
 [Github](https://github.com/nchammas/flintrock).
 
 ## Configure Flintrock
