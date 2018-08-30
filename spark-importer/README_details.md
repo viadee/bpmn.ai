@@ -13,7 +13,7 @@ Step							| Step type
 [VariableFilter](#variablefilter-user-config)				| user config	 
 [VariableNameMapping](#variablenamemapping-user-config)			| user config	
 [DetermineVariableTypes](#determinevariabletypes-generic)   	| generic
-[VariablesTypeEscalation](#variablestypesescalation-generic)		| generic
+[VariablesTypeEscalation](#variablestypeescalation-generic)		| generic
 [AggregateVariableUpdates](#aggregatevariableupdates-generic)	| generic
 [AddVariablesColumns](#addvariablescolumns-generic)			| generic
 [AggregateProcessInstances](#aggregateprocessinstances-generic)	| generic
