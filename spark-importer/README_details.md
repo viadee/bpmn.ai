@@ -7,8 +7,8 @@ When data runs through the processing, there are multiple steps involved. They d
 
 Step							| Step type
 --------------------------|------------
-[DataFilter](#datafilter-(user-coonfig))					| user config
-[ColumnRemove](#columnremove-(user-config))					| user config
+[DataFilter](#datafilter-user-coonfig)					| user config
+[ColumnRemove](#columnremove-user-config)					| user config
 ReduceColumns 				| generic	 
 VariableFilter				| user config	 
 VariableNameMapping			| user config	
