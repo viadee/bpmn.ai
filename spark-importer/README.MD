@@ -101,7 +101,7 @@ The configuration file has the following structure:
     		]
       },
       "model_learning": {}
-	}`
+	}
 ```
 
 It contains three sections:

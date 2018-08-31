@@ -111,6 +111,7 @@ processInstanceId  	| variableName  |  serializer | text | long |  double  |  re
 
 Let's now assume the following variable_configuration has been defined:
 
+```json
 	...
 	"variable_configuration": [
 		{
@@ -133,6 +134,7 @@ Let's now assume the following variable_configuration has been defined:
 		}
 	],
 	...
+```
 	
 The following dataset is then returned from this step:
 
@@ -157,6 +159,7 @@ processInstanceId  	| variableName  |  serializer | text | long |  double  |  re
 
 Let's now assume the following variable_configuration has been defined:
 
+```json
 	...
 	"variable_name_mapping": [
       {
@@ -165,6 +168,8 @@ Let's now assume the following variable_configuration has been defined:
       }
     ],
     ...
+```
+
 	
 The following dataset is then returned by this step:
 
@@ -355,6 +360,7 @@ processInstanceId   | f     | f_rev | b | b_rev | c | c_rev
 
 and the following variable config:
 
+```json
 	...
 		{
 			"variable_name": "b",
@@ -363,6 +369,8 @@ and the following variable config:
 			"comment": ""
 		},
     ...
+```
+
 
 The following dataset is returned by this step:
 
