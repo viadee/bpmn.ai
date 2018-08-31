@@ -30,10 +30,11 @@ public class ColumnHashStep implements PreprocessingStepInterface {
                 for(ColumnHashConfiguration chc : preprocessingConfiguration.getColumnHashConfiguration()) {
                     if(chc.isHashColumn()) {
                         if(!existingColumns.contains(chc.getColumnName())) {
-                            // log the fact that a variable that should be filtered does not exist
+                            // log the fact that a column that should be hashed does not exist
                             SparkImporterLogger.getInstance().writeWarn("The column '" + chc.getColumnName() + "' is configured to be hashed, but does not exist in the data.");
                         } else {
                             dataSet = dataSet.withColumn(chc.getColumnName(), sha1(dataSet.col(chc.getColumnName())));
+                            SparkImporterLogger.getInstance().writeInfo("The column '" + chc.getColumnName() + "' is being hashed.");
                         }
                     }
 
