@@ -35,8 +35,6 @@ public class KafkaConsumerConfig {
         // automatically reset the offset to the earliest offset
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        props.put(ConsumerConfig.CLIENT_ID_CONFIG, "earliest");
-
         return props;
     }
 

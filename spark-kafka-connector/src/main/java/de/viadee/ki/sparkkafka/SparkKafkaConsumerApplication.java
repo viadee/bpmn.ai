@@ -20,6 +20,7 @@ public class SparkKafkaConsumerApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
+        System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
         sparkKafkaConsumerService.run();
     }
 

@@ -50,7 +50,6 @@ public class SparkKafkaConsumerService {
 
             // Get the lines, split them into words, count the words and print
             JavaDStream<String> lines = messages.map(stringStringConsumerRecord -> stringStringConsumerRecord.value());
-
             //Count the tweets and print
             lines
                     .count()
