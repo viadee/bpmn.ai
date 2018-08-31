@@ -38,6 +38,7 @@ public class KafkaProcessingApplication {
 
 		//workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
 		SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
+		SparkImporterVariables.setDevTypeCastCheckEnabled(ARGS.isDevTypeCastCheckEnabled());
 		SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
 		SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
 

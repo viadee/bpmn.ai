@@ -20,9 +20,9 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     private static final String TEST_INPUT_FILE_NAME = "./src/test/resources/integration_test_file.csv";
 
-    private static final String TEST_OUTPUT_FILE_PATH = "integration-test-result-kafka/";
+    private static final String TEST_OUTPUT_FILE_PATH = "integration-test-result-csv/";
 
-    private static final String TEST_OUTPUT_FILE_NAME = "integration-test-result-kafka/result.csv";
+    private static final String TEST_OUTPUT_FILE_NAME = "integration-test-result-csv/result.csv";
 
     private static final String RESULT_FILE_DELIMITER = "\\|";
 
@@ -32,7 +32,7 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
     public static void setUpBeforeClass() throws IOException {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
-                String args[] = {"-fs", TEST_INPUT_FILE_NAME, "-fd", TEST_OUTPUT_FILE_PATH, "-d", ";", "-sr", "true", "-wd", "./src/test/resources/"};
+        String args[] = {"-fs", TEST_INPUT_FILE_NAME, "-fd", TEST_OUTPUT_FILE_PATH, "-d", ";", "-sr", "false", "-wd", "./src/test/resources/"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -67,9 +67,9 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     @Test
     public void testColumnHeaders() throws IOException {
-        //check if result contains 33 columns as variable g is filtered out and b renamed to f via the user config
+        //check if result contains 37 columns as variable g is filtered out and b renamed to f via the user config
         //+ case_execution_id_ is removed by ColumnRemoveStep
-        assertEquals(33, headerValues.length);
+        assertEquals(37, headerValues.length);
 
         //check if the following columns exist
         assertTrue(ArrayUtils.contains(headerValues, "id_"));
@@ -116,6 +116,10 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
         assertTrue(ArrayUtils.contains(headerValues, "e_rev"));
         assertTrue(ArrayUtils.contains(headerValues, "f"));
         assertTrue(ArrayUtils.contains(headerValues, "f_rev"));
+        assertTrue(ArrayUtils.contains(headerValues, "i"));
+        assertTrue(ArrayUtils.contains(headerValues, "i_rev"));
+        assertTrue(ArrayUtils.contains(headerValues, "j"));
+        assertTrue(ArrayUtils.contains(headerValues, "j_rev"));
 
         //check if g and g_rev columns are missing as they are taken out by configuration
         assertTrue(!ArrayUtils.contains(headerValues, "g"));
@@ -134,16 +138,16 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
     public void testLineValuesHashes() {
         //check if hashes of line values are correct
         //kept in for easier amendment after test case change
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
-        assertEquals("E6081483A6725361A332A7BFD947FE16", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        assertEquals("A8908D380A57666966D7A7EF013B87A7", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        assertEquals("34F3ECB78BB29EB8A20194FCDB12A48B", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
-        assertEquals("B0FE7FB4D5FB8BAA093DE7955AE72439", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        assertEquals("317B52522236A775C8109378F3492925", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        assertEquals("B53D5802012947FF268E7553CFC76E8B", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+        assertEquals("062B07EEAF1F5D7ECBC74D2615FE567B", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+        assertEquals("E2FA6ABB6DDBAB1C4606195B9452994E", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+        assertEquals("F9F11A8AF86576C3CE236B141D39F0FD", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+        assertEquals("24CE318FD9EAB1AC04599642BB12BB1F", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
     }
 
     private static String[] combine(String[] a, String[]... b){

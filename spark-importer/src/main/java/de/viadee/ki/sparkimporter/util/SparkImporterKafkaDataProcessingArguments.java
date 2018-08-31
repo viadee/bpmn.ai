@@ -37,6 +37,10 @@ public class SparkImporterKafkaDataProcessingArguments {
 			"-ld" }, required = false, description = "Folder where the log files should be stored.")
 	private String logDirectory = "./";
 
+	@Parameter(names = { "--dev-type-cast-check",
+			"-devtcc" }, required = false, description = "Development feature: Check for type casting errors of columns.", arity = 1)
+	private boolean devTypeCastCheckEnabled = false;
+
 	/**
 	 * Singleton.
 	 */
@@ -71,6 +75,10 @@ public class SparkImporterKafkaDataProcessingArguments {
 		return logDirectory;
 	}
 
+	public boolean isDevTypeCastCheckEnabled() {
+		return devTypeCastCheckEnabled;
+	}
+
 	/**
 	 * @return SparkImporterKafkaDataProcessingArguments instance
 	 */
@@ -87,6 +95,7 @@ public class SparkImporterKafkaDataProcessingArguments {
 				+ '\'' + ", fileDestination='" + fileDestination + '\'' + ", revisionCount=" + revisionCount
 				+ '\'' + ", writeStepResultsToCSV='" + writeStepResultsToCSV
 				+ '\'' + ", workingDirectory=" + workingDirectory
+				+ '\'' + ", devTypeCastCheckEnabled=" + devTypeCastCheckEnabled
 				+ '\'' + ", logDirectory=" + logDirectory + '}';
 	}
 }

@@ -10,6 +10,9 @@ public class VariableConfiguration {
     @SerializedName("variable_type")
     private String variableType;
 
+    @SerializedName("parse_format")
+    private String parseFormat;
+
     @SerializedName("use_variable")
     private boolean useVariable;
 
@@ -30,6 +33,14 @@ public class VariableConfiguration {
 
     public void setVariableType(String variableType) {
         this.variableType = variableType;
+    }
+
+    public String getParseFormat() {
+        return parseFormat;
+    }
+
+    public void setParseFormat(String parseFormat) {
+        this.parseFormat = parseFormat;
     }
 
     public boolean isUseVariable() {

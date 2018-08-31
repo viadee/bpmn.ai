@@ -3,6 +3,8 @@ package de.viadee.ki.sparkimporter.util;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.*;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -94,14 +96,35 @@ public class SparkImporterUtils {
 
     private void renameResultFile() {
         //rename result file to deterministic name
-        File dir = new File(SparkImporterVariables.getTargetFolder()+"/"+ String.format("%02d", PreprocessingRunner.getCounter()) + "_result");
-        if(!dir.isDirectory()) throw new IllegalStateException("Cannot find result folder!");
-        for(File file : dir.listFiles()) {
-            if(file.getName().startsWith("part-0000")) {
-                try {
-                    Files.copy(file.toPath(), new File(dir + "/../result.csv").toPath());
-                } catch (IOException e) {
-                    e.printStackTrace();
+        String targetFolder = SparkImporterVariables.getTargetFolder()+"/"+ String.format("%02d", PreprocessingRunner.getCounter()) + "_result";
+        if(targetFolder.startsWith("hdfs")) {
+            // data stored in Hadoop
+            Path path = new Path(targetFolder);
+            Configuration conf = new Configuration();
+            FileSystem fileSystem = null;
+            try {
+                fileSystem = FileSystem.get(conf);
+                if(!fileSystem.isDirectory(path)) throw new IllegalStateException("Cannot find result folder!");
+                RemoteIterator<LocatedFileStatus> files = fileSystem.listFiles(path, false);
+                while(files.hasNext()) {
+                    LocatedFileStatus file = files.next();
+                    if(file.isFile() && file.getPath().getName().contains("part-0000")) {
+                        FileUtil.copy(fileSystem, file.getPath(), fileSystem, new Path(targetFolder + "/../result.csv"), false, conf);
+                    }
+                }
+            } catch (IOException e) {
+                SparkImporterLogger.getInstance().writeError("An error occurred during the renaming of the result file in HDFS. Exception: " + e.getMessage());
+            }
+        } else {
+            File dir = new File(targetFolder);
+            if(!dir.isDirectory()) throw new IllegalStateException("Cannot find result folder!");
+            for(File file : dir.listFiles()) {
+                if(file.getName().startsWith("part-0000")) {
+                    try {
+                        Files.copy(file.toPath(), new File(dir + "/../result.csv").toPath());
+                    } catch (IOException e) {
+                        SparkImporterLogger.getInstance().writeError("An error occurred during the renaming of the result file. Exception: " + e.getMessage());
+                    }
                 }
             }
         }

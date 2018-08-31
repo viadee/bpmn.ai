@@ -1,8 +1,12 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.configuration.Configuration;
+import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
+import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -61,9 +65,19 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
             filteredVariablesRows.add(RowFactory.create(key, variables.get(key)));
         }
 
-        //if there is no configuration file yet, write one
-        if(ConfigurationUtils.getInstance().getConfiguration() == null) {
-            ConfigurationUtils.getInstance().writeConfiguration(variables);
+        //if there is no configuration file yet, write variables into the empty one
+        if(PreprocessingRunner.initialConfigToBeWritten) {
+            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+            for(String name : variables.keySet()) {
+                String type = variables.get(name);
+                VariableConfiguration variableConfiguration = new VariableConfiguration();
+                variableConfiguration.setVariableName(name);
+                variableConfiguration.setVariableType(type);
+                variableConfiguration.setUseVariable(true);
+                variableConfiguration.setComment("");
+                configuration.getPreprocessingConfiguration().getVariableConfiguration().add(variableConfiguration);
+            }
+
         }
 
         StructType schema = new StructType(new StructField[] {
@@ -77,6 +91,8 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
 
         SparkSession sparkSession = SparkSession.builder().getOrCreate();
         Dataset<Row> helpDataSet = sparkSession.createDataFrame(filteredVariablesRows, schema).toDF().orderBy(VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+
+        SparkImporterLogger.getInstance().writeInfo("Found " + helpDataSet.count() + " variables.");
 
         SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_escalated");
 

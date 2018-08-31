@@ -23,6 +23,8 @@ public class PreprocessingRunner {
 
     public static boolean writeStepResultsIntoFile = false;
 
+    public static boolean initialConfigToBeWritten = false;
+
     public PreprocessingRunner(){}
 
     public void run(Dataset<Row> dataset) {

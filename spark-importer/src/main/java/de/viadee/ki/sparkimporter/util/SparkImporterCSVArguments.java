@@ -5,9 +5,9 @@ import com.beust.jcommander.Parameter;
 /**
  * Configures command line parameters of the import application.
  */
-public class SparkImporterArguments {
+public class SparkImporterCSVArguments {
 
-	private static SparkImporterArguments sparkImporterArguments = null;
+	private static SparkImporterCSVArguments sparkImporterCSVArguments = null;
 
 	@Parameter(names = { "--file-source",
 			"-fs" }, required = true, description = "Path an name of the CSV-File to be processed. You can generate the file with a query such as this one: SELECT *\r\n"
@@ -39,10 +39,14 @@ public class SparkImporterArguments {
 			"-ld" }, required = false, description = "Folder where the log files should be stored.")
 	private String logDirectory = "./";
 
+	@Parameter(names = { "--dev-type-cast-check",
+			"-devtcc" }, required = false, description = "Development feature: Check for type casting errors of columns.", arity = 1)
+	private boolean devTypeCastCheckEnabled = false;
+
 	/**
 	 * Singleton.
 	 */
-	private SparkImporterArguments() {
+	private SparkImporterCSVArguments() {
 	}
 
 	public boolean isRevisionCount() {
@@ -73,14 +77,18 @@ public class SparkImporterArguments {
 		return logDirectory;
 	}
 
+	public boolean isDevTypeCastCheckEnabled() {
+		return devTypeCastCheckEnabled;
+	}
+
 	/**
 	 * @return DataExtractorArguments-Instanz as Singleton
 	 */
-	public static SparkImporterArguments getInstance() {
-		if (sparkImporterArguments == null) {
-			sparkImporterArguments = new SparkImporterArguments();
+	public static SparkImporterCSVArguments getInstance() {
+		if (sparkImporterCSVArguments == null) {
+			sparkImporterCSVArguments = new SparkImporterCSVArguments();
 		}
-		return sparkImporterArguments;
+		return sparkImporterCSVArguments;
 	}
 
 	@Override
@@ -88,6 +96,7 @@ public class SparkImporterArguments {
 		return "SpringImporterArguments{" + "fileSource='" + fileSource + '\'' + ", delimiter='" + delimiter
 				+ '\'' + ", fileDestination='" + fileDestination + '\'' + ", revisionCount=" + revisionCount
 				+ '\'' + ", workingDirectory=" + workingDirectory
+				+ '\'' + ", devTypeCastCheckEnabled=" + devTypeCastCheckEnabled
 				+ '\'' + ", logDirectory=" + logDirectory + '}';
 	}
 }

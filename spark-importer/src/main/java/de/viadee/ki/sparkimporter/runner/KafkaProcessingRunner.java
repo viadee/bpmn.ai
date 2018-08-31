@@ -1,12 +1,10 @@
 package de.viadee.ki.sparkimporter.runner;
 
+import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.ColumnRemoveStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.DataFilterStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableFilterStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableNameMappingStep;
+import de.viadee.ki.sparkimporter.processing.steps.userconfig.*;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import org.apache.spark.sql.Dataset;
@@ -23,6 +21,12 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         SparkImporterLogger.getInstance().writeInfo("Starting data processing with data from: " + ARGS.getFileSource());
 
         final long startMillis = System.currentTimeMillis();
+
+        //if there is no configuration file yet, write one in the next steps
+        if(ConfigurationUtils.getInstance().getConfiguration() == null) {
+            PreprocessingRunner.initialConfigToBeWritten = true;
+            ConfigurationUtils.getInstance().createEmptyConfig();
+        }
 
         //Load source parquet file
         Dataset<Row> dataset = sparkSession.read()
@@ -41,7 +45,7 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new DataFilterStep());
 
-        // ..
+        // user configuration step
         preprocessingRunner.addPreprocessorStep(new ColumnRemoveStep());
 
         //generic step
@@ -60,10 +64,23 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
         preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
         preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
+
+        // user configuration step
+        preprocessingRunner.addPreprocessorStep(new ColumnHashStep());
+
+        //user configuration step
+        preprocessingRunner.addPreprocessorStep(new TypeCastStep());
+
+        //generic step
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 
         // Run processing runner
         preprocessingRunner.run(dataset);
+
+        //write initial config file
+        if(PreprocessingRunner.initialConfigToBeWritten) {
+            ConfigurationUtils.getInstance().writeConfigurationToFile();
+        }
 
         final long endMillis = System.currentTimeMillis();
         SparkImporterLogger.getInstance().writeInfo("Kafka processing finished (took " + ((endMillis - startMillis) / 1000) + " seconds in total)");

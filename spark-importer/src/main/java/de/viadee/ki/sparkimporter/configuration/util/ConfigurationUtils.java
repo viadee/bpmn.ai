@@ -6,13 +6,10 @@ import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.dataextraction.DataExtractionConfiguration;
 import de.viadee.ki.sparkimporter.configuration.modellearning.ModelLearningConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
-import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
-import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableNameMapping;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 
 import java.io.*;
-import java.util.Map;
 
 public class ConfigurationUtils {
 
@@ -48,34 +45,29 @@ public class ConfigurationUtils {
         return configuration;
     }
 
-    public void writeConfiguration(Map<String, String> variables) {
+    public void createEmptyConfig() {
+
+        SparkImporterLogger.getInstance().writeInfo("No config file found. Creating default config file for dataset.");
+
         PreprocessingConfiguration preprocessingConfiguration = new PreprocessingConfiguration();
 
-        VariableNameMapping variableNameMapping = new VariableNameMapping();
-        variableNameMapping.setOldName("");
-        variableNameMapping.setNewName("");
-        preprocessingConfiguration.getVariableNameMappings().add(variableNameMapping);
-
-        for(String key : variables.keySet()) {
-            VariableConfiguration variableConfiguration = new VariableConfiguration();
-            variableConfiguration.setVariableName(key);
-            variableConfiguration.setVariableType(variables.get(key));
-            variableConfiguration.setUseVariable(true);
-            variableConfiguration.setComment("");
-
-            preprocessingConfiguration.getVariableConfiguration().add(variableConfiguration);
-        }
-
         DataExtractionConfiguration dataExtractionConfiguration = new DataExtractionConfiguration();
-        dataExtractionConfiguration.setFilterQuery("");
 
         ModelLearningConfiguration modelLearningConfiguration = new ModelLearningConfiguration();
 
-        Configuration configuration = new Configuration();
+        configuration = new Configuration();
         configuration.setDataExtractionConfiguration(dataExtractionConfiguration);
         configuration.setPreprocessingConfiguration(preprocessingConfiguration);
         configuration.setModelLearningConfiguration(modelLearningConfiguration);
 
+        try (Writer writer = new FileWriter(SparkImporterUtils.getWorkingDirectory()+"/"+CONFIGURATION_FILE_NAME)) {
+            gson.toJson(configuration, writer);
+        } catch (IOException e) {
+            SparkImporterLogger.getInstance().writeError("An error occurred while writing the configuration file: " + e.getMessage());
+        };
+    }
+
+    public void writeConfigurationToFile() {
         try (Writer writer = new FileWriter(SparkImporterUtils.getWorkingDirectory()+"/"+CONFIGURATION_FILE_NAME)) {
             gson.toJson(configuration, writer);
         } catch (IOException e) {

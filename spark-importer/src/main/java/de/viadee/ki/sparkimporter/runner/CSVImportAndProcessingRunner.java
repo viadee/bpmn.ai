@@ -1,12 +1,13 @@
 package de.viadee.ki.sparkimporter.runner;
 
+import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.*;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
@@ -22,6 +23,12 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
 
         final long startMillis = System.currentTimeMillis();
 
+        //if there is no configuration file yet, write one in the next steps
+        if(ConfigurationUtils.getInstance().getConfiguration() == null) {
+            PreprocessingRunner.initialConfigToBeWritten = true;
+            ConfigurationUtils.getInstance().createEmptyConfig();
+        }
+
         SparkImporterLogger.getInstance().writeInfo("Starting CSV import and processing");
         SparkImporterLogger.getInstance().writeInfo("Importing CSV file: " + ARGS.getFileSource());
 
@@ -35,7 +42,7 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
                 .csv(ARGS.getFileSource());
 
         // write imported CSV structure to file for debugging
-        if (SparkImporterArguments.getInstance().isWriteStepResultsToCSV()) {
+        if (SparkImporterCSVArguments.getInstance().isWriteStepResultsToCSV()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
         }
 
@@ -54,7 +61,7 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new DataFilterStep());
 
-        // ..
+        // user configuration step
         preprocessingRunner.addPreprocessorStep(new ColumnRemoveStep());
 
         //generic step
@@ -73,7 +80,14 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
         preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
         preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
+
+        // user configuration step
         preprocessingRunner.addPreprocessorStep(new ColumnHashStep());
+
+        // user configuration step
+        preprocessingRunner.addPreprocessorStep(new TypeCastStep());
+
+        //generic step
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 
         // Run processing runner
@@ -81,6 +95,11 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
 
         // Cleanup
         sparkSession.close();
+
+        //write initial config file
+        if(PreprocessingRunner.initialConfigToBeWritten) {
+            ConfigurationUtils.getInstance().writeConfigurationToFile();
+        }
 
         final long endMillis = System.currentTimeMillis();
 

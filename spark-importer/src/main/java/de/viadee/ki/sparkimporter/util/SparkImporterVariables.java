@@ -40,7 +40,8 @@ public final class SparkImporterVariables {
     public static final String PROCESS_STATE_ACTIVE = "ACTIVE";
     public static final String PROCESS_STATE_COMPLETED = "COMPLETED";
 
-    public static String targetFolder = "";
+    private static String targetFolder = "";
+    private static boolean devTypeCastCheckEnabled = false;
 
     public static String getTargetFolder() {
         return targetFolder;
@@ -48,5 +49,13 @@ public final class SparkImporterVariables {
 
     public static void setTargetFolder(String targetFolder) {
         SparkImporterVariables.targetFolder = targetFolder;
+    }
+
+    public static boolean isDevTypeCastCheckEnabled() {
+        return devTypeCastCheckEnabled;
+    }
+
+    public static void setDevTypeCastCheckEnabled(boolean devTypeCastCheckEnabled) {
+        SparkImporterVariables.devTypeCastCheckEnabled = devTypeCastCheckEnabled;
     }
 }

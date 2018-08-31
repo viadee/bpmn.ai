@@ -1,14 +1,14 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.configuration.Configuration;
+import de.viadee.ki.sparkimporter.configuration.preprocessing.ColumnConfiguration;
+import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.Metadata;
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
+import org.apache.spark.sql.types.*;
 import scala.collection.Seq;
 
 import java.util.ArrayList;
@@ -20,8 +20,39 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
 
+        // get dataset structure for type determination
+        List<StructField> datasetFields = Arrays.asList(dataset.schema().fields());
+
         // write initial column set into a new dataset to be able add them back again later
         List<String> startColumnsString = Arrays.asList(dataset.columns());
+
+        //these columns have to stay in in order to do the processing
+        List<String> columnsToKeep = new ArrayList<>();
+        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
+        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE);
+        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION);
+        columnsToKeep.add(SparkImporterVariables.VAR_STATE);
+        columnsToKeep.add(SparkImporterVariables.VAR_LONG);
+        columnsToKeep.add(SparkImporterVariables.VAR_DOUBLE);
+        columnsToKeep.add(SparkImporterVariables.VAR_TEXT);
+        columnsToKeep.add(SparkImporterVariables.VAR_TEXT2);
+
+        //if there is no configuration file yet, write columns into the empty one
+        if(PreprocessingRunner.initialConfigToBeWritten) {
+            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+            for(String column : startColumnsString) {
+                if(!columnsToKeep.contains(column)) {
+                    ColumnConfiguration columnConfiguration = new ColumnConfiguration();
+                    columnConfiguration.setColumnName(column);
+                    columnConfiguration.setColumnType(getColumnTypeString(datasetFields, column));
+                    columnConfiguration.setUseColumn(true);
+                    columnConfiguration.setComment("");
+                    configuration.getPreprocessingConfiguration().getColumnConfiguration().add(columnConfiguration);
+                }
+            }
+        }
+
         List<Row> startColumns = new ArrayList<>();
 
         for(String column : startColumnsString) {
@@ -70,5 +101,37 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
 
         //return preprocessed data
         return dataset;
+    }
+
+    private String getColumnTypeString(List<StructField> datasetFields, String column) {
+
+        DataType currentDatatype = DataTypes.StringType;
+
+        // search current datatype
+        for(StructField sf : datasetFields) {
+            if(sf.name().equals(column)) {
+                currentDatatype = sf.dataType();
+                break;
+            }
+        }
+
+        //determine string representation
+        if(currentDatatype.equals(DataTypes.IntegerType)) {
+            return "integer";
+        } else if(currentDatatype.equals(DataTypes.LongType)) {
+            return "long";
+        } else if(currentDatatype.equals(DataTypes.DoubleType)) {
+            return "double";
+        } else if(currentDatatype.equals(DataTypes.BooleanType)) {
+            return "boolean";
+        } else if(currentDatatype.equals(DataTypes.TimestampType)) {
+            return "timestamp";
+        } else if(currentDatatype.equals(DataTypes.DateType)) {
+            return "date";
+        } else if(currentDatatype.equals(DataTypes.FloatType)) {
+            return "float";
+        } else {
+            return "string";
+        }
     }
 }
