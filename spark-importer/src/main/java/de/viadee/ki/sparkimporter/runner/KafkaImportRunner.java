@@ -32,12 +32,10 @@ import static de.viadee.ki.sparkimporter.KafkaImportApplication.ARGS;
 public class KafkaImportRunner implements ImportRunnerInterface {
 
     private final static String TOPIC_PROCESS_INSTANCE = "processInstance";
-    private final static String TOPIC_ACTIVITY_INSTANCE = "activityInstance";
     private final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
 
     private final Map<String, Object> kafkaConsumerConfigPI  = new HashMap<>();
     private final Map<String, Object> kafkaConsumerConfigVU  = new HashMap<>();
-    private final Map<String, Object> kafkaConsumerConfigAI  = new HashMap<>();
 
     private JavaRDD<String> masterRdd = null;
     private Dataset<Row> masterDataset = null;
@@ -79,15 +77,6 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         kafkaConsumerConfigPI.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         // list of host:port pairs used for establishing the initial connections to the Kafka cluster
-        kafkaConsumerConfigAI.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, ARGS.getKafkaBroker());
-        kafkaConsumerConfigAI.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        kafkaConsumerConfigAI.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        // allows a pool of processes to divide the work of consuming and processing records
-        kafkaConsumerConfigAI.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString());
-        // automatically reset the offset to the earliest offset
-        kafkaConsumerConfigAI.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-
-        // list of host:port pairs used for establishing the initial connections to the Kafka cluster
         kafkaConsumerConfigVU.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, ARGS.getKafkaBroker());
         kafkaConsumerConfigVU.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         kafkaConsumerConfigVU.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -112,21 +101,6 @@ public class KafkaImportRunner implements ImportRunnerInterface {
                 .foreachRDD((VoidFunction<JavaRDD<String>>) stringJavaRDD -> {
                     processMasterRDD(stringJavaRDD, TOPIC_PROCESS_INSTANCE);
                 });
-
-        // Create direct kafka stream with brokers and topics
-        JavaInputDStream<ConsumerRecord<String, String>> activityInstances = KafkaUtils.createDirectStream(
-                jssc,
-                LocationStrategies.PreferConsistent(),
-                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{TOPIC_ACTIVITY_INSTANCE}), kafkaConsumerConfigAI));
-
-        //go through pipe elements
-        activityInstances
-                .map(record -> record.value())
-                .foreachRDD((VoidFunction<JavaRDD<String>>) stringJavaRDD -> {
-                    processMasterRDD(stringJavaRDD, TOPIC_ACTIVITY_INSTANCE);
-                });
-
-
 
         // Create direct kafka stream with brokers and topics
         JavaInputDStream<ConsumerRecord<String, String>> variableUpdates = KafkaUtils.createDirectStream(
