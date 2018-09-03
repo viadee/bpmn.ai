@@ -13,3 +13,7 @@ spark-importer/integration-test-result-kafka-processing-process
 **/vcs.xml
 spark-importer/out
 spark-importer/target
+spark-importer/bin/
+spark-importer/.settings/
+.project
+spark-importer/.classpath
