@@ -42,6 +42,7 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
             columnsToKeep.add(SparkImporterVariables.VAR_ACT_NAME);
             columnsToKeep.add(SparkImporterVariables.VAR_ACT_TYPE);
             columnsToKeep.add(SparkImporterVariables.VAR_ACT_INST_ID);
+            columnsToKeep.add(SparkImporterVariables.VAR_START_TIME);
         }
 
         //if there is no configuration file yet, write columns into the empty one
@@ -93,6 +94,7 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
             columns.add(new Column(SparkImporterVariables.VAR_ACT_NAME));
             columns.add(new Column(SparkImporterVariables.VAR_ACT_TYPE));
             columns.add(new Column(SparkImporterVariables.VAR_ACT_INST_ID));
+            columns.add(new Column(SparkImporterVariables.VAR_START_TIME));
         }
 
         if(Arrays.asList(dataset.columns()).contains(SparkImporterVariables.VAR_TIMESTAMP)) {
