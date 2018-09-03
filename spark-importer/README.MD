@@ -79,6 +79,7 @@ Some steps in the processing can be controlled by the user (see chapter "Data pr
 
 The configuration file has the following structure:
 
+```json
 	{
   		"data_extraction": {
 	  		"filter_query": ""
@@ -101,6 +102,7 @@ The configuration file has the following structure:
       },
       "model_learning": {}
 	}
+```
 
 It contains three sections:
 
@@ -130,16 +132,19 @@ Property      |  Description
 --------------|-------------
 variable_name | The name of the variable
 variable_type | Which type the variable should be casted to after the data mining table has been created. In the processing all variables are handled as strings.
+parse_format  | if variable_type is set to date or timestamp this optional property defines how spark should parse the value while casting it. This follows the [SimpleDateFormat patterns](https://docs.oracle.com/javase/tutorial/i18n/format/simpleDateFormat.html).
 use_variable  | Should the variable be considered during the run. If set to false it will filtered out before the processing runs through.
 comment       | A comment if changes have been done to this variable, which will be written into the application log during processing.
 
 Example:
 
+```json
 	...
 	"variable_configuration": [
 		{
 			"variable_name": "a",
 			"variable_type": "string",
+			"parse_format": "yyy"
 			"use_variable": true,
 			"comment": ""
 		},
@@ -154,9 +159,17 @@ Example:
 			"variable_type": "double",
 			"use_variable": true,
 			"comment": ""
-		}
+		},
+		{
+			"variable_name": "d",
+			"variable_type": "date",
+			"parse_format": "yyyy/MM/dd"
+			"use_variable": true,
+			"comment": ""
+		},
 	],
 	...
+```
 
 ### variable\_name\_mapping
 
@@ -169,6 +182,7 @@ new_value     | The (new) name of the variable to be renamed to
 
 Example:
 
+```json
 	...
 	"variable_name_mapping": [
       {
@@ -177,6 +191,7 @@ Example:
       }
     ],
     ...
+```
     
 ### column\_configuration
 
@@ -185,20 +200,25 @@ After the first run this array is filled with all columns found in the data and 
 Property      |  Description
 --------------|-------------
 column_name | The name of the column
+column_type | Which type the column should be casted to after the data mining table has been created.
+parse_format  | if column_type is set to date or timestamp this optional property defines how spark should parse the value while casting it. This follows the [SimpleDateFormat patterns](https://docs.oracle.com/javase/tutorial/i18n/format/simpleDateFormat.html).
 use_column  | Should the column be considered during the run. If set to false it will filtered out before the processing runs through.
 comment       | A comment if changes have been done to this column, which will be written into the application log during processing.
 
 Example: 
 
+```json
     ...
     "column_configuration": [
       {
         "column_name": "case_execution_id_",
+        "column_type": "string"
         "use_column": false,
         "comment": ""
       }
     ],
     ...
+```
 
 ### column\_hash\_configuration
 
@@ -212,6 +232,7 @@ comment       | A comment if changes have been done to this variable, which will
 
 Example: 
 
+```json
     ...
     "column_hash_configuration": [
       {
@@ -221,7 +242,7 @@ Example:
       }
     ]
     ...
-
+```
 
 
 ### Model learning

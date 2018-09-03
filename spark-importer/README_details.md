@@ -19,6 +19,7 @@ Step							| Step type
 [AggregateProcessInstances](#aggregateprocessinstances-generic)	| generic
 [AddRemovedColumnsToDataset](#addremovedcolumnstodataset-generic)	| generic
 [ColumnHash](#columnhash-user-config) 			      	| user config
+[TypeCast](#typecast-user-config) 			      	| user config
 [WriteToCSV](#writetocsv-generic)					| generic
 
 Each step is now described in more detail and a (to a minimum reduced) example is used to better illustrate it.
@@ -110,6 +111,7 @@ processInstanceId  	| variableName  |  serializer | text | long |  double  |  re
 
 Let's now assume the following variable_configuration has been defined:
 
+```json
 	...
 	"variable_configuration": [
 		{
@@ -132,6 +134,7 @@ Let's now assume the following variable_configuration has been defined:
 		}
 	],
 	...
+```
 	
 The following dataset is then returned from this step:
 
@@ -156,6 +159,7 @@ processInstanceId  	| variableName  |  serializer | text | long |  double  |  re
 
 Let's now assume the following variable_configuration has been defined:
 
+```json
 	...
 	"variable_name_mapping": [
       {
@@ -164,6 +168,8 @@ Let's now assume the following variable_configuration has been defined:
       }
     ],
     ...
+```
+
 	
 The following dataset is then returned by this step:
 
@@ -341,6 +347,37 @@ processInstanceId   | processDefinitioId | f     | f_rev | b | b_rev | c | c_rev
 --------------------|--------------------|-------|-------|---|-------|---|------
 1						| p1                 | aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d | 0     | 1 | 1     |2.0| 0
 2						| p1                 | c22b5f9178342609428d6f51b2c5af4c0bde6a42    | 0     | 0 | 1     |1.5| 0
+
+### TypeCast (user config)
+In this step the columns are casted into the data type they have been defined in the configuration. If the cast could not be done by Spark the value is null afterwards. The development feature --devtcc helps detecting these.
+
+As an example let's assume the following data is the input for this step:
+
+processInstanceId   | f     | f_rev | b | b_rev | c | c_rev  
+--------------------|-------|-------|---|-------|---|------
+1						| hello | 0     | 1 | 1     |2.0| 0
+2						| hi    | 0     | 0 | 1     |1.5| 0
+
+and the following variable config:
+
+```json
+	...
+		{
+			"variable_name": "b",
+			"variable_type": "boolean",
+			"use_variable": true,
+			"comment": ""
+		},
+    ...
+```
+
+
+The following dataset is returned by this step:
+
+processInstanceId   | f     | f_rev | b | b_rev | c | c_rev  
+--------------------|-------|-------|---|-------|---|------
+1						| hello | 0     | true | 1     |2.0| 0
+2						| hi    | 0     | false | 1     |1.5| 0
 
 
 ### WriteToCSV (generic)

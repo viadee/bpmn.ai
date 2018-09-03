@@ -33,6 +33,10 @@ public class SparkImporterKafkaImportArguments {
 			"-ld" }, required = false, description = "Folder where the log files should be stored.")
 	private String logDirectory = "./";
 
+	@Parameter(names = { "--data-level",
+			"-dl" }, required = false, description = "Which level sjould the resulting data have. It can be process or activity.")
+	private String dataLavel = "process";
+
 	/**
 	 * Singleton.
 	 */
@@ -64,6 +68,10 @@ public class SparkImporterKafkaImportArguments {
 		return logDirectory;
 	}
 
+	public String getDataLavel() {
+		return dataLavel;
+	}
+
 	/**
 	 * @return SparkImporterKafkaImportArguments instance
 	 */
@@ -80,6 +88,7 @@ public class SparkImporterKafkaImportArguments {
 				+ '\'' + ", writeStepResultsToCSV=" + writeStepResultsToCSV + '}'
 				+ '\'' + ", batchMode=" + batchMode
 				+ '\'' + ", workingDirectory=" + workingDirectory
+				+ '\'' + ", dataLavel=" + dataLavel
 				+ '\'' + ", logDirectory=" + logDirectory + '}';
 	}
 }
