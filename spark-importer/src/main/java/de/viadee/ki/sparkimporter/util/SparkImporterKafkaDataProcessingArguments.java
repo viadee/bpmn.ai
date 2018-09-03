@@ -41,6 +41,10 @@ public class SparkImporterKafkaDataProcessingArguments {
 			"-devtcc" }, required = false, description = "Development feature: Check for type casting errors of columns.", arity = 1)
 	private boolean devTypeCastCheckEnabled = false;
 
+	@Parameter(names = { "--data-level",
+			"-dl" }, required = false, description = "Which level sjould the resulting data have. It can be process or activity.")
+	private String dataLavel = "process";
+
 	/**
 	 * Singleton.
 	 */
@@ -79,6 +83,10 @@ public class SparkImporterKafkaDataProcessingArguments {
 		return devTypeCastCheckEnabled;
 	}
 
+	public String getDataLavel() {
+		return dataLavel;
+	}
+
 	/**
 	 * @return SparkImporterKafkaDataProcessingArguments instance
 	 */
@@ -96,6 +104,7 @@ public class SparkImporterKafkaDataProcessingArguments {
 				+ '\'' + ", writeStepResultsToCSV='" + writeStepResultsToCSV
 				+ '\'' + ", workingDirectory=" + workingDirectory
 				+ '\'' + ", devTypeCastCheckEnabled=" + devTypeCastCheckEnabled
+				+ '\'' + ", dataLavel=" + dataLavel
 				+ '\'' + ", logDirectory=" + logDirectory + '}';
 	}
 }

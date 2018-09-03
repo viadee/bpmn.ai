@@ -34,12 +34,22 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         }
 
         //first aggregation
-        //take only processInstance rows
-        Dataset<Row> datasetPIAgg = dataset
-                .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_STATE))))
-                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
-                .agg(aggregationMap);
-        
+        Dataset<Row> datasetPIAgg = null;
+
+        if(SparkImporterVariables.getDataLevel().equals("process")) {
+            //take only processInstance rows
+            datasetPIAgg = dataset
+                    .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_STATE))))
+                    .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
+                    .agg(aggregationMap);
+        } else {
+            //activity level, take only processInstance and activityInstance rows
+            datasetPIAgg = dataset
+                    .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_STATE))))
+                    .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_ACT_INST_ID)
+                    .agg(aggregationMap);
+        }
+
         //rename back columns after aggregation
         String pattern = "(max|allbutemptystring|processstate)\\((.+)\\)";
         Pattern r = Pattern.compile(pattern);
@@ -52,11 +62,21 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
             }
         }
 
-        dataset = dataset
-                .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
-                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
-                .agg(aggregationMap)
-                .union(datasetPIAgg);
+        if(SparkImporterVariables.getDataLevel().equals("process")) {
+            dataset = dataset
+                    .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
+                    .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
+                    .agg(aggregationMap)
+                    .union(datasetPIAgg);
+        } else {
+            // activity level
+            dataset = dataset
+                    .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
+                    .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_ACT_INST_ID)
+                    .agg(aggregationMap)
+                    .union(datasetPIAgg);
+        }
+
 
         //rename back columns after aggregation
         for(String columnName : dataset.columns()) {
@@ -69,6 +89,13 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
 
         //in case we add the CSV we have a name column in the first dataset of the join so we call drop again to make sure it is gone
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+        dataset = dataset.drop(SparkImporterVariables.VAR_ACT_INST_ID);
+
+
+        if(SparkImporterVariables.getDataLevel().equals("activity")) {
+            // order by starttime
+            dataset = dataset.sort(SparkImporterVariables.VAR_START_TIME);
+        }
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_process_instances");
