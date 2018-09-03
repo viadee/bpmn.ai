@@ -2,3 +2,14 @@
 .Rhistory
 .RData
 .Ruserdata
+
+**/.idea
+**/.DS_STORE
+spark-importer/integration-test-result-csv
+spark-importer/integration-test-result-kafka-import-activity
+spark-importer/integration-test-result-kafka-processing-activity
+spark-importer/integration-test-result-kafka-import-process
+spark-importer/integration-test-result-kafka-processing-process
+**/vcs.xml
+spark-importer/out
+spark-importer/target
