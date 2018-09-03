@@ -33,9 +33,11 @@ public class KafkaImportRunner implements ImportRunnerInterface {
 
     private final static String TOPIC_PROCESS_INSTANCE = "processInstance";
     private final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
+    private final static String TOPIC_ACTIVITY_INSTANCE = "activityInstance";
 
     private final Map<String, Object> kafkaConsumerConfigPI  = new HashMap<>();
     private final Map<String, Object> kafkaConsumerConfigVU  = new HashMap<>();
+    private final Map<String, Object> kafkaConsumerConfigAI  = new HashMap<>();
 
     private JavaRDD<String> masterRdd = null;
     private Dataset<Row> masterDataset = null;
@@ -47,7 +49,7 @@ public class KafkaImportRunner implements ImportRunnerInterface {
     private CountDownLatch countDownLatch;
 
     //how many queues are we querying and expecting to be empty in batch mode
-    private int EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = 2;
+    private int EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (ARGS.getDataLavel().equals("process") ? 2 : 3);
 
     @Override
     public void run(SparkSession sc) {
@@ -85,6 +87,8 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         // automatically reset the offset to the earliest offset
         kafkaConsumerConfigVU.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
+
+
         // Create context with a x seconds batch interval
         JavaSparkContext jsc = new JavaSparkContext(sparkSession.sparkContext());
         JavaStreamingContext jssc = new JavaStreamingContext(jsc, Duration.apply(duration));
@@ -102,7 +106,6 @@ public class KafkaImportRunner implements ImportRunnerInterface {
                     processMasterRDD(stringJavaRDD, TOPIC_PROCESS_INSTANCE);
                 });
 
-
         // Create direct kafka stream with brokers and topics
         JavaInputDStream<ConsumerRecord<String, String>> variableUpdates = KafkaUtils.createDirectStream(
                 jssc,
@@ -115,6 +118,31 @@ public class KafkaImportRunner implements ImportRunnerInterface {
                 .foreachRDD((VoidFunction<JavaRDD<String>>) stringJavaRDD -> {
                     processMasterRDD(stringJavaRDD, TOPIC_VARIABLE_UPDATE);
                 });
+
+
+        if(ARGS.getDataLavel().equals("activity")) {
+            // list of host:port pairs used for establishing the initial connections to the Kafka cluster
+            kafkaConsumerConfigAI.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, ARGS.getKafkaBroker());
+            kafkaConsumerConfigAI.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+            kafkaConsumerConfigAI.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+            // allows a pool of processes to divide the work of consuming and processing records
+            kafkaConsumerConfigAI.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString());
+            // automatically reset the offset to the earliest offset
+            kafkaConsumerConfigAI.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
+            // Create direct kafka stream with brokers and topics
+            JavaInputDStream<ConsumerRecord<String, String>> activityInstances = KafkaUtils.createDirectStream(
+                    jssc,
+                    LocationStrategies.PreferConsistent(),
+                    ConsumerStrategies.Subscribe(Arrays.asList(new String[]{TOPIC_ACTIVITY_INSTANCE}), kafkaConsumerConfigAI));
+
+            //go through pipe elements
+            activityInstances
+                    .map(record -> record.value())
+                    .foreachRDD((VoidFunction<JavaRDD<String>>) stringJavaRDD -> {
+                        processMasterRDD(stringJavaRDD, TOPIC_ACTIVITY_INSTANCE);
+                    });
+        }
 
         // Start the computation
         jssc.start();
@@ -156,8 +184,6 @@ public class KafkaImportRunner implements ImportRunnerInterface {
                 }
             }
 
-
-
             return;
         }
 
@@ -166,14 +192,19 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         }
 
         if (masterDataset == null) {
-            if(receivedQueues.size() == 2) {
+            if(receivedQueues.size() == EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) {
                 masterRdd = masterRdd.union(newRDD);
                 Dataset<String> jsonDataset = sparkSession.createDataset(masterRdd.rdd(), Encoders.STRING());
                 masterDataset = sparkSession.read().json(jsonDataset);
 
                 writeMasterDataset();
             } else {
-                masterRdd = newRDD;
+                if(masterRdd == null) {
+                    masterRdd = newRDD;
+                } else {
+                    masterRdd = masterRdd.union(newRDD);
+                }
+
             }
         } else {
             Dataset<String> jsonDataset = sparkSession.createDataset(newRDD.rdd(), Encoders.STRING());

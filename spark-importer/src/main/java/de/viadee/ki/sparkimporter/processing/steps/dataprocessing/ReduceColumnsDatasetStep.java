@@ -38,6 +38,12 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT);
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT2);
 
+        if(SparkImporterVariables.getDataLevel().equals("activity")) {
+            columnsToKeep.add(SparkImporterVariables.VAR_ACT_NAME);
+            columnsToKeep.add(SparkImporterVariables.VAR_ACT_TYPE);
+            columnsToKeep.add(SparkImporterVariables.VAR_ACT_INST_ID);
+        }
+
         //if there is no configuration file yet, write columns into the empty one
         if(PreprocessingRunner.initialConfigToBeWritten) {
             Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
@@ -82,6 +88,12 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
         columns.add(new Column(SparkImporterVariables.VAR_DOUBLE));
         columns.add(new Column(SparkImporterVariables.VAR_TEXT));
         columns.add(new Column(SparkImporterVariables.VAR_TEXT2));
+
+        if(SparkImporterVariables.getDataLevel().equals("activity")) {
+            columns.add(new Column(SparkImporterVariables.VAR_ACT_NAME));
+            columns.add(new Column(SparkImporterVariables.VAR_ACT_TYPE));
+            columns.add(new Column(SparkImporterVariables.VAR_ACT_INST_ID));
+        }
 
         if(Arrays.asList(dataset.columns()).contains(SparkImporterVariables.VAR_TIMESTAMP)) {
             columns.add(new Column(SparkImporterVariables.VAR_TIMESTAMP));

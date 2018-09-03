@@ -32,10 +32,13 @@ import static org.junit.Assert.assertEquals;
 public class KafkaImportApplicationIntegrationTest {
 
     private final static String FILE_STREAM_INPUT_PROCESS_INSTANCE = "./src/test/resources/integration_test_file_kafka_stream_processInstance.json";
+    private final static String FILE_STREAM_INPUT_ACTIVITY_INSTANCE = "./src/test/resources/integration_test_file_kafka_stream_activityInstance.json";
     private final static String FILE_STREAM_INPUT_VARIABLE_UPDATE = "./src/test/resources/integration_test_file_kafka_stream_variableUpdate.json";
-    private final static String IMPORT_TEST_OUTPUT_DIRECTORY = "integration-test-result-kafka-import";
+    private final static String IMPORT_TEST_OUTPUT_DIRECTORY_PROCESS = "integration-test-result-kafka-import-process";
+    private final static String IMPORT_TEST_OUTPUT_DIRECTORY_ACTIVITY = "integration-test-result-kafka-import-activity";
 
     private final static String TOPIC_PROCESS_INSTANCE = "processInstance";
+    private final static String TOPIC_ACTIVITY_INSTANCE = "activityInstance";
     private final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
 
     private final static String ZOOKEEPER_HOST = "127.0.0.1";
@@ -69,6 +72,7 @@ public class KafkaImportApplicationIntegrationTest {
 
         // create topic
         AdminUtils.createTopic(zkUtils, TOPIC_PROCESS_INSTANCE, 1, 1, new Properties(), RackAwareMode.Disabled$.MODULE$);
+        AdminUtils.createTopic(zkUtils, TOPIC_ACTIVITY_INSTANCE, 1, 1, new Properties(), RackAwareMode.Disabled$.MODULE$);
         AdminUtils.createTopic(zkUtils, TOPIC_VARIABLE_UPDATE, 1, 1, new Properties(), RackAwareMode.Disabled$.MODULE$);
 
         // setup producer
@@ -83,15 +87,19 @@ public class KafkaImportApplicationIntegrationTest {
             stream.forEach(l -> producer.send(new ProducerRecord<>(TOPIC_PROCESS_INSTANCE, 0, 0, l)));
         }
 
+        try (Stream<String> stream = Files.lines(Paths.get(FILE_STREAM_INPUT_ACTIVITY_INSTANCE))) {
+            stream.forEach(l -> producer.send(new ProducerRecord<>(TOPIC_ACTIVITY_INSTANCE, 0, 0, l)));
+        }
+
         try (Stream<String> stream = Files.lines(Paths.get(FILE_STREAM_INPUT_VARIABLE_UPDATE))) {
             stream.forEach(l -> producer.send(new ProducerRecord<>(TOPIC_VARIABLE_UPDATE, 0, 0, l)));
         }
     }
 
     @Test
-    public void testKafkaStreamingImport() throws Exception {
+    public void testKafkaStreamingImportProcessLevel() throws Exception {
         //run main class
-        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", IMPORT_TEST_OUTPUT_DIRECTORY, "-bm", "true", "-sr", "false"};
+        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", IMPORT_TEST_OUTPUT_DIRECTORY_PROCESS, "-bm", "true", "-sr", "false", "-dl", "process"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -104,7 +112,7 @@ public class KafkaImportApplicationIntegrationTest {
                 .getOrCreate();
 
         //generate Dataset and create hash to compare
-        Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY);
+        Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY_PROCESS);
 
         //check that dataset contains 24 lines
         assertEquals(24, importedDataset.count());
@@ -112,6 +120,35 @@ public class KafkaImportApplicationIntegrationTest {
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
         assertEquals("C1E2B8E5BBF234E3B5AD2511B586BC81", hash);
+
+        //close Spark session
+        sparkSession.close();
+    }
+
+    @Test
+    public void testKafkaStreamingImportActivityLevel() throws Exception {
+        //run main class
+        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", IMPORT_TEST_OUTPUT_DIRECTORY_ACTIVITY, "-bm", "true", "-sr", "false", "-dl", "activity"};
+        SparkConf sparkConf = new SparkConf();
+        sparkConf.setMaster("local[*]");
+        SparkSession.builder().config(sparkConf).getOrCreate();
+        KafkaImportApplication.main(args);
+
+        //start Spark session
+        SparkSession sparkSession = SparkSession.builder()
+                .master("local[*]")
+                .appName("IntegrationTest")
+                .getOrCreate();
+
+        //generate Dataset and create hash to compare
+        Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY_ACTIVITY);
+
+        //check that dataset contains 27 lines
+        assertEquals(27, importedDataset.count());
+
+        //check hash of dataset
+        String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
+        assertEquals("5F7FDA3055DE3BD23C2685A10EBB7622", hash);
 
         //close Spark session
         sparkSession.close();

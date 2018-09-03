@@ -15,6 +15,8 @@ public final class SparkImporterVariables {
     public static final String VAR_DURATION = "duration_";
     public static final String VAR_START_USER_ID = "start_user_id_";
     public static final String VAR_ACT_INST_ID = "act_inst_id_";
+    public static final String VAR_ACT_TYPE = "activity_type_";
+    public static final String VAR_ACT_NAME = "activity_name_";
     public static final String VAR_START_ACT_ID = "start_act_id_";
     public static final String VAR_END_ACT_ID = "end_act_id_";
     public static final String VAR_CASE_INST_ID = "case_inst_id_";
@@ -42,6 +44,7 @@ public final class SparkImporterVariables {
 
     private static String targetFolder = "";
     private static boolean devTypeCastCheckEnabled = false;
+    private static String dataLevel = "process";
 
     public static String getTargetFolder() {
         return targetFolder;
@@ -57,5 +60,13 @@ public final class SparkImporterVariables {
 
     public static void setDevTypeCastCheckEnabled(boolean devTypeCastCheckEnabled) {
         SparkImporterVariables.devTypeCastCheckEnabled = devTypeCastCheckEnabled;
+    }
+
+    public static String getDataLevel() {
+        return dataLevel;
+    }
+
+    public static void setDataLevel(String dataLevel) {
+        SparkImporterVariables.dataLevel = dataLevel;
     }
 }
