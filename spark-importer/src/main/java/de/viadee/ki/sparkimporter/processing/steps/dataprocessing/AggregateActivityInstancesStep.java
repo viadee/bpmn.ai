@@ -21,84 +21,64 @@ public class AggregateActivityInstancesStep implements PreprocessingStepInterfac
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
 
-        //apply max aggregator to known date columns start_time_ and end_time_ so that no date formatting is done in custom aggregator
-        List<String> dateFormatColumns = Arrays.asList(new String[]{SparkImporterVariables.VAR_START_TIME, SparkImporterVariables.VAR_END_TIME});
-
+        //apply first and processState aggregator
         Map<String, String> aggregationMap = new HashMap<>();
         for(String column : dataset.columns()) {
-            if(column.endsWith("_rev")) {
+            if(column.equals(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)) {
+                continue;
+            } else if(column.equals(SparkImporterVariables.VAR_DURATION)) {
                 aggregationMap.put(column, "max");
-            } else if(dateFormatColumns.contains(column)) {
-                aggregationMap.put(column, "first");
+            } else if(column.equals(SparkImporterVariables.VAR_STATE)) {
+                aggregationMap.put(column, "ProcessState");
             } else {
                 aggregationMap.put(column, "AllButEmptyString");
             }
         }
 
         //first aggregation
-        //take only variableUpdate rows
+        //activity level, take only processInstance and activityInstance rows
+        Dataset<Row> datasetAIAgg = dataset
+                        .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_ACT_INST_ID))))
+                        .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_ACT_INST_ID)
+                        .agg(aggregationMap);
 
-        Dataset<Row> datasetVIAgg = null;
-
-        datasetVIAgg = dataset
-                .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
-                .groupBy(SparkImporterVariables.VAR_ACT_INST_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
-                .agg(aggregationMap);
-
-        //cleanup, so renaming columns and dropping not used ones
-        datasetVIAgg = datasetVIAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
-        datasetVIAgg = datasetVIAgg.drop(SparkImporterVariables.VAR_ACT_INST_ID);
-        datasetVIAgg = datasetVIAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
-
-        String pattern = "(first|max|allbutemptystring)\\((.+)\\)";
+        //rename back columns after aggregation
+        String pattern = "(max|allbutemptystring|processstate)\\((.+)\\)";
         Pattern r = Pattern.compile(pattern);
 
-        for(String columnName : datasetVIAgg.columns()) {
+        for(String columnName : dataset.columns()) {
             Matcher m = r.matcher(columnName);
             if(m.find()) {
                 String newColumnName = m.group(2);
-                datasetVIAgg = datasetVIAgg.withColumnRenamed(columnName, newColumnName);
+                dataset = dataset.withColumnRenamed(columnName, newColumnName);
             }
         }
 
-        //union again with processInstance rows. we aggregate them as well to have the same columns
+        // activity level
         dataset = dataset
-                .select(
-                        SparkImporterVariables.VAR_PROCESS_INSTANCE_ID,
-                        SparkImporterVariables.VAR_STATE,
-                        SparkImporterVariables.VAR_ACT_INST_ID,
-                        SparkImporterVariables.VAR_ACT_TYPE,
-                        SparkImporterVariables.VAR_ACT_NAME,
-                        SparkImporterVariables.VAR_START_TIME,
-                        SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
-                        SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
-                        SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
-                        SparkImporterVariables.VAR_LONG,
-                        SparkImporterVariables.VAR_DOUBLE,
-                        SparkImporterVariables.VAR_TEXT,
-                        SparkImporterVariables.VAR_TEXT2
-                )
-                .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_STATE))))
-                .union(datasetVIAgg
-                        .select(
-                                SparkImporterVariables.VAR_PROCESS_INSTANCE_ID,
-                                SparkImporterVariables.VAR_STATE,
-                                SparkImporterVariables.VAR_ACT_INST_ID,
-                                SparkImporterVariables.VAR_ACT_TYPE,
-                                SparkImporterVariables.VAR_ACT_NAME,
-                                SparkImporterVariables.VAR_START_TIME,
-                                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
-                                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
-                                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
-                                SparkImporterVariables.VAR_LONG,
-                                SparkImporterVariables.VAR_DOUBLE,
-                                SparkImporterVariables.VAR_TEXT,
-                                SparkImporterVariables.VAR_TEXT2
-                        ))
-                .orderBy(SparkImporterVariables.VAR_ACT_INST_ID, SparkImporterVariables.VAR_START_TIME);
+                .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
+                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_ACT_INST_ID)
+                .agg(aggregationMap)
+                .union(datasetAIAgg);
+
+
+        //rename back columns after aggregation
+        for(String columnName : dataset.columns()) {
+            Matcher m = r.matcher(columnName);
+            if(m.find()) {
+                String newColumnName = m.group(2);
+                dataset = dataset.withColumnRenamed(columnName, newColumnName);
+            }
+        }
+
+        //in case we add the CSV we have a name column in the first dataset of the join so we call drop again to make sure it is gone
+        dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+        dataset = dataset.drop(SparkImporterVariables.VAR_ACT_INST_ID);
+
+        dataset = dataset.sort(SparkImporterVariables.VAR_START_TIME);
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_activity_instances");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_process_instances");
         }
 
         //return preprocessed data

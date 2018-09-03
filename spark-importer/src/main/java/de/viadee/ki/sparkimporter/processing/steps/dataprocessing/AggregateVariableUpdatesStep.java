@@ -39,22 +39,34 @@ public class AggregateVariableUpdatesStep implements PreprocessingStepInterface 
 
         Dataset<Row> datasetVUAgg = null;
 
-        if(Arrays.asList(dataset.columns()).contains("timestamp_")) {
-            datasetVUAgg = dataset
-                    .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
-                    .orderBy(desc("timestamp_"))
-                    .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
-                    .agg(aggregationMap);
+
+        if(SparkImporterVariables.getDataLevel().equals("process")) {
+            if (Arrays.asList(dataset.columns()).contains("timestamp_")) {
+                datasetVUAgg = dataset
+                        .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
+                        .orderBy(desc("timestamp_"))
+                        .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
+                        .agg(aggregationMap);
+            } else {
+                datasetVUAgg = dataset
+                        .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
+                        .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
+                        .agg(aggregationMap);
+            }
+
         } else {
             datasetVUAgg = dataset
                     .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
-                    .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
+                    .groupBy(SparkImporterVariables.VAR_ACT_INST_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
                     .agg(aggregationMap);
         }
-
         //cleanup, so renaming columns and dropping not used ones
         datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
         datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+
+        if(SparkImporterVariables.getDataLevel().equals("activity")) {
+            datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_ACT_INST_ID);
+        }
 
         String pattern = "(first|max|allbutemptystring)\\((.+)\\)";
         Pattern r = Pattern.compile(pattern);
@@ -67,32 +79,70 @@ public class AggregateVariableUpdatesStep implements PreprocessingStepInterface 
             }
         }
 
-        //union again with processInstance rows. we aggregate them as well to have the same columns
-        dataset = dataset
-                .select(
-                        SparkImporterVariables.VAR_PROCESS_INSTANCE_ID,
-                        SparkImporterVariables.VAR_STATE,
-                        SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
-                        SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
-                        SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
-                        SparkImporterVariables.VAR_LONG,
-                        SparkImporterVariables.VAR_DOUBLE,
-                        SparkImporterVariables.VAR_TEXT,
-                        SparkImporterVariables.VAR_TEXT2
-                )
-                .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_STATE))))
-                .union(datasetVUAgg
-                        .select(
-                                SparkImporterVariables.VAR_PROCESS_INSTANCE_ID,
-                                SparkImporterVariables.VAR_STATE,
-                                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
-                                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
-                                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
-                                SparkImporterVariables.VAR_LONG,
-                                SparkImporterVariables.VAR_DOUBLE,
-                                SparkImporterVariables.VAR_TEXT,
-                                SparkImporterVariables.VAR_TEXT2
-                        ));
+        if(SparkImporterVariables.getDataLevel().equals("process")) {
+            //union again with processInstance rows. we aggregate them as well to have the same columns
+            dataset = dataset
+                    .select(
+                            SparkImporterVariables.VAR_PROCESS_INSTANCE_ID,
+                            SparkImporterVariables.VAR_STATE,
+                            SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
+                            SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
+                            SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
+                            SparkImporterVariables.VAR_LONG,
+                            SparkImporterVariables.VAR_DOUBLE,
+                            SparkImporterVariables.VAR_TEXT,
+                            SparkImporterVariables.VAR_TEXT2
+                    )
+                    .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_STATE))))
+                    .union(datasetVUAgg
+                            .select(
+                                    SparkImporterVariables.VAR_PROCESS_INSTANCE_ID,
+                                    SparkImporterVariables.VAR_STATE,
+                                    SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
+                                    SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
+                                    SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
+                                    SparkImporterVariables.VAR_LONG,
+                                    SparkImporterVariables.VAR_DOUBLE,
+                                    SparkImporterVariables.VAR_TEXT,
+                                    SparkImporterVariables.VAR_TEXT2
+                            ));
+        } else {
+            //union again with processInstance rows. we aggregate them as well to have the same columns
+            dataset = dataset
+                    .select(
+                            SparkImporterVariables.VAR_PROCESS_INSTANCE_ID,
+                            SparkImporterVariables.VAR_STATE,
+                            SparkImporterVariables.VAR_ACT_INST_ID,
+                            SparkImporterVariables.VAR_ACT_TYPE,
+                            SparkImporterVariables.VAR_ACT_NAME,
+                            SparkImporterVariables.VAR_START_TIME,
+                            SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
+                            SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
+                            SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
+                            SparkImporterVariables.VAR_LONG,
+                            SparkImporterVariables.VAR_DOUBLE,
+                            SparkImporterVariables.VAR_TEXT,
+                            SparkImporterVariables.VAR_TEXT2
+                    )
+                    .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_STATE))))
+                    .union(datasetVUAgg
+                            .select(
+                                    SparkImporterVariables.VAR_PROCESS_INSTANCE_ID,
+                                    SparkImporterVariables.VAR_STATE,
+                                    SparkImporterVariables.VAR_ACT_INST_ID,
+                                    SparkImporterVariables.VAR_ACT_TYPE,
+                                    SparkImporterVariables.VAR_ACT_NAME,
+                                    SparkImporterVariables.VAR_START_TIME,
+                                    SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
+                                    SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
+                                    SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
+                                    SparkImporterVariables.VAR_LONG,
+                                    SparkImporterVariables.VAR_DOUBLE,
+                                    SparkImporterVariables.VAR_TEXT,
+                                    SparkImporterVariables.VAR_TEXT2
+                            ))
+                    .orderBy(SparkImporterVariables.VAR_ACT_INST_ID, SparkImporterVariables.VAR_START_TIME);
+        }
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_variable_updates");

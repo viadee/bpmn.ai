@@ -61,18 +61,17 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         //generic steps
         preprocessingRunner.addPreprocessorStep(new DetermineVariableTypesStep());
         preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
-
+        preprocessingRunner.addPreprocessorStep(new AggregateVariableUpdatesStep());
+        preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
 
         if(SparkImporterVariables.getDataLevel().equals("process")) {
             // process level
-            preprocessingRunner.addPreprocessorStep(new AggregateVariableUpdatesStep());
+            preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
         } else {
             // activity level
             preprocessingRunner.addPreprocessorStep(new AggregateActivityInstancesStep());
         }
 
-        preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
-        preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
         preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
 
         // user configuration step
