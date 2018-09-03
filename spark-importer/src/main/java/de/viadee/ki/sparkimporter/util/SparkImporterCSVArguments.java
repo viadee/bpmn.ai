@@ -15,6 +15,10 @@ public class SparkImporterCSVArguments {
 					+ "AND a.proc_def_key_ = 'XYZ' \r\n" + "")
 	private String fileSource;
 
+	@Parameter(names = { "--data-level",
+			"-dl" }, required = false, description = "Which level should the resulting data have. It can be process or activity.")
+	private String dataLavel = "process";
+
 	@Parameter(names = { "--delimiter",
 			"-d" }, required = true, description = "Character or string that separates fields such as [ ;,  | or ||| ]. Please make sure that these are not contained in your data.")
 	private String delimiter;
