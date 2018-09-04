@@ -6,9 +6,7 @@ import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +28,9 @@ public class AggregateActivityInstancesStep implements PreprocessingStepInterfac
                 aggregationMap.put(column, "max");
             } else if(column.equals(SparkImporterVariables.VAR_STATE)) {
                 aggregationMap.put(column, "ProcessState");
+            } else if(column.equals(SparkImporterVariables.VAR_ACT_INST_ID)) {
+                //ignore it, as we aggregate by it
+                continue;
             } else {
                 aggregationMap.put(column, "AllButEmptyString");
             }
@@ -73,12 +74,11 @@ public class AggregateActivityInstancesStep implements PreprocessingStepInterfac
 
         //in case we add the CSV we have a name column in the first dataset of the join so we call drop again to make sure it is gone
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
-        dataset = dataset.drop(SparkImporterVariables.VAR_ACT_INST_ID);
 
         dataset = dataset.sort(SparkImporterVariables.VAR_START_TIME);
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_process_instances");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_activity_instances");
         }
 
         //return preprocessed data
