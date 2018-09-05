@@ -17,7 +17,7 @@ Step							| Step type
 [AggregateVariableUpdates](#aggregatevariableupdates-generic)	| generic
 [AddVariablesColumns](#addvariablescolumns-generic)			| generic
 [AggregateProcessInstances](#aggregateprocessinstances-generic)	| generic
-[AddRemovedColumnsToDataset](#addremovedcolumnstodataset-generic)	| generic
+[AddReducedColumnsToDataset](#addreducedcolumnstodataset-generic)	| generic
 [ColumnHash](#columnhash-user-config) 			      	| user config
 [TypeCast](#typecast-user-config) 			      	| user config
 [WriteToCSV](#writetocsv-generic)					| generic
@@ -314,7 +314,7 @@ processInstanceId   | f     | f_rev | b | b_rev | c | c_rev
 1						| hello | 0     | 1 | 1     |2.0| 0
 2						| hi    | 0     | 0 | 1     |1.5| 0
 
-### AddRemovedColumnsToDataset (generic)
+### AddReducedColumnsToDataset (generic)
 In the beginning the non relevant columns where removed to speed up the processing. These columns are now added back to the dataset by using the processInstanceId as a reference.
 
 As an example let's assume the following data is the input for this step:

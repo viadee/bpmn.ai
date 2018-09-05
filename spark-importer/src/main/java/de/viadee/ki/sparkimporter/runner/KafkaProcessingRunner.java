@@ -73,7 +73,7 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
             preprocessingRunner.addPreprocessorStep(new FillActivityInstancesHistoryStep());
         }
 
-        preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
+        preprocessingRunner.addPreprocessorStep(new AddReducedColumnsToDatasetStep());
 
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new ColumnHashStep());

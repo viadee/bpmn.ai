@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 import static org.apache.spark.sql.functions.col;
 
-public class AddRemovedColumnsToDatasetStep implements PreprocessingStepInterface {
+public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterface {
 
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
