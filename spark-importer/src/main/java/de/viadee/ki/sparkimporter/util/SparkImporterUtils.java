@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -91,10 +92,10 @@ public class SparkImporterUtils {
                 .csv(SparkImporterVariables.getTargetFolder()+"/"+ String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory);
 
         if(aggreateCSVToOneFile && subDirectory.equals("result"))
-            renameResultFile();
+            moveResultFile();
     }
 
-    private void renameResultFile() {
+    private void moveResultFile() {
         //rename result file to deterministic name
         String targetFolder = SparkImporterVariables.getTargetFolder()+"/"+ String.format("%02d", PreprocessingRunner.getCounter()) + "_result";
         if(targetFolder.startsWith("hdfs")) {
@@ -121,7 +122,7 @@ public class SparkImporterUtils {
             for(File file : dir.listFiles()) {
                 if(file.getName().startsWith("part-0000")) {
                     try {
-                        Files.copy(file.toPath(), new File(dir + "/../result.csv").toPath());
+                        Files.move(file.toPath(), new File(dir + "/../result.csv").toPath());
                     } catch (IOException e) {
                         SparkImporterLogger.getInstance().writeError("An error occurred during the renaming of the result file. Exception: " + e.getMessage());
                     }

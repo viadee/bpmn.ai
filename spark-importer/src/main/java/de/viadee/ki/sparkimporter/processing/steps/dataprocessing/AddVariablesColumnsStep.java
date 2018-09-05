@@ -30,7 +30,7 @@ public class AddVariablesColumnsStep implements PreprocessingStepInterface {
                             .when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE).equalTo("double"), dataset.col(SparkImporterVariables.VAR_DOUBLE))
                             .when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE).equalTo("date"), dataset.col(SparkImporterVariables.VAR_LONG))
                             .otherwise(dataset.col(SparkImporterVariables.VAR_TEXT2)))
-                    .otherwise(""));
+                    .otherwise(null));
 
             if(SparkImporterVariables.isRevCountEnabled()) {
                 dataset = dataset.withColumn(v+"_rev",
