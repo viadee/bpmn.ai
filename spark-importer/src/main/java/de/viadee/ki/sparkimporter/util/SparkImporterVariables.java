@@ -14,6 +14,7 @@ public final class SparkImporterVariables {
     public static final String VAR_END_TIME = "end_time_";
     public static final String VAR_DURATION = "duration_";
     public static final String VAR_START_USER_ID = "start_user_id_";
+    public static final String VAR_ACT_ID = "activity_id_";
     public static final String VAR_ACT_INST_ID = "act_inst_id_";
     public static final String VAR_ACT_TYPE = "activity_type_";
     public static final String VAR_ACT_NAME = "activity_name_";

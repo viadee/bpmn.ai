@@ -6,6 +6,7 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableNameMappin
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -46,6 +47,10 @@ public class VariableNameMappingStep implements PreprocessingStepInterface {
             dataset = dataset.withColumn(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
                     when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).equalTo(oldName), lit(newName))
                             .otherwise(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)));
+        }
+
+        if(writeStepResultIntoFile) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "variable_name_mapping");
         }
 
         return dataset;

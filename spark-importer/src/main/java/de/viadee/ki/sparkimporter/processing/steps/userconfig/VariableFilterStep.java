@@ -6,6 +6,7 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfigurat
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.sql.Dataset;
@@ -59,6 +60,10 @@ public class VariableFilterStep implements PreprocessingStepInterface {
             String variable = row.getAs(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
             return !variablesToFilter.contains(variable);
         });
+
+        if(writeStepResultIntoFile) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataSet, "variable_filter");
+        }
 
         return dataSet;
     }
