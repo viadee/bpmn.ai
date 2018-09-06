@@ -8,11 +8,11 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.catalyst.encoders.RowEncoder;
-import org.apache.spark.sql.expressions.Window;
-import org.apache.spark.sql.expressions.WindowSpec;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static org.apache.spark.sql.functions.when;
 
@@ -46,10 +46,11 @@ public class FillActivityInstancesHistoryStep implements PreprocessingStepInterf
 
 
         //iterate through dataset and fill up values in each process instance
-        Dataset<Row> changed_data = dataset.map(row -> {
+        dataset = dataset.map(row -> {
             String currentProcessInstanceId = row.getAs(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
             String[] newRow = new String[columns.length];
 
+            //check if we switch to a new process instance
             if(!lastProcessInstanceId[0].equals(currentProcessInstanceId)) {
                 // new process instance
                 valuesToWrite.clear();
@@ -60,10 +61,12 @@ public class FillActivityInstancesHistoryStep implements PreprocessingStepInterf
             for(String c : columns) {
                 String columnValue = null;
                 if(Arrays.asList(vars).contains(c)) {
-                    //variable
+                    //it was a variable
                     if(valuesToWrite.get(c) != null) {
+                        // we already have a value for the current process instance, so we use it
                         columnValue = valuesToWrite.get(c);
                     } else {
+                        // we don't have a value yet for the current process instance
                         String currentValue = row.getAs(c);
                         if(currentValue != null) {
                             valuesToWrite.put(c, currentValue);
@@ -71,7 +74,7 @@ public class FillActivityInstancesHistoryStep implements PreprocessingStepInterf
                         }
                     }
                 } else {
-                    //column
+                    //it was a column, just use the value as it is
                     columnValue = row.getAs(c);
                 }
                 newRow[columnCount++] = columnValue;
@@ -79,8 +82,6 @@ public class FillActivityInstancesHistoryStep implements PreprocessingStepInterf
 
             return RowFactory.create(newRow);
         }, RowEncoder.apply(dataset.schema()));
-
-        dataset = changed_data;
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "fill_activity_instances_history");

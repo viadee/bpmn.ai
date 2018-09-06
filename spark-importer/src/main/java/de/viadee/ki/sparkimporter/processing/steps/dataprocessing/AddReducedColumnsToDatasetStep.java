@@ -13,8 +13,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.spark.sql.functions.col;
-
 public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterface {
 
     @Override
