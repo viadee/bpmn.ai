@@ -21,10 +21,13 @@ public class FillActivityInstancesHistoryStep implements PreprocessingStepInterf
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
 
+        //repartition py process instance and order by start_time for this operation
         dataset = dataset.repartition(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)).sortWithinPartitions(SparkImporterVariables.VAR_START_TIME);
 
+        // get variables
         Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
 
+        //convert to String array so it is serializable and can be used in map function
         Set<String> variables = varMap.keySet();
         String[] vars = new String[variables.size()];
         int vc = 0;
@@ -32,8 +35,8 @@ public class FillActivityInstancesHistoryStep implements PreprocessingStepInterf
             vars[vc++] = v;
         }
 
+        // make empty values actually null
         for(String v : variables) {
-            // make empty values actually null
             dataset = dataset.withColumn(v, when(dataset.col(v).equalTo(""), null).otherwise(dataset.col(v)));
         }
 
@@ -41,8 +44,9 @@ public class FillActivityInstancesHistoryStep implements PreprocessingStepInterf
         final String[] lastProcessInstanceId = {""};
         String[] columns = dataset.columns();
 
-        Dataset<Row> changed_data = dataset.map(row -> {
 
+        //iterate through dataset and fill up values in each process instance
+        Dataset<Row> changed_data = dataset.map(row -> {
             String currentProcessInstanceId = row.getAs(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
             String[] newRow = new String[columns.length];
 

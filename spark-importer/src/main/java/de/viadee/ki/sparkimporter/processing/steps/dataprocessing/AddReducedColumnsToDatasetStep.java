@@ -39,6 +39,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_INSTANCE_ID
         });
         columnNames.add(new Column(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID));
+        columnNames.add(new Column(SparkImporterVariables.VAR_ACT_INST_ID));
         for(Row row : startColumns.collectAsList()) {
             String column = row.getString(0);
             if(!existingColumns.contains(column) && !columnsNotBeAddedAgain.contains(column)) {
@@ -55,11 +56,21 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
             aggregationMap.put(column, "first");
         }
 
-        initialDataset = initialDataset
-                .select(selectionColumns).toDF()
-                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
-                .agg(aggregationMap)
-                .withColumnRenamed(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
+        if(SparkImporterVariables.getDataLevel().equals("process")) {
+            initialDataset = initialDataset
+                    .select(selectionColumns)
+                    .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
+                    .agg(aggregationMap)
+                    .withColumnRenamed(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
+        } else {
+            initialDataset = initialDataset
+                    .select(selectionColumns)
+                    .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_ACT_INST_ID)
+                    .agg(aggregationMap)
+                    .withColumnRenamed(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right")
+                    .withColumnRenamed(SparkImporterVariables.VAR_ACT_INST_ID, SparkImporterVariables.VAR_ACT_INST_ID+"_right");
+        }
+
 
         //rename back columns after aggregation
         String pattern = "(first)\\((.+)\\)";
@@ -74,8 +85,21 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         }
 
         // rejoin removed columns to dataset
-        dataset = dataset.join(initialDataset, col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).equalTo(col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right")), "left");
+        if(SparkImporterVariables.getDataLevel().equals("process")) {
+            dataset = dataset.join(initialDataset,
+                    dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).equalTo(initialDataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right")
+                    ), "left");
+        } else {
+            dataset = dataset.join(initialDataset,
+                    dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).equalTo(initialDataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right"))
+                            .and(dataset.col(SparkImporterVariables.VAR_ACT_INST_ID).equalTo(initialDataset.col(SparkImporterVariables.VAR_ACT_INST_ID+"_right")))
+                    , "left");
+        }
+
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
+        if(SparkImporterVariables.getDataLevel().equals("activity")) {
+            dataset = dataset.drop(SparkImporterVariables.VAR_ACT_INST_ID+"_right");
+        }
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "joined_columns");
