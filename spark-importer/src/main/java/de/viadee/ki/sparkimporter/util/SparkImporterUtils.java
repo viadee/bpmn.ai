@@ -109,7 +109,7 @@ public class SparkImporterUtils {
                 while(files.hasNext()) {
                     LocatedFileStatus file = files.next();
                     if(file.isFile() && file.getPath().getName().contains("part-0000")) {
-                        FileUtil.copy(fileSystem, file.getPath(), fileSystem, new Path(targetFolder + "/../result.csv"), false, conf);
+                        FileUtil.copy(fileSystem, file.getPath(), fileSystem, new Path(targetFolder + "/../result.csv"), true, conf);
                     }
                 }
             } catch (IOException e) {
