@@ -63,6 +63,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         } else {
             initialDataset = initialDataset
                     .select(selectionColumns)
+                    .filter(initialDataset.col(SparkImporterVariables.VAR_ACT_ID).isNotNull())
                     .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_ACT_INST_ID)
                     .agg(aggregationMap)
                     .withColumnRenamed(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right")
