@@ -37,23 +37,26 @@ public class SparkTestApplication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SparkTestApplication.class);
 
+	
 	public static void main(String[] arguments) {
 		// configuration is being loaded from Environment (e.g. when using spark-submit)
 		final SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("Test").getOrCreate();
 
-		// read data
+		// read dataset
 		Dataset<Row> data = sparkSession.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Desktop\\brandsReal.csv");
+		Dataset<Row> testdata = sparkSession.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Desktop\\test.csv");
 		data = data.withColumn("id", functions.row_number().over(Window.orderBy(data.col("int_fahrzeugHerstellernameAusVertrag"))));
 
 		// Add geodata to dataset
-		//Dataset p = addLocation(data, "postleitzahl");
-		mapBrands(data);
+		Dataset locationds = addLocation(testdata, "postleitzahl");
+		locationds.show();
+		Dataset brandds = mapBrands(data);
 			
 		sparkSession.close();
 	}
 	
 	
-	
+	// add geodata 
 	public static Dataset addLocation(Dataset ds, String colname) {
 		final SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("Test").getOrCreate();
 		
@@ -141,7 +144,7 @@ public class SparkTestApplication {
    
         String[] columns = dataset.columns();
           
-        // go through data
+        // traverse the dataset
         dataset = dataset.map(row -> {
           
         	Object[] newRow = new Object[columns.length];	        
@@ -155,17 +158,17 @@ public class SparkTestApplication {
 	        		String regexpValue = null;
 	        		int lineNo = 1;
 	        
-	        		// go through matching list
+	        		// traverse the matching list
 	                for(List<String> line: lines) {
 	                    int columnNo = 1;
 	                    String brandMatch = line.get(0);
 	                    String regExpBrand = line.get(1);
 	                    lineNo++;
-	                    System.out.println(brandMatch + regExpBrand);
+	                    
 	                	// replace value with regexp from matching list
 	                	columnValue = ((String) row.getAs("int_fahrzeugHerstellernameAusVertrag")).replaceAll(regExpBrand, brandMatch);
 	                	
-	                	// stop loop if value is replaced
+	                	// stop loop if value is already replaced and otherwise the value stays "Sonstige"
 	                	if( (String) row.getAs("int_fahrzeugHerstellernameAusVertrag") !=  columnValue) {
 	                		break;
 	                	}else {
@@ -184,9 +187,9 @@ public class SparkTestApplication {
             return RowFactory.create(newRow);
         }, RowEncoder.apply(dataset.schema()));
 
-      
-       dataset.show(1050);
-       //save dataset into CSV file
+        dataset = dataset.drop("_c1").drop("score").drop("maxLength").drop("_c1_Modified").drop("minRatio").drop("int_fahrzeugHerstellernameAusVertragModified");
+       
+        /*save dataset into CSV file
        dataset.coalesce(1)
                .write()
                .option("header", "true")
@@ -194,7 +197,8 @@ public class SparkTestApplication {
                .option("ignoreLeadingWhiteSpace", "false")
                .option("ignoreTrailingWhiteSpace", "false")
                .mode(SaveMode.Overwrite)
-               .csv("C:\\Users\\B77\\Desktop\\outputBrands.csv");
+               .csv("C:\\Users\\B77\\Desktop\\outputBrands.csv");*/
+
 
        return dataset;
     }
