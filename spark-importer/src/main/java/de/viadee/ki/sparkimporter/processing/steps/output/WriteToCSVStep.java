@@ -7,7 +7,7 @@ import org.apache.spark.sql.Row;
 
 public class WriteToCSVStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
 
         SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "result");
 

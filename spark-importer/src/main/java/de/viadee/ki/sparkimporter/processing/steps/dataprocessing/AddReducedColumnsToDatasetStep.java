@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
 
 
         // take columns available initially from helper dataset and select the ones to be added back again
@@ -55,7 +55,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
             aggregationMap.put(column, "first");
         }
 
-        if(SparkImporterVariables.getDataLevel().equals("process")) {
+        if(dataLevel.equals("process")) {
             initialDataset = initialDataset
                     .select(selectionColumns)
                     .filter(initialDataset.col(SparkImporterVariables.VAR_STATE).isNotNull())
@@ -86,7 +86,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         }
 
         // rejoin removed columns to dataset
-        if(SparkImporterVariables.getDataLevel().equals("process")) {
+        if(dataLevel.equals("process")) {
             dataset = dataset.join(initialDataset,
                     dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).equalTo(initialDataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right")
                     ), "left");
@@ -98,7 +98,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         }
 
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
-        if(SparkImporterVariables.getDataLevel().equals("activity")) {
+        if(dataLevel.equals("activity")) {
             dataset = dataset.drop(SparkImporterVariables.VAR_ACT_INST_ID+"_right");
         }
 

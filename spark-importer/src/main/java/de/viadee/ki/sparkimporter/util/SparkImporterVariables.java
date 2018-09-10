@@ -46,7 +46,6 @@ public final class SparkImporterVariables {
     private static String targetFolder = "";
     private static boolean devTypeCastCheckEnabled = false;
     private static boolean revCountEnabled = false;
-    private static String dataLevel = "process";
 
     public static String getTargetFolder() {
         return targetFolder;
@@ -70,13 +69,5 @@ public final class SparkImporterVariables {
 
     public static void setRevCountEnabled(boolean revCountEnabled) {
         SparkImporterVariables.revCountEnabled = revCountEnabled;
-    }
-
-    public static String getDataLevel() {
-        return dataLevel;
-    }
-
-    public static void setDataLevel(String dataLevel) {
-        SparkImporterVariables.dataLevel = dataLevel;
     }
 }

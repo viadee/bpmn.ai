@@ -15,7 +15,7 @@ import static org.apache.spark.sql.functions.when;
 public class AddVariablesColumnsStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
 
         Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
         Set<String> variables = varMap.keySet();
@@ -33,7 +33,7 @@ public class AddVariablesColumnsStep implements PreprocessingStepInterface {
                     .otherwise(null));
 
             //rev count is only relevant on process level
-            if(SparkImporterVariables.getDataLevel().equals("process") && SparkImporterVariables.isRevCountEnabled()) {
+            if(dataLevel.equals("process") && SparkImporterVariables.isRevCountEnabled()) {
                 dataset = dataset.withColumn(v+"_rev",
                         when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).equalTo(v), dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION))
                         .otherwise("0"));

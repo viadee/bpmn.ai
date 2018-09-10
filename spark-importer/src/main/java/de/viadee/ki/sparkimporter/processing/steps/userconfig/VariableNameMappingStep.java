@@ -19,7 +19,7 @@ import static org.apache.spark.sql.functions.when;
 
 public class VariableNameMappingStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
 
         Map<String, String> variableNameMappings = new HashMap<>();
 

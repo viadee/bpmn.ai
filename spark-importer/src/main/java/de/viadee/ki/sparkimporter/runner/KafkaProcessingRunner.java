@@ -7,7 +7,6 @@ import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.*;
 import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
-import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -38,6 +37,8 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         // Define processing steps to run
         final PreprocessingRunner preprocessingRunner = new PreprocessingRunner();
 
+        String dataLevel = ARGS.getDataLavel();
+
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 
 
@@ -64,7 +65,7 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new AggregateVariableUpdatesStep());
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
 
-        if(SparkImporterVariables.getDataLevel().equals("process")) {
+        if(dataLevel.equals("process")) {
             // process level
             preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
         } else {
@@ -85,7 +86,7 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 
         // Run processing runner
-        preprocessingRunner.run(dataset);
+        preprocessingRunner.run(dataset, dataLevel);
 
         //write initial config file
         if(PreprocessingRunner.initialConfigToBeWritten) {

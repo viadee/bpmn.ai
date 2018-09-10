@@ -40,7 +40,6 @@ public class KafkaProcessingApplication {
 		SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
 		SparkImporterVariables.setDevTypeCastCheckEnabled(ARGS.isDevTypeCastCheckEnabled());
 		SparkImporterVariables.setRevCountEnabled(ARGS.isRevisionCount());
-		SparkImporterVariables.setDataLevel(ARGS.getDataLavel());
 		SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
 		SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
 

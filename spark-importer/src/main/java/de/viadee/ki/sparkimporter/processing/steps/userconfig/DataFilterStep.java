@@ -10,7 +10,7 @@ import org.apache.spark.sql.Row;
 
 public class DataFilterStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
 
         Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
         if(configuration != null) {

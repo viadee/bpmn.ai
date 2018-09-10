@@ -18,7 +18,7 @@ import static org.apache.spark.sql.functions.*;
 public class AggregateVariableUpdatesStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
 
         //apply max aggregator to known date columns start_time_ and end_time_ so that no date formatting is done in custom aggregator
         List<String> dateFormatColumns = Arrays.asList(new String[]{SparkImporterVariables.VAR_START_TIME, SparkImporterVariables.VAR_END_TIME});
@@ -40,7 +40,7 @@ public class AggregateVariableUpdatesStep implements PreprocessingStepInterface 
         Dataset<Row> datasetVUAgg = null;
 
 
-        if(SparkImporterVariables.getDataLevel().equals("process")) {
+        if(dataLevel.equals("process")) {
             if (Arrays.asList(dataset.columns()).contains("timestamp_")) {
                 datasetVUAgg = dataset
                         .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
@@ -64,7 +64,7 @@ public class AggregateVariableUpdatesStep implements PreprocessingStepInterface 
         datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
         datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
-        if(SparkImporterVariables.getDataLevel().equals("activity")) {
+        if(dataLevel.equals("activity")) {
             datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_ACT_INST_ID);
         }
 
@@ -79,7 +79,7 @@ public class AggregateVariableUpdatesStep implements PreprocessingStepInterface 
             }
         }
 
-        if(SparkImporterVariables.getDataLevel().equals("process")) {
+        if(dataLevel.equals("process")) {
             //union again with processInstance rows. we aggregate them as well to have the same columns
             dataset = dataset
                     .select(

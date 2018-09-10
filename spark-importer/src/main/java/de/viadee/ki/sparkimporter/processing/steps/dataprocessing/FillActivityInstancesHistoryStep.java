@@ -19,7 +19,7 @@ import static org.apache.spark.sql.functions.when;
 public class FillActivityInstancesHistoryStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
 
         //repartition py process instance and order by start_time for this operation
         dataset = dataset.repartition(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)).sortWithinPartitions(SparkImporterVariables.VAR_START_TIME);

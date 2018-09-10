@@ -18,7 +18,7 @@ import java.util.List;
 public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
 
         // get dataset structure for type determination
         List<StructField> datasetFields = Arrays.asList(dataset.schema().fields());
@@ -38,7 +38,7 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT);
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT2);
 
-        if(SparkImporterVariables.getDataLevel().equals("activity")) {
+        if(dataLevel.equals("activity")) {
             columnsToKeep.add(SparkImporterVariables.VAR_ACT_INST_ID);
             columnsToKeep.add(SparkImporterVariables.VAR_START_TIME);
             columnsToKeep.add(SparkImporterVariables.VAR_END_TIME);
@@ -90,7 +90,7 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
         columns.add(new Column(SparkImporterVariables.VAR_TEXT));
         columns.add(new Column(SparkImporterVariables.VAR_TEXT2));
 
-        if(SparkImporterVariables.getDataLevel().equals("activity")) {
+        if(dataLevel.equals("activity")) {
             columns.add(new Column(SparkImporterVariables.VAR_ACT_INST_ID));
             columns.add(new Column(SparkImporterVariables.VAR_START_TIME));
             columns.add(new Column(SparkImporterVariables.VAR_END_TIME));

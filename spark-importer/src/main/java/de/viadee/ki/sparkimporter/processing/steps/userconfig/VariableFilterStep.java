@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class VariableFilterStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel) {
 
         List<String> variablesToFilter = new ArrayList<>();
 
