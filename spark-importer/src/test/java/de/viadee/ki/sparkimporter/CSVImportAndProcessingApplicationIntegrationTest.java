@@ -143,11 +143,11 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
-        assertEquals("B53D5802012947FF268E7553CFC76E8B", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        assertEquals("062B07EEAF1F5D7ECBC74D2615FE567B", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        assertEquals("E2FA6ABB6DDBAB1C4606195B9452994E", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
-        assertEquals("F9F11A8AF86576C3CE236B141D39F0FD", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        assertEquals("24CE318FD9EAB1AC04599642BB12BB1F", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        assertEquals("8C79905C077E9D9938730A9728D89553", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+        assertEquals("973490C78F34515547E5E228BEDA7E6A", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+        assertEquals("9448850646A3E5D1CADE079AAD87B491", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+        assertEquals("834FBED99E0CC28F22AB9BF4A44E3360", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+        assertEquals("883F520B9997FB402613F3C75A592F79", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
     }
 
     private static String[] combine(String[] a, String[]... b){
