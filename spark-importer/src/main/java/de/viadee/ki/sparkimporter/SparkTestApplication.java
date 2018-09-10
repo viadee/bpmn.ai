@@ -1,22 +1,27 @@
 package de.viadee.ki.sparkimporter;
 
-import org.apache.spark.sql.Column;
-import org.apache.spark.sql.functions;
 import org.apache.spark.sql.expressions.Window;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.catalyst.expressions.Levenshtein;
 import org.apache.spark.sql.catalyst.expressions.WindowSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.apache.spark.sql.functions.levenshtein;
-import static org.apache.spark.sql.functions.upper;
+
+import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
+import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+
 import org.apache.spark.sql.expressions.Window;
 import javax.validation.constraints.Max;
 import org.apache.spark.sql.*;
-import static org.apache.spark.sql.functions.length;
-import static org.apache.spark.sql. functions.regexp_replace;
+
 import static org.apache.spark.sql.functions.*;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.spark.api.java.function.ForeachFunction;
 
 public class SparkTestApplication {
@@ -28,7 +33,7 @@ public class SparkTestApplication {
 		final SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("Test").getOrCreate();
 
 		// read data
-		Dataset data = sparkSession.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Desktop\\brandsReal.csv");
+		Dataset<Row> data = sparkSession.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Desktop\\brandsReal.csv");
 		data = data.withColumn("id", functions.row_number().over(Window.orderBy(data.col("int_fahrzeugHerstellernameAusVertrag"))));
 
 		// Add geodata to dataset
@@ -55,26 +60,27 @@ public class SparkTestApplication {
 	
 	
 	
-	
-	public static Dataset mapBrands(Dataset ds) {
+	// 
+	public static Dataset<Row> mapBrands(Dataset<Row> ds) {
 		final SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("Test").getOrCreate();
 
-		Dataset levenshteinds = LevenshteinMatching(ds,sparkSession);
-		Dataset regexds = regexMatching(levenshteinds, sparkSession);
+		Dataset<Row> levenshteinds = LevenshteinMatching(ds,sparkSession);
+		//levenshteinds.show(500);
+		regexMatching(levenshteinds, sparkSession);
 		//levenshteinds.show(1000);
 		
 		return null;	
 	}
 	
 	
-	
-	public static Dataset LevenshteinMatching(Dataset ds, SparkSession s) {
+	//
+	public static Dataset<Row> LevenshteinMatching(Dataset<Row> ds, SparkSession s) {
 		
 		// read brands
-		Dataset brands = s.read().option("header", "false").option("delimiter", ",").csv("C:\\Users\\B77\\Desktop\\Glasbruch-Mining\\car_brands.csv");
+		Dataset<Row> brands = s.read().option("header", "false").option("delimiter", ",").csv("C:\\Users\\B77\\Desktop\\Glasbruch-Mining\\car_brands.csv");
 	
 		// compare all
-		Dataset joined = ds.crossJoin(brands);
+		Dataset<Row> joined = ds.crossJoin(brands);
 		
 		// remove all special characters and convert to upper case
 		joined = joined.withColumn("int_fahrzeugHerstellernameAusVertrag", upper(joined.col("int_fahrzeugHerstellernameAusVertrag")));
@@ -101,16 +107,69 @@ public class SparkTestApplication {
 	}
 	
 
-	public static Dataset regexMatching(Dataset ds, SparkSession s) {
+	/*public static Dataset regexMatching(Dataset ds, SparkSession s) {
 		// read matching file
 		Dataset matching = s.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Desktop\\brandmatching.csv");
 		
-		matching.foreach((ForeachFunction<Row>) row ->  regexp_replace(ds.col("int_fahrzeugHerstellernameAusVertragModified"), row.getString(1), row.getString(0)));
-		matching.foreach((ForeachFunction<Row>) row -> System.out.println(row.getString(0)));
+		ds.foreach((ForeachFunction<Row>) row ->  
+		System.out.println(row.getString(0))	
+		//regexp_replace(ds.col("int_fahrzeugHerstellernameAusVertragModified"), row.getString(1), row.getString(0))
+		);
+	
 		
 		ds.show(5000);
 		
 	 return null;
-	}
+	}*/
+	
+	
+	public static Dataset<Row> regexMatching(Dataset<Row> dataset, SparkSession s) {
+
+		Dataset matching = s.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Desktop\\brandmatching.csv");
+		matching.show();
+		//dataset.show();
+		
+        String[] columns = dataset.columns();
+        String[] columnsMatching = matching.columns();
+        
+        
+        dataset = dataset.map(row -> {
+          
+            Object[] newRow = new Object[columns.length];
+
+            int columnCount = 0;
+            for(String c : columns) {
+                Object columnValue = null;
+                
+                // change value of brand if its value is "Sonstige" and it exists in the regex file
+                
+                if(c.equals("brand") ) {
+                	if(row.getAs(c).equals("Sonstige") ) {
+                		String regexpValue = null;
+                		// regexp_replace(dataset.col("int_fahrzeugHerstellernameAusVertrag"), "", "");
+                		
+                		
+                		//regexpValue = ;
+                		
+                    	//columnValue = ((String) row.getAs("int_fahrzeugHerstellernameAusVertrag")).replaceAll("-", "+");
+                    	
+                	}else {
+                    	columnValue = row.getAs(c);
+                    }	
+                }
+                else {
+                	columnValue = row.getAs(c);
+                }
+                
+                newRow[columnCount++] = columnValue;
+            }
+
+            return RowFactory.create(newRow);
+        }, RowEncoder.apply(dataset.schema()));
+
+      
+       //dataset.show(100);
+        return dataset;
+    }
 
 }
