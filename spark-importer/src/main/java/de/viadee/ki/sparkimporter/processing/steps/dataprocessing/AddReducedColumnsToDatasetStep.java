@@ -37,6 +37,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_INSTANCE_ID
         });
         columnNames.add(new Column(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID));
+        columnNames.add(new Column(SparkImporterVariables.VAR_STATE));
         columnNames.add(new Column(SparkImporterVariables.VAR_ACT_INST_ID));
         for(Row row : startColumns.collectAsList()) {
             String column = row.getString(0);
@@ -57,6 +58,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         if(SparkImporterVariables.getDataLevel().equals("process")) {
             initialDataset = initialDataset
                     .select(selectionColumns)
+                    .filter(initialDataset.col(SparkImporterVariables.VAR_STATE).isNotNull())
                     .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
                     .agg(aggregationMap)
                     .withColumnRenamed(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");

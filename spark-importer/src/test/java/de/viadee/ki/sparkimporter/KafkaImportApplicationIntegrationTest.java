@@ -114,12 +114,12 @@ public class KafkaImportApplicationIntegrationTest {
         //generate Dataset and create hash to compare
         Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY_PROCESS);
 
-        //check that dataset contains 24 lines
-        assertEquals(24, importedDataset.count());
+        //check that dataset contains 43 lines
+        assertEquals(43, importedDataset.count());
 
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("C1E2B8E5BBF234E3B5AD2511B586BC81", hash);
+        assertEquals("E3DB14A986C30DC28BD91A9995353A0C", hash);
 
         //close Spark session
         sparkSession.close();
@@ -143,12 +143,12 @@ public class KafkaImportApplicationIntegrationTest {
         //generate Dataset and create hash to compare
         Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY_ACTIVITY);
 
-        //check that dataset contains 29 lines
-        assertEquals(29, importedDataset.count());
+        //check that dataset contains 55 lines
+        assertEquals(55, importedDataset.count());
 
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("3D27088174639135ECFF107688CA7FAD", hash);
+        assertEquals("A4C58B4B824734D4C51D97FA269A6EB2", hash);
 
         //close Spark session
         sparkSession.close();
