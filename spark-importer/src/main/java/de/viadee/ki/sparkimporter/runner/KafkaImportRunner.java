@@ -222,6 +222,8 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         // Define processing steps to run
         final PreprocessingRunner preprocessingRunner = new PreprocessingRunner();
 
+        String dataLevel = ARGS.getDataLavel();
+
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 
         // it's faster if we do not reduce the dataset columns in the beginning and
@@ -231,7 +233,7 @@ public class KafkaImportRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new WriteToDataSinkStep());
 
         // Run processing runner
-        preprocessingRunner.run(masterDataset);
+        preprocessingRunner.run(masterDataset, dataLevel);
 
     }
 }

@@ -24,11 +24,7 @@
       <bpmn:incoming>SequenceFlow_0r32ryz</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_13exgl0</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:userTask id="Task_0whxngi" name="Externe Prüfung durchführen">
-      <bpmn:incoming>SequenceFlow_134ng99</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_120ji1p</bpmn:outgoing>
-    </bpmn:userTask>
-    <bpmn:serviceTask id="Task_1eu2pch" name="Rechnung freigegeben">
+    <bpmn:serviceTask id="Task_1eu2pch" name="Rechnung freigeben">
       <bpmn:incoming>SequenceFlow_0hznosm</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_03pd660</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -41,18 +37,20 @@
     <bpmn:sequenceFlow id="SequenceFlow_11rbr50" name="ja" sourceRef="ExclusiveGateway_1chhhij" targetRef="ExclusiveGateway_06xbbvm" />
     <bpmn:sequenceFlow id="SequenceFlow_0ve8wan" name="nein" sourceRef="ExclusiveGateway_1chhhij" targetRef="Task_0n1ik7y" />
     <bpmn:sequenceFlow id="SequenceFlow_01iyskd" sourceRef="Task_0n1ik7y" targetRef="EndEvent_0bs7aiq" />
-    <bpmn:endEvent id="EndEvent_16nxhk3">
-      <bpmn:incoming>SequenceFlow_03pd660</bpmn:incoming>
-      <bpmn:terminateEventDefinition />
-    </bpmn:endEvent>
-    <bpmn:endEvent id="EndEvent_0bs7aiq">
-      <bpmn:incoming>SequenceFlow_01iyskd</bpmn:incoming>
-      <bpmn:terminateEventDefinition />
-    </bpmn:endEvent>
     <bpmn:serviceTask id="Task_0n1ik7y" name="Rechnung ablehnen">
       <bpmn:incoming>SequenceFlow_0ve8wan</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_01iyskd</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:subProcess id="Task_0whxngi" name="Externe Prüfung durchführen">
+      <bpmn:incoming>SequenceFlow_134ng99</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_120ji1p</bpmn:outgoing>
+    </bpmn:subProcess>
+    <bpmn:endEvent id="EndEvent_16nxhk3">
+      <bpmn:incoming>SequenceFlow_03pd660</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_0bs7aiq">
+      <bpmn:incoming>SequenceFlow_01iyskd</bpmn:incoming>
+    </bpmn:endEvent>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
@@ -105,9 +103,6 @@
       <bpmndi:BPMNShape id="UserTask_017g0zq_di" bpmnElement="Task_0wmtu73">
         <dc:Bounds x="259" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="UserTask_0utyy94_di" bpmnElement="Task_0whxngi">
-        <dc:Bounds x="520" y="176" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_07atkad_di" bpmnElement="Task_1eu2pch">
         <dc:Bounds x="805" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -139,14 +134,17 @@
         <di:waypoint x="905" y="215" />
         <di:waypoint x="960" y="215" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="EndEvent_1vcjxvf_di" bpmnElement="EndEvent_16nxhk3">
-        <dc:Bounds x="960" y="102" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_0h3457w_di" bpmnElement="EndEvent_0bs7aiq">
-        <dc:Bounds x="960" y="197" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_1urkxs8_di" bpmnElement="Task_0n1ik7y">
         <dc:Bounds x="805" y="175" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_1q3gc8k_di" bpmnElement="Task_0whxngi">
+        <dc:Bounds x="520" y="176" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_12mhw7d_di" bpmnElement="EndEvent_16nxhk3">
+        <dc:Bounds x="960" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_14j9o0m_di" bpmnElement="EndEvent_0bs7aiq">
+        <dc:Bounds x="960" y="197" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

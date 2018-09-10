@@ -49,7 +49,7 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         SparkImporterLogger.getInstance().writeInfo("Starting data processing");
 
         InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
-        dataset = initialCleanupStep.runPreprocessingStep(dataset, false);
+        dataset = initialCleanupStep.runPreprocessingStep(dataset, false, "process");
 
 
         // Define processing steps to run
@@ -79,7 +79,7 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new AggregateVariableUpdatesStep());
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
         preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
-        preprocessingRunner.addPreprocessorStep(new AddRemovedColumnsToDatasetStep());
+        preprocessingRunner.addPreprocessorStep(new AddReducedColumnsToDatasetStep());
 
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new ColumnHashStep());
@@ -91,7 +91,7 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 
         // Run processing runner
-        preprocessingRunner.run(dataset);
+        preprocessingRunner.run(dataset, "process");
 
         // Cleanup
         sparkSession.close();

@@ -6,7 +6,6 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfi
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -26,7 +25,7 @@ import static org.apache.spark.sql.functions.*;
 public class TypeCastStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
 
         List<StructField> datasetFields = Arrays.asList(dataset.schema().fields());
 
@@ -105,8 +104,8 @@ public class TypeCastStep implements PreprocessingStepInterface {
                 dataset = castColumn(dataset, column, column, newDataType, configurationParseFormat);
             }
 
-            // cast revision columns for former variables
-            if(SparkImporterCSVArguments.getInstance().isRevisionCount() && isVariableColumn) {
+            // cast revision columns for former variables, revisions columns only exist on process level
+            if(dataLevel.equals("process") && SparkImporterVariables.isRevCountEnabled() && isVariableColumn) {
                 dataset = dataset.withColumn(column+"_rev", dataset.col(column+"_rev").cast("integer"));
             }
         }

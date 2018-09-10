@@ -91,10 +91,10 @@ public class SparkImporterUtils {
                 .csv(SparkImporterVariables.getTargetFolder()+"/"+ String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory);
 
         if(aggreateCSVToOneFile && subDirectory.equals("result"))
-            renameResultFile();
+            moveResultFile();
     }
 
-    private void renameResultFile() {
+    private void moveResultFile() {
         //rename result file to deterministic name
         String targetFolder = SparkImporterVariables.getTargetFolder()+"/"+ String.format("%02d", PreprocessingRunner.getCounter()) + "_result";
         if(targetFolder.startsWith("hdfs")) {
@@ -109,7 +109,7 @@ public class SparkImporterUtils {
                 while(files.hasNext()) {
                     LocatedFileStatus file = files.next();
                     if(file.isFile() && file.getPath().getName().contains("part-0000")) {
-                        FileUtil.copy(fileSystem, file.getPath(), fileSystem, new Path(targetFolder + "/../result.csv"), false, conf);
+                        FileUtil.copy(fileSystem, file.getPath(), fileSystem, new Path(targetFolder + "/../result.csv"), true, conf);
                     }
                 }
             } catch (IOException e) {
@@ -121,7 +121,7 @@ public class SparkImporterUtils {
             for(File file : dir.listFiles()) {
                 if(file.getName().startsWith("part-0000")) {
                     try {
-                        Files.copy(file.toPath(), new File(dir + "/../result.csv").toPath());
+                        Files.move(file.toPath(), new File(dir + "/../result.csv").toPath());
                     } catch (IOException e) {
                         SparkImporterLogger.getInstance().writeError("An error occurred during the renaming of the result file. Exception: " + e.getMessage());
                     }

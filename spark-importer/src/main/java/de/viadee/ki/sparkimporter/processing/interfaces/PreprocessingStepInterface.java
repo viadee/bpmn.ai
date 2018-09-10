@@ -11,5 +11,5 @@ public interface PreprocessingStepInterface {
      * @param dataSet the incoming dataset for this processing step
      * @return the resulting dataset of the processing step
      */
-    Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile);
+    Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel);
 }

@@ -45,12 +45,12 @@ public class KafkaProcessingApplicationIntegrationTest {
         //check that dataset contains 4 lines
         assertEquals(4, importedDataset.count());
 
-        //check that dataset contains 44 columns
-        assertEquals(44, importedDataset.columns().length);
+        //check that dataset contains 42 columns
+        assertEquals(42, importedDataset.columns().length);
 
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("8766C0492167D51A22B530DDFFC866DE", hash);
+        assertEquals("42F92CACD3DB20A399337862FE235327", hash);
 
     }
 
@@ -80,16 +80,16 @@ public class KafkaProcessingApplicationIntegrationTest {
                 .option("header", "true")
                 .csv(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_ACTIVITY + "/result.csv");
 
-        //check that dataset contains 4 lines
-        assertEquals(4, importedDataset.count());
+        //check that dataset contains 12 lines
+        assertEquals(12, importedDataset.count());
 
-        //check that dataset contains 44 columns
-        assertEquals(52, importedDataset.columns().length);
+        //check that dataset contains 43 columns
+        assertEquals(43, importedDataset.columns().length);
 
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
         System.out.println(hash);
-        assertEquals("51EF77CD2466723D8D19B4487E7824BF", hash);
+        assertEquals("F9F8EDF98F5907EDD11A886D6A1529C0", hash);
 
     }
 }

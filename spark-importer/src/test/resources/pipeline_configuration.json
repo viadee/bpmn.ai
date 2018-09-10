@@ -12,13 +12,13 @@
       },
       {
         "variable_name": "c",
-        "variable_type": "boolean",
+        "variable_type": "long",
         "use_variable": true,
         "comment": ""
       },
       {
         "variable_name": "d",
-        "variable_type": "long",
+        "variable_type": "boolean",
         "use_variable": true,
         "comment": ""
       },

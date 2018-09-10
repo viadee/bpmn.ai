@@ -27,12 +27,12 @@ public class PreprocessingRunner {
 
     public PreprocessingRunner(){}
 
-    public void run(Dataset<Row> dataset) {
+    public void run(Dataset<Row> dataset, String dataLevel) {
         helper_datasets.clear();
         helper_datasets.put(DATASET_INITIAL, dataset);
 
         for(PreprocessingStepInterface ps : this.preprocessorSteps) {
-            dataset = ps.runPreprocessingStep(dataset, writeStepResultsIntoFile);
+            dataset = ps.runPreprocessingStep(dataset, writeStepResultsIntoFile, dataLevel);
         }
 
     }

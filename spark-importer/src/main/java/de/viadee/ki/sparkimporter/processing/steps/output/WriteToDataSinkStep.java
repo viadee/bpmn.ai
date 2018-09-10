@@ -10,7 +10,7 @@ import static de.viadee.ki.sparkimporter.KafkaImportApplication.ARGS;
 
 public class WriteToDataSinkStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
         dataset
                 //we repartition the data by process instances, which allows spark to better distribute the data between workers as the operations are related to a process instance
                 .repartition(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID))
