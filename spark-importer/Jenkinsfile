@@ -40,7 +40,9 @@ node {
         stage('publish') {
             dir('spark-importer')
 			{
-			   	sh 'mvn deploy:deploy'
+			     withEnv(buildEnvironment)  {
+			   	    sh 'mvn deploy:deploy'
+			     }
 			}
         }
        
