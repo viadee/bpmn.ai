@@ -7,9 +7,11 @@ import org.apache.spark.sql.catalyst.expressions.WindowSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import scala.util.parsing.input.StreamReader;
 
 import org.apache.spark.sql.expressions.Window;
 import javax.validation.constraints.Max;
@@ -17,9 +19,16 @@ import org.apache.spark.sql.*;
 
 import static org.apache.spark.sql.functions.*;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.spark.api.java.function.ForeachFunction;
@@ -60,20 +69,18 @@ public class SparkTestApplication {
 	
 	
 	
-	// 
+	// perform levenshtein and regexp matching
 	public static Dataset<Row> mapBrands(Dataset<Row> ds) {
 		final SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("Test").getOrCreate();
 
 		Dataset<Row> levenshteinds = LevenshteinMatching(ds,sparkSession);
-		//levenshteinds.show(500);
-		regexMatching(levenshteinds, sparkSession);
-		//levenshteinds.show(1000);
+		Dataset<Row> matchedds = regexMatching(levenshteinds, sparkSession);
 		
-		return null;	
+		return matchedds;	
 	}
 	
 	
-	//
+	// Perform similarity matching of the brands using the levenshtein score
 	public static Dataset<Row> LevenshteinMatching(Dataset<Row> ds, SparkSession s) {
 		
 		// read brands
@@ -107,56 +114,66 @@ public class SparkTestApplication {
 	}
 	
 
-	/*public static Dataset regexMatching(Dataset ds, SparkSession s) {
-		// read matching file
-		Dataset matching = s.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Desktop\\brandmatching.csv");
-		
-		ds.foreach((ForeachFunction<Row>) row ->  
-		System.out.println(row.getString(0))	
-		//regexp_replace(ds.col("int_fahrzeugHerstellernameAusVertragModified"), row.getString(1), row.getString(0))
-		);
-	
-		
-		ds.show(5000);
-		
-	 return null;
-	}*/
-	
-	
-	public static Dataset<Row> regexMatching(Dataset<Row> dataset, SparkSession s) {
 
-		Dataset matching = s.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Desktop\\brandmatching.csv");
-		matching.show();
-		//dataset.show();
+	
+	// applies the regexp functions from a csv file to the brands of the dataset
+	public static Dataset<Row> regexMatching(Dataset<Row> dataset, SparkSession s) {
 		
+		// read matching data in a 2-dim array
+		String fileName= "C:\\Users\\B77\\Desktop\\brandmatching.csv";
+        File file = new File(fileName);
+
+        // return a 2-dimensional array of strings
+        List<List<String>> lines = new ArrayList<>();
+        Scanner inputStream;
+        try{
+            inputStream = new Scanner(file);
+            while(inputStream.hasNext()){
+                String line= inputStream.next();
+                String[] values = line.split(";");
+                lines.add(Arrays.asList(values));
+            }
+            inputStream.close();
+        }catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+   
         String[] columns = dataset.columns();
-        String[] columnsMatching = matching.columns();
-        
-        
+          
+        // go through data
         dataset = dataset.map(row -> {
           
-            Object[] newRow = new Object[columns.length];
-
+        	Object[] newRow = new Object[columns.length];	        
             int columnCount = 0;
             for(String c : columns) {
                 Object columnValue = null;
-                
-                // change value of brand if its value is "Sonstige" and it exists in the regex file
-                
-                if(c.equals("brand") ) {
-                	if(row.getAs(c).equals("Sonstige") ) {
-                		String regexpValue = null;
-                		// regexp_replace(dataset.col("int_fahrzeugHerstellernameAusVertrag"), "", "");
-                		
-                		
-                		//regexpValue = ;
-                		
-                    	//columnValue = ((String) row.getAs("int_fahrzeugHerstellernameAusVertrag")).replaceAll("-", "+");
-                    	
-                	}else {
-                    	columnValue = row.getAs(c);
-                    }	
+                       
+                // if brand is not matched
+                if(c.equals("brand") && row.getAs(c).equals("Sonstige")) {
+              
+	        		String regexpValue = null;
+	        		int lineNo = 1;
+	        
+	        		// go through matching list
+	                for(List<String> line: lines) {
+	                    int columnNo = 1;
+	                    String brandMatch = line.get(0);
+	                    String regExpBrand = line.get(1);
+	                    lineNo++;
+	                    System.out.println(brandMatch + regExpBrand);
+	                	// replace value with regexp from matching list
+	                	columnValue = ((String) row.getAs("int_fahrzeugHerstellernameAusVertrag")).replaceAll(regExpBrand, brandMatch);
+	                	
+	                	// stop loop if value is replaced
+	                	if( (String) row.getAs("int_fahrzeugHerstellernameAusVertrag") !=  columnValue) {
+	                		break;
+	                	}else {
+	                		columnValue = "Sonstige";
+	                	}
+	                }	                     	                   	
                 }
+                // the value of all the other columns stay the same
                 else {
                 	columnValue = row.getAs(c);
                 }
@@ -168,8 +185,18 @@ public class SparkTestApplication {
         }, RowEncoder.apply(dataset.schema()));
 
       
-       //dataset.show(100);
-        return dataset;
+       dataset.show(1050);
+       //save dataset into CSV file
+       dataset.coalesce(1)
+               .write()
+               .option("header", "true")
+               .option("delimiter", ";")
+               .option("ignoreLeadingWhiteSpace", "false")
+               .option("ignoreTrailingWhiteSpace", "false")
+               .mode(SaveMode.Overwrite)
+               .csv("C:\\Users\\B77\\Desktop\\outputBrands.csv");
+
+       return dataset;
     }
 
 }
