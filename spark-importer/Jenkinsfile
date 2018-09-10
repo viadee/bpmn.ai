@@ -41,7 +41,7 @@ node {
             dir('spark-importer')
 			{
 			     withEnv(buildEnvironment)  {
-			   	    sh 'mvn deploy:deploy'
+			   	    sh 'mvn deploy -DskipTests=true'
 			     }
 			}
         }
