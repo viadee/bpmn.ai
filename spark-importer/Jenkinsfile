@@ -37,6 +37,12 @@ node {
            }
         } 
 
+        stage('publish') {
+            dir('spark-importer')
+			{
+			   	sh 'mvn deploy:deploy'
+			}
+        }
        
     } catch (error) {
 
