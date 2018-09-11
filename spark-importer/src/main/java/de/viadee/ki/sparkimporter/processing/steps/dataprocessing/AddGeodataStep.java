@@ -15,13 +15,13 @@ import static org.apache.spark.sql.functions.when;
 
 public class AddGeodataStep implements PreprocessingStepInterface {
 
-    @Override
+
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
 
-    	final SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("Test").getOrCreate();
+    	final SparkSession sparkSession = SparkSession.builder().getOrCreate();
 		
     	// TODO - adapt column name when PLZ-column exists
-		String colname = null;
+		String colname = "postleitzahl";
 		
 		// read data that has to be mapped
 		Dataset plz = sparkSession.read().option("header", "true").option("delimiter", "\t").csv("C:\\Users\\B77\\Desktop\\Glasbruch-Mining\\plz\\PLZ.tab");
