@@ -1,10 +1,7 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
-import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
@@ -12,28 +9,21 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.expressions.Window;
 
-import scala.collection.Seq;
-
-import static org.apache.spark.sql.functions.asc;
-import static org.apache.spark.sql.functions.first;
-import static org.apache.spark.sql.functions.length;
-import static org.apache.spark.sql.functions.levenshtein;
-import static org.apache.spark.sql.functions.regexp_replace;
-import static org.apache.spark.sql.functions.upper;
-import static org.apache.spark.sql.functions.when;
-
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+
+import static org.apache.spark.sql.functions.*;
 
 public class MatchBrandsStep implements PreprocessingStepInterface {
 
 	@Override
 	public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
 
-		final SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("Test").getOrCreate();
+		final SparkSession sparkSession = SparkSession.builder().getOrCreate();
 
 		String herstellercolumn = "int_fahrzeugHerstellernameAusVertrag";
 
@@ -63,24 +53,23 @@ public class MatchBrandsStep implements PreprocessingStepInterface {
 		// calculate score
 		joined = joined.withColumn("score",
 				levenshtein(joined.col("int_fahrzeugHerstellernameAusVertragModified"), joined.col("_c1_Modified")));
-		joined = joined.withColumn("length1", length(joined.col("_c1_Modified")));
-		joined = joined.withColumn("length2", length(joined.col("int_fahrzeugHerstellernameAusVertragModified")));
 		joined = joined.withColumn("maxLength",
-				(when(joined.col("length1").lt(joined.col("length2")), joined.col("length2"))
-						.otherwise(joined.col("length1"))));
-		joined = joined.drop("length1").drop("length2");
+				(when(length(joined.col("_c1_Modified"))
+						.lt(length(joined.col("int_fahrzeugHerstellernameAusVertragModified"))), length(joined.col("int_fahrzeugHerstellernameAusVertragModified")))
+						.otherwise(length(joined.col("_c1_Modified")))));
 		joined = joined.withColumn("ratio", joined.col("score").divide(joined.col("maxLength")));
 
 		// filter rows with minimal ratios
-		org.apache.spark.sql.expressions.WindowSpec windowSpec = Window.partitionBy(joined.col("proc_inst_id_"))
-				.orderBy(joined.col("ratio").asc());
+		org.apache.spark.sql.expressions.WindowSpec windowSpec =
+				Window.partitionBy(joined.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID))
+					.orderBy(joined.col("ratio").asc());
 		joined = joined.withColumn("minRatio", first(joined.col("ratio")).over(windowSpec).as("minRatio"))
 				.filter("ratio = minRatio");
 		joined = joined.drop("ratio").drop("_c0");
 		joined = joined.withColumn("brand",
 				when(joined.col("minRatio").lt(0.5), joined.col("_c1")).otherwise("Sonstige"));
-		joined = joined.orderBy(asc("proc_inst_id_"));
-		joined = joined.dropDuplicates("proc_inst_id_");
+		joined = joined.orderBy(asc(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID));
+		joined = joined.dropDuplicates(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
 
 		return joined;
 	}

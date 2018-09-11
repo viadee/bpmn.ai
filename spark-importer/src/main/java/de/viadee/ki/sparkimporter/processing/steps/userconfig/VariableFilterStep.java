@@ -58,7 +58,14 @@ public class VariableFilterStep implements PreprocessingStepInterface {
         dataSet = dataSet.filter((FilterFunction<Row>) row -> {
             // keep the row if the variable name column does not contain a value that should be filtered
             String variable = row.getAs(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
-            return !variablesToFilter.contains(variable);
+
+            //TODO: cleanup
+            boolean keep = !variablesToFilter.contains(variable);
+            if(variable != null && variable.startsWith("_CORRELATION_ID_")) {
+                keep = false;
+            }
+
+            return keep;
         });
 
         if(writeStepResultIntoFile) {
