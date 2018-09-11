@@ -68,6 +68,7 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         if(dataLevel.equals("process")) {
             // process level
             preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
+            preprocessingRunner.addPreprocessorStep(new CreateColumnsFromJsonStep());
         } else {
             // activity level
             preprocessingRunner.addPreprocessorStep(new AggregateActivityInstancesStep());
