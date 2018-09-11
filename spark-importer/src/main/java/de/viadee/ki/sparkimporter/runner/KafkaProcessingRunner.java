@@ -82,6 +82,10 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         //user configuration step
         preprocessingRunner.addPreprocessorStep(new TypeCastStep());
 
+        //customer specific steps: brand matching and location adding
+        preprocessingRunner.addPreprocessorStep(new MatchBrandsStep());
+        //preprocessingRunner.addPreprocessorStep(new AddGeodataStep());
+        
         //generic step
         preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
 

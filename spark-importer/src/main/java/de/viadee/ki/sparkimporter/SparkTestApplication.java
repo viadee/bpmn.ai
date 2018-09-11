@@ -48,23 +48,26 @@ public class SparkTestApplication {
 		data = data.withColumn("id", functions.row_number().over(Window.orderBy(data.col("int_fahrzeugHerstellernameAusVertrag"))));
 
 		// Add geodata to dataset
-		Dataset locationds = addLocation(testdata, "postleitzahl");
-		locationds.show();
-		Dataset brandds = mapBrands(data);
-			
+		 //locationds = addLocationStep(testdata, "postleitzahl");
+		//locationds.show();
+		Dataset brandds = mapBrandsStep(data, true, null); //data, "int_fahrzeugHerstellernameAusVertrag");
+	
 		sparkSession.close();
 	}
 	
 	
 	// add geodata 
-	public static Dataset addLocation(Dataset ds, String colname) {
+	public static Dataset addLocationStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
+		
 		final SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("Test").getOrCreate();
+		
+		String colname = null;
 		
 		// read data that has to be mapped
 		Dataset plz = sparkSession.read().option("header", "true").option("delimiter", "\t").csv("C:\\Users\\B77\\Desktop\\Glasbruch-Mining\\plz\\PLZ.tab");
 		
 		//inner join and remove unnecessary columns
-		Dataset joinedDs = ds.join(plz, ds.col(colname).equalTo(plz.col("plz")));
+		Dataset joinedDs = dataset.join(plz, dataset.col(colname).equalTo(plz.col("plz")));
 		joinedDs = joinedDs.drop("plz").drop("Ort").drop("#loc_id");
 		
 		return joinedDs;
@@ -73,28 +76,32 @@ public class SparkTestApplication {
 	
 	
 	// perform levenshtein and regexp matching
-	public static Dataset<Row> mapBrands(Dataset<Row> ds) {
+	public static Dataset<Row> mapBrandsStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
+		
+		String herstellercolumn = "int_fahrzeugHerstellernameAusVertrag";
+				
 		final SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("Test").getOrCreate();
 
-		Dataset<Row> levenshteinds = LevenshteinMatching(ds,sparkSession);
-		Dataset<Row> matchedds = regexMatching(levenshteinds, sparkSession);
+		Dataset<Row> levenshteinds = LevenshteinMatching(dataset,sparkSession, herstellercolumn);
+		Dataset<Row> matchedds = regexMatching(levenshteinds, sparkSession, herstellercolumn);
 		
 		return matchedds;	
 	}
 	
 	
 	// Perform similarity matching of the brands using the levenshtein score
-	public static Dataset<Row> LevenshteinMatching(Dataset<Row> ds, SparkSession s) {
+	public static Dataset<Row> LevenshteinMatching(Dataset<Row> ds, SparkSession s, String herstellercolumn) {
 		
 		// read brands
 		Dataset<Row> brands = s.read().option("header", "false").option("delimiter", ",").csv("C:\\Users\\B77\\Desktop\\Glasbruch-Mining\\car_brands.csv");
-	
+		brands.show(20);
+		ds.show(20);
 		// compare all
 		Dataset<Row> joined = ds.crossJoin(brands);
 		
 		// remove all special characters and convert to upper case
-		joined = joined.withColumn("int_fahrzeugHerstellernameAusVertrag", upper(joined.col("int_fahrzeugHerstellernameAusVertrag")));
-		joined = joined.withColumn("int_fahrzeugHerstellernameAusVertragModified", regexp_replace(joined.col("int_fahrzeugHerstellernameAusVertrag"), "[\\-,1,2,3,4,5,6,7,8,9,0,\\.,\\,\\_,\\+,\\),\\(,/\\s/g]", ""));
+		joined = joined.withColumn(herstellercolumn, upper(joined.col(herstellercolumn)));
+		joined = joined.withColumn("int_fahrzeugHerstellernameAusVertragModified", regexp_replace(joined.col(herstellercolumn), "[\\-,1,2,3,4,5,6,7,8,9,0,\\.,\\,\\_,\\+,\\),\\(,/\\s/g]", ""));
 		joined = joined.withColumn("_c1_Modified", regexp_replace(joined.col("_c1"), "[\\-,1,2,3,4,5,6,7,8,9,0,\\.,\\,\\_,\\+,\\),\\(,/\\s/g]", ""));
 		
 		// calculate score
@@ -120,7 +127,7 @@ public class SparkTestApplication {
 
 	
 	// applies the regexp functions from a csv file to the brands of the dataset
-	public static Dataset<Row> regexMatching(Dataset<Row> dataset, SparkSession s) {
+	public static Dataset<Row> regexMatching(Dataset<Row> dataset, SparkSession s, String herstellercolumn) {
 		
 		// read matching data in a 2-dim array
 		String fileName= "C:\\Users\\B77\\Desktop\\brandmatching.csv";
@@ -166,10 +173,10 @@ public class SparkTestApplication {
 	                    lineNo++;
 	                    
 	                	// replace value with regexp from matching list
-	                	columnValue = ((String) row.getAs("int_fahrzeugHerstellernameAusVertrag")).replaceAll(regExpBrand, brandMatch);
+	                	columnValue = ((String) row.getAs(herstellercolumn)).replaceAll(regExpBrand, brandMatch);
 	                	
 	                	// stop loop if value is already replaced and otherwise the value stays "Sonstige"
-	                	if( (String) row.getAs("int_fahrzeugHerstellernameAusVertrag") !=  columnValue) {
+	                	if( (String) row.getAs(herstellercolumn) !=  columnValue) {
 	                		break;
 	                	}else {
 	                		columnValue = "Sonstige";
