@@ -37,6 +37,14 @@ node {
            }
         } 
 
+        stage('publish') {
+            dir('spark-importer')
+			{
+			     withEnv(buildEnvironment)  {
+			   	    sh 'mvn deploy -DskipTests=true'
+			     }
+			}
+        }
        
     } catch (error) {
 
