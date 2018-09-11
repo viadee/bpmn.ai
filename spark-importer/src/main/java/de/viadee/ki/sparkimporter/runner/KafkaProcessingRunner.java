@@ -68,9 +68,11 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         if(dataLevel.equals("process")) {
             // process level
             preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
+            preprocessingRunner.addPreprocessorStep(new CreateColumnsFromJsonStep());
         } else {
             // activity level
             preprocessingRunner.addPreprocessorStep(new AggregateActivityInstancesStep());
+            preprocessingRunner.addPreprocessorStep(new CreateColumnsFromJsonStep());
             preprocessingRunner.addPreprocessorStep(new FillActivityInstancesHistoryStep());
         }
 
@@ -82,6 +84,9 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
         //user configuration step
         preprocessingRunner.addPreprocessorStep(new TypeCastStep());
 
+
+        preprocessingRunner.addPreprocessorStep(new AddGeodataStep());
+        preprocessingRunner.addPreprocessorStep(new MatchBrandsStep());
        
         
         //generic step
