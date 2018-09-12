@@ -67,9 +67,10 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     @Test
     public void testColumnHeaders() throws IOException {
-        //check if result contains 37 columns as variable g is filtered out and b renamed to f via the user config
+        //check if result contains 41 columns as variable g is filtered out and b renamed to f via the user config
         //+ case_execution_id_ is removed by ColumnRemoveStep
-        assertEquals(37, headerValues.length);
+        //+ added jsontest variable with 2 json parameters
+        assertEquals(41, headerValues.length);
 
         //check if the following columns exist
         assertTrue(ArrayUtils.contains(headerValues, "id_"));
@@ -143,11 +144,11 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
-        assertEquals("8C79905C077E9D9938730A9728D89553", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        assertEquals("973490C78F34515547E5E228BEDA7E6A", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        assertEquals("9448850646A3E5D1CADE079AAD87B491", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
-        assertEquals("834FBED99E0CC28F22AB9BF4A44E3360", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        assertEquals("883F520B9997FB402613F3C75A592F79", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        assertEquals("C92162E610883DC02E5558CB949F2D4E", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+        assertEquals("F70F6D20ED7605815A2C0E67E89626E3", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+        assertEquals("17F1FC4994A0097990C5BA2CE44B3045", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+        assertEquals("FC5C76B8FC93D3F55C9A95832E82F766", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+        assertEquals("54A250FFFBC2D61E7D98C68BACB67572", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
     }
 
     private static String[] combine(String[] a, String[]... b){

@@ -3,7 +3,14 @@
 This document describes the steps that are implemented in the Spark Importer application to get more in-depth understanding of the application.
 
 ## Data processing steps
-When data runs through the processing, there are multiple steps involved. They differ in user configuration and generic processing steps. The following list show the steps from top to bottom the data is passing through:
+When data runs through the processing, there are multiple steps involved. They differ in user configuration and generic processing steps and if the process or activity level is targeted for the processing. 
+
+The graph shows the overall processing pipieline:
+![alt text](./doc/pipeline-process.png "Spark processing pipeline")
+
+The following lists show the steps from top to bottom the data is passing through for each level:
+
+### Process level
 
 Step							| Step type
 --------------------------|------------
@@ -17,10 +24,35 @@ Step							| Step type
 [AggregateVariableUpdates](#aggregatevariableupdates-generic)	| generic
 [AddVariablesColumns](#addvariablescolumns-generic)			| generic
 [AggregateProcessInstances](#aggregateprocessinstances-generic)	| generic
+[CreateColumnsFromJson](#createcolumnsfromjson-generic)	| generic
+[AddReducedColumnsToDataset](#addreducedcolumnstodataset-generic)	| generic
+[ColumnHash](#columnhash-user-config) 			      	| user config
+[TypeCast](#typecast-user-config) 			      	| user config
+[MatchBrandsStep](#matchbrands-user-config)         | user config
+[AddGeodataStep](#addgeodata-user-config)           | user config
+[WriteToCSV](#writetocsv-generic)					| generic
+
+### Activity level
+
+Step							| Step type
+--------------------------|------------
+[DataFilter](#datafilter-user-config)					| user config
+[ColumnRemove](#columnremove-user-config)					| user config
+[ReduceColumns](#reducecolumns-generic) 				| generic	 
+[VariableFilter](#variablefilter-user-config)				| user config	 
+[VariableNameMapping](#variablenamemapping-user-config)			| user config	
+[DetermineVariableTypes](#determinevariabletypes-generic)   	| generic
+[VariablesTypeEscalation](#variablestypeescalation-generic)		| generic
+[AggregateVariableUpdates](#aggregatevariableupdates-generic)	| generic
+[AddVariablesColumns](#addvariablescolumns-generic)			| generic
+[AggregateActivityInstances](#aggregateactivityinstances-generic)	| generic
+[CreateColumnsFromJson](#createcolumnsfromjson-generic)	| generic	
+[FillActivityInstancesHistory](#fillactivityinstanceshistory-generic)	| generic	
 [AddReducedColumnsToDataset](#addreducedcolumnstodataset-generic)	| generic
 [ColumnHash](#columnhash-user-config) 			      	| user config
 [TypeCast](#typecast-user-config) 			      	| user config
 [WriteToCSV](#writetocsv-generic)					| generic
+
 
 Each step is now described in more detail and a (to a minimum reduced) example is used to better illustrate it.
 
@@ -314,6 +346,70 @@ processInstanceId   | f     | f_rev | b | b_rev | c | c_rev
 1						| hello | 0     | 1 | 1     |2.0| 0
 2						| hi    | 0     | 0 | 1     |1.5| 0
 
+### AggregateActivityInstances (generic)
+In this step the data is aggregated in a way so that there is only one line per activity instance per process instance in the dataset.
+
+As an example let's assume the following data is the input for this step:
+
+processInstanceId   | activityInstanceId |  a     | b     | c
+--------------------|--------------------|--------|-------|----
+1						| a1                 | hans   |       | 
+1						| a1                 |        |       | 14
+1						| a2                 |        | 1     |
+1						| a2                 |        |       | 16
+2						| a1                 | klaus  |       | 
+2						| a1                 |        |       | 5
+2						| a2                 |        | 0     |
+2						| a2                 |        |       | 8
+
+The following dataset is returned by this step:
+
+processInstanceId   | activityInstanceId |  a     | b     | c
+--------------------|--------------------|--------|-------|----
+1						| a1                 | hans   |       | 14
+1						| a2                 |        | 1     | 16
+2						| a1                 | klaus  |       | 5
+2						| a2                 |        | 0     | 8
+
+### CreateColumnsFromJson (generic)
+In this step each variable column is checked if it contains a json and if so, the first level of attributes is transformed into separate columns. No object or array parameters are converted.
+
+As an example let's assume the following data is the input for this step:
+
+processInstanceId   | f     |  
+--------------------|-------|
+1						| {"name":"hans","age":30,"children":[{"name":"clara"},{"name":"joe"}]} |
+2						| {"name":"klaus","age":34}      |
+
+The following dataset is returned by this step:
+
+processInstanceId   | f     | f_name  | f_age |
+--------------------|-------|---------|-------|
+1						| {"name":"hans","age":30,"children":[{"name":"clara"},{"name":"joe"}]} | hans | 30
+2						| {"name":"klaus","age":34}      | klaus | 34
+
+
+### FillActivityInstancesHistory (generic)
+In this step each variable column is filled with values according to the history of the process instance up to the point of activity activity represented in the line. That means that not only the variables set at this activity are shown in each row but all variables that have been set or changed up until this activity in the according process instance in order to have the complete knowledge at this activity in the process instance.
+
+As an example let's assume the following data is the input for this step where a1 happens before a2:
+
+processInstanceId   | activityInstanceId |  a     | b
+--------------------|--------------------|--------|-----
+1						| a1                 | hans   | 
+1						| a2                 |        | 1   
+2						| a1                 | klaus  | 
+2						| a2                 |        | 0   
+
+The following dataset is returned by this step:
+
+processInstanceId   | activityInstanceId |  a     | b
+--------------------|--------------------|--------|-----
+1						| a1                 | hans   | 
+1						| a2                 | hans   | 1   
+2						| a1                 | klaus  | 
+2						| a2                 | klaus  | 0 
+
 ### AddReducedColumnsToDataset (generic)
 In the beginning the non relevant columns where removed to speed up the processing. These columns are now added back to the dataset by using the processInstanceId as a reference.
 
@@ -378,6 +474,75 @@ processInstanceId   | f     | f_rev | b | b_rev | c | c_rev
 --------------------|-------|-------|---|-------|---|------
 1						| hello | 0     | true | 1     |2.0| 0
 2						| hi    | 0     | false | 1     |1.5| 0
+
+
+### MatchBrands (user config)
+
+In this step the column containing the car brands is adjusted. Therefore two steps are applied. On the one hand the Levenshtein matching score is calculated by comparing the dataset with a list of car brands and on the other hand manually created "regular expressions" are applied to remaining unassigned brands.
+
+
+As an example let's assume the following data is the input for this step:
+
+int_fahrzeugHerstellernameAusVertrag|
+------------------------------------|
+AUDI A1|
+B-M-W|
+MERCEDES-BENZ|
+FORD/EUROPA|
+VW|
+CHRYSLER|
+
+with the following brand matching table:
+
+Brands|
+------|
+AUDI|
+BMW|
+MERCEDES|
+
+and the following regular expression table:
+
+Matching|RegExp
+--------|------
+FORD | .*FORD.*
+VOLKSWAGEN| .*VOLK.*|.*VW.*
+MERCEDES | .*MERCE.*|.*MERZ.*|.*MB.*|.*DAIMLER.*|.*CHRYSLER.*|.*DC.*|DAIMLERC|.*DAIMLER.*|.*DB.*|.*BENZ.*
+
+The following dataset is returned by this step:
+
+int_fahrzeugHerstellernameAusVertrag|
+------------------------------------|
+AUDI|
+BMW|
+MERCEDES|
+FORD|
+VOLKSWAGEN|
+MERCEDES|
+
+
+
+
+### AddGeodata (user config)
+
+This step uses the postal code column to add two columns of the corresponding latitudes and longitudes.
+
+As an example let's assume the following data is the input for this step:
+
+plz|
+---|
+48149|
+
+with the following plz table:
+
+loc_id|plz|lon|lat|Ort
+------|---|---|---|---
+8147|48149|7.59642537191787|51.9657941405091|Münster
+
+The following dataset is returned by this step:
+
+plz|lon|lat
+---|---|---
+48149|7.59642537191787|51.9657941405091
 
 
 ### WriteToCSV (generic)
