@@ -479,6 +479,7 @@ processInstanceId   | f     | f_rev | b | b_rev | c | c_rev
 ### MatchBrands (user config)
 
 In this step the column containing the car brands is processed. Two steps are applied for this purpose. On the one hand the data is compared with a list of car brands using the Levenshtein matching score and on the other hand manually created "regular expressions" are applied to the unassigned brands.
+
 Levenshtein matching:
 
 As an example let's assume the following data is the input for this step:
@@ -524,6 +525,25 @@ MERCEDES|
 
 ### AddGeodata (user config)
 
+This step uses the postal code column and adds two columns with the corresponding latitudes and longitudes.
+
+As an example let's assume the following data is the input for this step:
+
+plz|
+---|
+48149|
+
+and the following plz table:
+
+loc_id|plz|lon|lat|Ort
+------|---|---|---|---
+8147|48149|7.59642537191787|51.9657941405091|Münster
+
+The following dataset is returned by this step:
+
+plz|lon|lat
+---|---|---
+48149|7.59642537191787|51.9657941405091
 
 
 ### WriteToCSV (generic)
