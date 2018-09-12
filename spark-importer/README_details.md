@@ -478,6 +478,46 @@ processInstanceId   | f     | f_rev | b | b_rev | c | c_rev
 
 ### MatchBrands (user config)
 
+In this step the column containing the car brands is processed. Two steps are applied for this purpose. On the one hand the data is compared with a list of car brands using the Levenshtein matching score and on the other hand manually created "regular expressions" are applied to the unassigned brands.
+Levenshtein matching:
+
+As an example let's assume the following data is the input for this step:
+
+int_fahrzeugHerstellernameAusVertrag|
+------------------------------------|
+AUDI A1|
+B-M-W|
+MERCEDES-BENZ|
+FORD/EUROPA|
+VW|
+CHRYSLER|
+
+and the following brand matching table:
+
+AUDI|
+BMW|
+MERCEDES|
+
+and the following regular expression table
+
+FORD | .*FORD.*
+VOLKSWAGEN| .*VOLK.*|.*VW.*
+MERCEDES | .*MERCE.*|.*MERZ.*|.*MB.*|.*DAIMLER.*|.*CHRYSLER.*|.*DC.*|DAIMLERC|.*DAIMLER.*|.*DB.*|.*BENZ.*
+
+The following dataset is returned by this step:
+
+int_fahrzeugHerstellernameAusVertrag|
+------------------------------------|
+AUDI|
+BMW|
+MERCEDES|
+FORD|
+VOLKSWAGEN|
+MERCEDES|
+
+
+
+
 
 ### AddGeodata (user config)
 
