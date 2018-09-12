@@ -18,8 +18,10 @@ public class AddGeodataStep implements PreprocessingStepInterface {
 		// read data that has to be mapped
 		Dataset plz = sparkSession.read().option("header", "true").option("delimiter", "\t").csv("C:\\Users\\B77\\Desktop\\Glasbruch-Mining\\plz\\PLZ.tab");
 		
+		
+		
 		//inner join and remove unnecessary columns
-		Dataset joinedds = dataset.join(plz, dataset.col(colname).equalTo(plz.col("plz")));
+		Dataset joinedds = dataset.join(plz, dataset.col(colname).equalTo(plz.col("plz")), "left");
 		joinedds = joinedds.drop("plz").drop("Ort").drop("#loc_id");
 		
 		return joinedds;
