@@ -28,6 +28,8 @@ Step							| Step type
 [AddReducedColumnsToDataset](#addreducedcolumnstodataset-generic)	| generic
 [ColumnHash](#columnhash-user-config) 			      	| user config
 [TypeCast](#typecast-user-config) 			      	| user config
+[MatchBrandsStep](#matchbrands-user-config)         | user config
+[AddGeodataStep](#addgeodata-user-config)           | user config
 [WriteToCSV](#writetocsv-generic)					| generic
 
 ### Activity level
