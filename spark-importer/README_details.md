@@ -494,12 +494,16 @@ CHRYSLER|
 
 and the following brand matching table:
 
+Brands|
+------|
 AUDI|
 BMW|
 MERCEDES|
 
 and the following regular expression table
 
+Matching|RegExp
+--------|------
 FORD | .*FORD.*
 VOLKSWAGEN| .*VOLK.*|.*VW.*
 MERCEDES | .*MERCE.*|.*MERZ.*|.*MB.*|.*DAIMLER.*|.*CHRYSLER.*|.*DC.*|DAIMLERC|.*DAIMLER.*|.*DB.*|.*BENZ.*
@@ -514,7 +518,6 @@ MERCEDES|
 FORD|
 VOLKSWAGEN|
 MERCEDES|
-
 
 
 
