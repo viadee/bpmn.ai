@@ -480,7 +480,6 @@ processInstanceId   | f     | f_rev | b | b_rev | c | c_rev
 
 In this step the column containing the car brands is processed. Two steps are applied for this purpose. On the one hand the data is compared with a list of car brands using the Levenshtein matching score and on the other hand manually created "regular expressions" are applied to the unassigned brands.
 
-Levenshtein matching:
 
 As an example let's assume the following data is the input for this step:
 
@@ -501,7 +500,7 @@ AUDI|
 BMW|
 MERCEDES|
 
-and the following regular expression table
+and the following regular expression table:
 
 Matching|RegExp
 --------|------
