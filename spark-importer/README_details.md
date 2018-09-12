@@ -43,7 +43,7 @@ Step							| Step type
 [VariablesTypeEscalation](#variablestypeescalation-generic)		| generic
 [AggregateVariableUpdates](#aggregatevariableupdates-generic)	| generic
 [AddVariablesColumns](#addvariablescolumns-generic)			| generic
-[AggregateActivityInstancesStep](#aggregateprocessinstances-generic)	| generic
+[AggregateActivityInstances](#aggregateactivityinstances-generic)	| generic
 [CreateColumnsFromJson](#createcolumnsfromjson-generic)	| generic	
 [FillActivityInstancesHistory](#fillactivityinstanceshistory-generic)	| generic	
 [AddReducedColumnsToDataset](#addreducedcolumnstodataset-generic)	| generic
@@ -369,7 +369,7 @@ processInstanceId   | activityInstanceId |  a     | b     | c
 2						| a1                 | klaus  |       | 5
 2						| a2                 |        | 0     | 8
 
-### CreateColumnsFromJsonStep (generic)
+### CreateColumnsFromJson (generic)
 In this step each variable column is checked if it contains a json and if so, the first level of attributes is transformed into separate columns. No object or array parameters are converted.
 
 As an example let's assume the following data is the input for this step:
