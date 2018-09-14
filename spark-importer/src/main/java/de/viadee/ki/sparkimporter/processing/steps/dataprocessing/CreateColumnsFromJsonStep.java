@@ -16,12 +16,18 @@ import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 
 import java.io.IOException;
 import java.util.*;
+
+import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME;
+import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE;
 
 public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
@@ -155,13 +161,22 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         }, RowEncoder.apply(newSchema1));
 
 
+        //create new Dataset
+        //write column names into list
+        List<Row> filteredVariablesRows = new ArrayList<>();
 
+        for(String name : newColumns) {
+            //these are always string in the beginning
+            String type = "string";
 
-        //if there is no configuration file yet, write additional variables into the configuration file
-        if(PreprocessingRunner.initialConfigToBeWritten) {
-            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
-            for(String name : newColumns) {
-                String type = "string";
+            // add new column to variables list for later processing
+            varMap.put(name, type);
+
+            filteredVariablesRows.add(RowFactory.create(name, type));
+
+            // add new variables to configuration
+            if(PreprocessingRunner.initialConfigToBeWritten) {
+                Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
                 VariableConfiguration variableConfiguration = new VariableConfiguration();
                 variableConfiguration.setVariableName(name);
                 variableConfiguration.setVariableType(type);
@@ -171,7 +186,25 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
             }
         }
 
+        //update variables list with new from json processing
+        SparkBroadcastHelper.getInstance().broadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED, varMap);
+
+
+        StructType schemaVars = new StructType(new StructField[] {
+                new StructField(VAR_PROCESS_INSTANCE_VARIABLE_NAME,
+                        DataTypes.StringType, false,
+                        Metadata.empty()),
+                new StructField(VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
+                        DataTypes.StringType, false,
+                        Metadata.empty())
+        });
+
         SparkImporterLogger.getInstance().writeInfo("Found " + newColumns.size() + " additional variables during Json processing.");
+
+        SparkSession sparkSession = SparkSession.builder().getOrCreate();
+        Dataset<Row> helpDataSet = sparkSession.createDataFrame(filteredVariablesRows, schemaVars).toDF().orderBy(VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+        SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_after_json_escalated");
+
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "create_columns_from_json");
