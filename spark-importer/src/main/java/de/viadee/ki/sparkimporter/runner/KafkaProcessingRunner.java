@@ -78,6 +78,7 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
 
         //generic step
         preprocessingRunner.addPreprocessorStep(new CreateColumnsFromJsonStep());
+        preprocessingRunner.addPreprocessorStep(new JsonVariableFilterStep());
 
         if(dataLevel.equals("activity")) {
             // activity level
@@ -85,6 +86,7 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
             preprocessingRunner.addPreprocessorStep(new FillActivityInstancesHistoryStep());
         }
 
+        //generic step
         preprocessingRunner.addPreprocessorStep(new AddReducedColumnsToDatasetStep());
 
         // user configuration step

@@ -4,6 +4,10 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.viadee.ki.sparkimporter.configuration.Configuration;
+import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
+import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
+import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
@@ -149,6 +153,25 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
             return RowFactory.create(newRowStrings.toArray());
         }, RowEncoder.apply(newSchema1));
+
+
+
+
+        //if there is no configuration file yet, write additional variables into the configuration file
+        if(PreprocessingRunner.initialConfigToBeWritten) {
+            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+            for(String name : newColumns) {
+                String type = "string";
+                VariableConfiguration variableConfiguration = new VariableConfiguration();
+                variableConfiguration.setVariableName(name);
+                variableConfiguration.setVariableType(type);
+                variableConfiguration.setUseVariable(true);
+                variableConfiguration.setComment("");
+                configuration.getPreprocessingConfiguration().getVariableConfiguration().add(variableConfiguration);
+            }
+        }
+
+        SparkImporterLogger.getInstance().writeInfo("Found " + newColumns.size() + " additional variables during Json processing.");
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "create_columns_from_json");

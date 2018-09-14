@@ -80,6 +80,7 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
         preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
         preprocessingRunner.addPreprocessorStep(new CreateColumnsFromJsonStep());
+        preprocessingRunner.addPreprocessorStep(new JsonVariableFilterStep());
         preprocessingRunner.addPreprocessorStep(new AddReducedColumnsToDatasetStep());
 
         // user configuration step

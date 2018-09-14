@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.logging.FileHandler;
@@ -20,6 +21,10 @@ public class SparkImporterLogger {
 
     private SparkImporterLogger(){
         try {
+            File logDirectory  = new File(getLogDirectory());
+            if(!logDirectory.exists()) {
+                logDirectory.mkdir();
+            }
             logFileHandler = new FileHandler(getLogDirectory()+"/"+LOG_FILE_NAME);
 
             logFileHandler.setFormatter(new SimpleFormatter() {
