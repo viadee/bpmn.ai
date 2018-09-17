@@ -2,7 +2,7 @@ package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
-import me.xdrop.fuzzywuzzy.FuzzySearch;
+import info.debatty.java.stringsimilarity.NormalizedLevenshtein;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import static org.apache.spark.sql.functions.*;
+import info.debatty.java.stringsimilarity.*;
 
 public class MatchBrandsStep implements PreprocessingStepInterface {
 
@@ -60,33 +61,37 @@ public class MatchBrandsStep implements PreprocessingStepInterface {
 			e.printStackTrace();
 		}
 		
-		
-		
+				
+
 		// create user defined function
 		s.udf().register("levenshteinMatching", new UDF1<String, String>() {
-			@Override
+			
 			public String call(String column) throws Exception {
-
+				
+	
+				String brandOutput = "SONSTIGE";
 				// discard not useful chars
 				column = column.toUpperCase();
 				column = column.replaceAll("[\\-,1,2,3,4,5,6,7,8,9,0,\\.,\\,\\_,\\+,\\),\\(,/\\s/g]", "");
 				
-				String brandOutput = "SONSTIGE";
+				
 				int lineNo = 1;
-				int score = 0;
+				double score = 1;
+				NormalizedLevenshtein lev = new NormalizedLevenshtein();
 				
 				// traverse brand list and select the brand with the best score
 				for (List<String> line : brandsList) {
 					int columnNo = 1;
 					String brand = line.get(1);
-					//System.out.println("brand ist " + line);
-					if(FuzzySearch.weightedRatio(column, brand) > score) {
-						score = FuzzySearch.weightedRatio(column, brand);
+					double levScore = lev.distance(column, brand);
+		
+					if(levScore < score) {
+						score = levScore;
 						brandOutput = brand;
 					}			
 					lineNo++;				
 				}
-				if(score < 70) {
+				if(score > 0.4) {
 					brandOutput = "SONSTIGE";
 				}
 				if(column.equals("") || column.equals("-")) {
@@ -99,7 +104,8 @@ public class MatchBrandsStep implements PreprocessingStepInterface {
 		
 		// call UDF for specific columns	
 		ds = ds.withColumn("brand",callUDF("levenshteinMatching", ds.col(herstellercolumn)));
-			
+	
+		
 		return ds;
 	}
 

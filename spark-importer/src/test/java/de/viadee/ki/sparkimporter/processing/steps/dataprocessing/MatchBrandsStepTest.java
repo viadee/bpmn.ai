@@ -55,8 +55,7 @@ public class MatchBrandsStepTest {
 		String hashlev = SparkImporterUtils.getInstance().md5CecksumOfObject(matchedBrandDatasetLev.collect());	
 		String hashRegexp = SparkImporterUtils.getInstance().md5CecksumOfObject(matchedBrandRegexp.collect());
 
-		
-       assertEquals("Error: Levenshtein brand matching", "891630E02FECC2EA6C991DF0461F6691", hashlev);
+        assertEquals("Error: Levenshtein brand matching", "208DE6A74B0C0A49E3A9AECFE92A2C49", hashlev);
         assertEquals("Error: Regexp brand matching","B8DEABD1375AC7D7350A479DF7D64359", hashRegexp);
 	}
 
