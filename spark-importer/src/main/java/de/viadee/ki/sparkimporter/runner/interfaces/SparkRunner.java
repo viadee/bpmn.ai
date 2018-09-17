@@ -5,6 +5,8 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.CustomStep;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PipelineStepConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
+import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
+import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import org.apache.spark.sql.SparkSession;
 
@@ -17,7 +19,7 @@ public abstract class SparkRunner {
 
     protected abstract void run(SparkSession sparkSession);
 
-    public void configureCustomSteps() {
+    public void configureCustomSteps() throws FaultyConfigurationException {
 
         List<CustomStep> customSteps = null;
 
@@ -37,6 +39,8 @@ public abstract class SparkRunner {
             for(CustomStep cs : customSteps) {
                 pipelineSteps.add(new PipelineStep(cs));
             }
-        }
+
+            PipelineManager pipelineManager = new PipelineManager(pipelineSteps);
+            }
     }
 }

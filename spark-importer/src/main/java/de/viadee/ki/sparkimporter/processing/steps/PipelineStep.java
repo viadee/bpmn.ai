@@ -4,15 +4,16 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.CustomStep;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class PipelineStep {
 
     private PreprocessingStepInterface preprocessingStep;
     private String id;
+    private String className;
     private String dependsOn;
-    private Map<String, Object> stepParameters = new HashMap<>();
+    private Map<String, Object> stepParameters;
 
     public PipelineStep(CustomStep cs) {
         Class<? extends PreprocessingStepInterface> step = null;
@@ -32,8 +33,9 @@ public class PipelineStep {
             }
         }
 
-        dependsOn = cs.getDependsOn();
         id = cs.getId();
+        className = cs.getClassName();
+        dependsOn = cs.getDependsOn();
         stepParameters = cs.getParameters();
     }
 
@@ -45,6 +47,14 @@ public class PipelineStep {
         this.id = id;
     }
 
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
     public String getDependsOn() {
         return dependsOn;
     }
@@ -54,7 +64,7 @@ public class PipelineStep {
     }
 
     public boolean hasPredecessor() {
-        return this.dependsOn != null;
+        return this.dependsOn != null && !this.dependsOn.equals("");
     }
 
     public PreprocessingStepInterface getPreprocessingStep() {
@@ -67,5 +77,24 @@ public class PipelineStep {
 
     public void setStepParameters(Map<String, Object> stepParameters) {
         this.stepParameters = stepParameters;
+    }
+
+    @Override
+    public String toString() {
+        return getId();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PipelineStep that = (PipelineStep) o;
+        return Objects.equals(getClassName(), that.getClassName()) &&
+                Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getClassName(), getId());
     }
 }

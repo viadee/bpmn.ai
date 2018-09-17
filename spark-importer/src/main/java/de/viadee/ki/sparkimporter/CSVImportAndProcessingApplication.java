@@ -2,6 +2,7 @@ package de.viadee.ki.sparkimporter;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
 import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.runner.CSVImportAndProcessingRunner;
@@ -55,7 +56,14 @@ public class CSVImportAndProcessingApplication {
 		sparkSession.udf().register("ProcessState", new ProcessStatesAggregationFunction());
 
 		CSVImportAndProcessingRunner csvImportAndProcessingRunner = new CSVImportAndProcessingRunner();
+		try {
+			csvImportAndProcessingRunner.configureCustomSteps();
+		} catch (FaultyConfigurationException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 		csvImportAndProcessingRunner.run(sparkSession);
+
 
 		// Cleanup
 		sparkSession.close();
