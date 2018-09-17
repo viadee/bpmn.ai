@@ -1,16 +1,13 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
-
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.catalyst.encoders.RowEncoder;
-import org.apache.spark.sql.expressions.Window;
 import org.apache.spark.sql.types.DataTypes;
 
 import java.io.File;
@@ -20,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-import static org.apache.spark.sql.functions.*;
+import static org.apache.spark.sql.functions.callUDF;
 
 public class MatchBrandsStep implements PreprocessingStepInterface {
 
@@ -65,31 +62,32 @@ public class MatchBrandsStep implements PreprocessingStepInterface {
 		// create user defined function
 		s.udf().register("levenshteinMatching", new UDF1<String, String>() {
 			@Override
-			public String call(String column) throws Exception {
+			public String call(String columnValue) throws Exception {
 
-				// discard not useful chars
-				column = column.toUpperCase();
-				column = column.replaceAll("[\\-,1,2,3,4,5,6,7,8,9,0,\\.,\\,\\_,\\+,\\),\\(,/\\s/g]", "");
+                // discard not useful chars
+                if (columnValue == null) {
+                    return columnValue;
+                }
+
+				columnValue = columnValue.toUpperCase();
+				columnValue = columnValue.replaceAll("[\\-,1,2,3,4,5,6,7,8,9,0,\\.,\\,\\_,\\+,\\),\\(,/\\s/g]", "");
 				
 				String brandOutput = "SONSTIGE";
-				int lineNo = 1;
 				int score = 0;
 				
 				// traverse brand list and select the brand with the best score
 				for (List<String> line : brandsList) {
-					int columnNo = 1;
 					String brand = line.get(1);
 					//System.out.println("brand ist " + line);
-					if(FuzzySearch.weightedRatio(column, brand) > score) {
-						score = FuzzySearch.weightedRatio(column, brand);
+					if(FuzzySearch.weightedRatio(columnValue, brand) > score) {
+						score = FuzzySearch.weightedRatio(columnValue, brand);
 						brandOutput = brand;
 					}			
-					lineNo++;				
 				}
 				if(score < 70) {
 					brandOutput = "SONSTIGE";
 				}
-				if(column.equals("") || column.equals("-")) {
+				if(columnValue.equals("") || columnValue.equals("-")) {
 					brandOutput = "UNBEKANNT";
 				}
 
@@ -134,26 +132,21 @@ public class MatchBrandsStep implements PreprocessingStepInterface {
 					int columnCount = 0;
 					for (String c : columns) {
 						Object columnValue = null;
-									
+
 						// if brand is not matched
-						if (c.equals("brand") && row.getAs(c).equals("SONSTIGE")) {
-					
-							String regexpValue = null;
-							int lineNo = 1;
+						if (c.equals("brand") && row.getAs(c) != null && row.getAs(c).equals("SONSTIGE")) {
 
 							// traverse the matching list
 							for (List<String> line : brandsRegexp) {
-								int columnNo = 1;
 								String brandMatch = line.get(0);
 								String regExpBrand = line.get(1);
-								lineNo++;
 
 								// replace value with regexp from matching list
 								columnValue = ((String) row.getAs(herstellercolumn)).replaceAll(regExpBrand, brandMatch);
 
 								// stop loop if value is already replaced and otherwise the value stays
 								// "Sonstige"
-								if ((String) row.getAs(herstellercolumn) != columnValue) {
+								if (row.getAs(herstellercolumn) != columnValue) {
 									break;
 								} else {
 									columnValue = "SONSTIGE";
@@ -170,7 +163,6 @@ public class MatchBrandsStep implements PreprocessingStepInterface {
 					return RowFactory.create(newRow);
 				}, RowEncoder.apply(dataset.schema()));
 
-			
 		
 				// remove all unnecessary columns
 				dataset = dataset.withColumn(herstellercolumn,dataset.col("brand"));
