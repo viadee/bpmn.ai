@@ -8,9 +8,11 @@ import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
+import java.util.Map;
+
 public class DataFilterStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
 
         Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
         if(configuration != null) {
@@ -29,7 +31,6 @@ public class DataFilterStep implements PreprocessingStepInterface {
                     SparkImporterLogger.getInstance().writeWarn("Ignoring empty filter query.");
                 }
             }
-
         }
 
         return dataset;

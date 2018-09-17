@@ -18,7 +18,7 @@ import static org.apache.spark.sql.functions.*;
 public class AggregateVariableUpdatesStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
 
         //apply max aggregator to known date columns start_time_ and end_time_ so that no date formatting is done in custom aggregator
         List<String> dateFormatColumns = Arrays.asList(new String[]{SparkImporterVariables.VAR_START_TIME, SparkImporterVariables.VAR_END_TIME});

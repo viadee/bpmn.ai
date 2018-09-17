@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
 
 
         // take columns available initially from helper dataset and select the ones to be added back again

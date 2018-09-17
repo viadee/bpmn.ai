@@ -13,12 +13,13 @@ import org.apache.spark.sql.Row;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.spark.sql.functions.sha1;
 
 public class ColumnHashStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
 
         //check if all variables that should be hashed actually exist, otherwise log a warning
         List<String> existingColumns = new ArrayList<>(Arrays.asList(dataSet.columns()));

@@ -6,7 +6,7 @@ import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.*;
-import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
+import de.viadee.ki.sparkimporter.runner.interfaces.SparkRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -16,7 +16,7 @@ import org.apache.spark.sql.SparkSession;
 
 import static de.viadee.ki.sparkimporter.CSVImportAndProcessingApplication.ARGS;
 
-public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
+public class CSVImportAndProcessingRunner extends SparkRunner {
 
     @Override
     public void run(SparkSession sparkSession) {
@@ -49,7 +49,7 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
         SparkImporterLogger.getInstance().writeInfo("Starting data processing");
 
         InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
-        dataset = initialCleanupStep.runPreprocessingStep(dataset, false, "process");
+        dataset = initialCleanupStep.runPreprocessingStep(dataset, false, "process", null);
 
 
         // Define processing steps to run
@@ -85,8 +85,6 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
 
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new ColumnHashStep());
-        preprocessingRunner.addPreprocessorStep(new AddGeodataStep());
-        preprocessingRunner.addPreprocessorStep(new MatchBrandsStep());
         preprocessingRunner.addPreprocessorStep(new TypeCastStep());
 
         //generic step

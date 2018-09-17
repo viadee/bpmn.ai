@@ -32,7 +32,7 @@ public class PreprocessingRunner {
         helper_datasets.put(DATASET_INITIAL, dataset);
 
         for(PreprocessingStepInterface ps : this.preprocessorSteps) {
-            dataset = ps.runPreprocessingStep(dataset, writeStepResultsIntoFile, dataLevel);
+            dataset = ps.runPreprocessingStep(dataset, writeStepResultsIntoFile, dataLevel, null);
         }
 
     }

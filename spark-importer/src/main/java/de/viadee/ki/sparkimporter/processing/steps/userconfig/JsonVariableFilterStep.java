@@ -13,10 +13,11 @@ import org.apache.spark.sql.Row;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class JsonVariableFilterStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
 
         //read all variables to filter again. They contain also variables that resulted from Json parsing and are not columns, so they can just be dropped
         List<String> variablesToFilter = new ArrayList<>();

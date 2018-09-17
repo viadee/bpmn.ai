@@ -17,7 +17,7 @@ import static org.apache.spark.sql.functions.not;
 public class AggregateProcessInstancesStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
 
         //apply first and processState aggregator
         Map<String, String> aggregationMap = new HashMap<>();

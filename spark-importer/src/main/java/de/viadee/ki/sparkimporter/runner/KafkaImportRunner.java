@@ -4,7 +4,7 @@ import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.KafkaImportStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep;
-import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
+import de.viadee.ki.sparkimporter.runner.interfaces.SparkRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 import static de.viadee.ki.sparkimporter.KafkaImportApplication.ARGS;
 
-public class KafkaImportRunner implements ImportRunnerInterface {
+public class KafkaImportRunner extends SparkRunner {
 
     private final static String TOPIC_PROCESS_INSTANCE = "processInstance";
     private final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";

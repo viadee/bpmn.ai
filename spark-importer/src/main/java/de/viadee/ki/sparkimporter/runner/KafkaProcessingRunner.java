@@ -5,7 +5,7 @@ import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.*;
-import de.viadee.ki.sparkimporter.runner.interfaces.ImportRunnerInterface;
+import de.viadee.ki.sparkimporter.runner.interfaces.SparkRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -13,7 +13,7 @@ import org.apache.spark.sql.SparkSession;
 
 import static de.viadee.ki.sparkimporter.KafkaProcessingApplication.ARGS;
 
-public class KafkaProcessingRunner implements ImportRunnerInterface {
+public class KafkaProcessingRunner extends SparkRunner {
 
     @Override
     public void run(SparkSession sparkSession) {
@@ -91,8 +91,6 @@ public class KafkaProcessingRunner implements ImportRunnerInterface {
 
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new ColumnHashStep());
-        preprocessingRunner.addPreprocessorStep(new AddGeodataStep());
-        preprocessingRunner.addPreprocessorStep(new MatchBrandsStep());
         preprocessingRunner.addPreprocessorStep(new TypeCastStep());
         
         //generic step

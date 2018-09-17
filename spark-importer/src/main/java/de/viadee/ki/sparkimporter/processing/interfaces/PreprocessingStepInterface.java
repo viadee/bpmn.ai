@@ -3,6 +3,8 @@ package de.viadee.ki.sparkimporter.processing.interfaces;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
+import java.util.Map;
+
 public interface PreprocessingStepInterface {
 
     /**
@@ -11,5 +13,5 @@ public interface PreprocessingStepInterface {
      * @param dataSet the incoming dataset for this processing step
      * @return the resulting dataset of the processing step
      */
-    Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel);
+    Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters);
 }

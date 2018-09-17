@@ -7,7 +7,7 @@ public class CustomStep {
     private String id;
     private String className;
     private String dependsOn;
-    private HashMap<String, String> parameters = new HashMap<>();
+    private HashMap<String, Object> parameters = new HashMap<>();
 
     public String getId() {
         return id;
@@ -33,11 +33,11 @@ public class CustomStep {
         this.dependsOn = dependsOn;
     }
 
-    public HashMap<String, String> getParameters() {
+    public HashMap<String, Object> getParameters() {
         return parameters;
     }
 
-    public void setParameters(HashMap<String, String> parameters) {
+    public void setParameters(HashMap<String, Object> parameters) {
         this.parameters = parameters;
     }
 }
