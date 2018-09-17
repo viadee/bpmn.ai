@@ -85,8 +85,8 @@ public class CSVImportAndProcessingRunner implements ImportRunnerInterface {
 
         // user configuration step
         preprocessingRunner.addPreprocessorStep(new ColumnHashStep());
-
-        // user configuration step
+        preprocessingRunner.addPreprocessorStep(new AddGeodataStep());
+        preprocessingRunner.addPreprocessorStep(new MatchBrandsStep());
         preprocessingRunner.addPreprocessorStep(new TypeCastStep());
 
         //generic step
