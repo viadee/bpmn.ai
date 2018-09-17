@@ -19,6 +19,9 @@ public class PreprocessingConfiguration {
     @SerializedName("column_hash_configuration")
     private List<ColumnHashConfiguration> columnHashConfiguration = new ArrayList<>();
 
+    @SerializedName("pipeline_step_configuration")
+    private PipelineStepConfiguration pipelineStepConfiguration;
+
     public List<VariableConfiguration> getVariableConfiguration() {
         return variableConfiguration;
     }
@@ -30,4 +33,8 @@ public class PreprocessingConfiguration {
     public List<ColumnConfiguration> getColumnConfiguration() { return columnConfiguration; }
 
     public List<ColumnHashConfiguration> getColumnHashConfiguration() { return columnHashConfiguration; }
+
+    public PipelineStepConfiguration getPipelineStepConfiguration() {
+        return pipelineStepConfiguration;
+    }
 }
