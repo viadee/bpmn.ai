@@ -228,6 +228,30 @@
         </plugins>
     </build>
 
+	<reporting>
+		<excludeDefaults>true</excludeDefaults>
+		<outputDirectory>${project.build.directory}/site</outputDirectory>
+		<plugins>
+			<plugin> <!-- Call via mvn project-info-reports:dependencies -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+				</configuration>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>dependencies</report>
+							<report>scm</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
+	
     <organization>
     	<name>viadee Unternehmensberatung GmbH</name>
     	<url>www.viadee.de</url>
