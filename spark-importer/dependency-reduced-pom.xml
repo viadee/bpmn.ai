@@ -65,22 +65,42 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.owasp</groupId>
-        <artifactId>dependency-check-maven</artifactId>
-        <version>3.3.1</version>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.2</version>
         <executions>
           <execution>
             <goals>
-              <goal>check</goal>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>report</goal>
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <failBuildOnCVSS>7</failBuildOnCVSS>
-        </configuration>
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <snapshots />
+      <id>viadee-snapshots</id>
+      <name>viadee Snapshots</name>
+      <url>http://nexus.intern.viadee.de/repository/maven-snapshots/</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>viadee-releases</id>
+      <name>viadee releases</name>
+      <url>http://nexus.intern.viadee.de/repository/maven-releases/</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>org.apache.spark</groupId>
@@ -144,7 +164,31 @@
       <classifier>test</classifier>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.6.7.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>info.debatty</groupId>
+      <artifactId>java-string-similarity</artifactId>
+      <version>1.1.0</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
+  <distributionManagement>
+    <repository>
+      <id>viadeeNexus</id>
+      <name>Internal Releases</name>
+      <url>http://nexus.intern.viadee.de/repository/maven-releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>viadeeNexus</id>
+      <name>Internal Snapshots</name>
+      <url>http://nexus.intern.viadee.de/repository/maven-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
   <properties>
     <commons-io.version>2.6</commons-io.version>
     <junit.version>4.12</junit.version>
@@ -155,6 +199,7 @@
     <jcommander.version>1.72</jcommander.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <ignite.version>2.6.0</ignite.version>
+    <jackson.version>2.6.7.1</jackson.version>
     <spark.version>2.3.1</spark.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <spark-scala.version>2.11</spark-scala.version>

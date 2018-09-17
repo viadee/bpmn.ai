@@ -19,8 +19,7 @@ public class AddGeodataStep implements PreprocessingStepInterface {
 		String[] targetColumns = {"ext_PartnerWerkstatt_plz", "ext_partnerVersicherungsnehmer_plz"};
 
 		// read data that has to be mapped
-		Dataset plz = sparkSession.read().option("header", "true").option("delimiter", "\t").csv("/Users/mim/Documents/viadee/01_Projekte/01_KI_BPM/99_sourcecode/bpmn.ai/marketing/Provi\\ Analyse/plz/PLZ.tab");
-
+		Dataset plz = sparkSession.read().option("header", "true").option("delimiter", "\t").csv("C:\\Users\\B77\\Desktop\\Glasbruch-Mining\\plz\\PLZ.tab");
 		for(String targetColumn : targetColumns) {
 			//inner join and remove unnecessary columns
 			dataset = dataset.join(plz, dataset.col(targetColumn).equalTo(plz.col("plz")), "left")
