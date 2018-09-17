@@ -5,6 +5,9 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AddGeodataStep implements PreprocessingStepInterface {
 
     @Override
@@ -13,17 +16,18 @@ public class AddGeodataStep implements PreprocessingStepInterface {
     	final SparkSession sparkSession = SparkSession.builder().getOrCreate();
 		
     	// TODO - adapt column name when PLZ-column exists
-		String colname = "ext_PartnerWerkstatt_plz";
-		
+		String[] targetColumns = {"ext_PartnerWerkstatt_plz", "ext_partnerVersicherungsnehmer_plz"};
+
 		// read data that has to be mapped
-		Dataset plz = sparkSession.read().option("header", "true").option("delimiter", "\t").csv("C:\\Users\\B77\\Desktop\\Glasbruch-Mining\\plz\\PLZ.tab");
-		
-		
-		
-		//inner join and remove unnecessary columns
-		Dataset joinedds = dataset.join(plz, dataset.col(colname).equalTo(plz.col("plz")), "left");
-		joinedds = joinedds.drop("plz").drop("Ort").drop("#loc_id");
-		
-		return joinedds;
+		Dataset plz = sparkSession.read().option("header", "true").option("delimiter", "\t").csv("/Users/mim/Documents/viadee/01_Projekte/01_KI_BPM/99_sourcecode/bpmn.ai/marketing/Provi\\ Analyse/plz/PLZ.tab");
+
+		for(String targetColumn : targetColumns) {
+			//inner join and remove unnecessary columns
+			dataset = dataset.join(plz, dataset.col(targetColumn).equalTo(plz.col("plz")), "left")
+					.withColumnRenamed("lon", targetColumn + "_long")
+					.withColumnRenamed("lat", targetColumn + "_lat").drop("plz").drop("Ort").drop("#loc_id");
+		}
+
+		return dataset;
     }
 }
