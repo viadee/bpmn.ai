@@ -16,16 +16,16 @@ public class AddGeodataStepTest {
 	public void test() throws Exception {
 		
 		AddGeodataStep AddGeodataStep = new AddGeodataStep();
-		final SparkSession sparkSession = SparkSession.builder().getOrCreate();
+		final SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("Test").getOrCreate();
 		
-		Dataset<Row> dataGeo = sparkSession.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Desktop\\geoTest.csv");
+		Dataset<Row> dataGeo = sparkSession.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Documents\\datasets\\geoTest.csv");
 			
 		Dataset<Row> matchedGeoDataset = AddGeodataStep.runPreprocessingStep(dataGeo, false, "process");
 		matchedGeoDataset.show(20);
 		
 		String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(matchedGeoDataset.collect());	
-			
-        assertEquals("Error: Geomatching", "DF63BEADD88327E9078AF0E1E7D327CA", hash);
+	
+       assertEquals("Error: Geomatching", "9A51C56015559189F4162C6652E8F3DC", hash);
 	
 	}
 

@@ -45,9 +45,9 @@ public class MatchBrandsStepTest {
 		
 		MatchBrandsStep MatchBrandsStep = new MatchBrandsStep();
 		final SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("Test").getOrCreate();
-		Dataset<Row> dataLev = sparkSession.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Desktop\\brandsTestLev.csv");
+		Dataset<Row> dataLev = sparkSession.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Documents\\datasets\\brandsTestLev.csv");
 		
-		Dataset<Row> dataRegexp = sparkSession.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Desktop\\brandsTestRegexp.csv");
+		Dataset<Row> dataRegexp = sparkSession.read().option("header", "true").option("delimiter", ";").csv("C:\\Users\\B77\\Documents\\datasets\\brandsTestRegexp.csv");
 		
 		Dataset<Row> matchedBrandDatasetLev = MatchBrandsStep.runPreprocessingStep(dataLev, false, "process");
 		Dataset<Row> matchedBrandRegexp = MatchBrandsStep.runPreprocessingStep(dataRegexp, false, "process");
@@ -55,7 +55,8 @@ public class MatchBrandsStepTest {
 		String hashlev = SparkImporterUtils.getInstance().md5CecksumOfObject(matchedBrandDatasetLev.collect());	
 		String hashRegexp = SparkImporterUtils.getInstance().md5CecksumOfObject(matchedBrandRegexp.collect());
 
-        assertEquals("Error: Levenshtein brand matching", "6CB07E0EC2D49302FDFE7A882864A813", hashlev);
+		
+       assertEquals("Error: Levenshtein brand matching", "891630E02FECC2EA6C991DF0461F6691", hashlev);
         assertEquals("Error: Regexp brand matching","B8DEABD1375AC7D7350A479DF7D64359", hashRegexp);
 	}
 

@@ -107,7 +107,7 @@ public class MatchBrandsStep implements PreprocessingStepInterface {
 	public static Dataset<Row> regexMatching(Dataset<Row> dataset, SparkSession s, String herstellercolumn) {
 
 		// read matching data in a 2-dim array
-				String fileName = "C:\\Users\\B77\\Desktop\\brandmatching.csv";
+				String fileName = "C:\\Users\\B77\\Documents\\datasets\\brandmatching.csv";
 				File file = new File(fileName);
 
 				// return a 2-dimensional array of strings
