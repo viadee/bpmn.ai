@@ -1,11 +1,17 @@
 package de.viadee.ki.sparkimporter.runner;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
+import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.KafkaImportStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep;
-import de.viadee.ki.sparkimporter.runner.interfaces.SparkRunner;
+import de.viadee.ki.sparkimporter.util.SparkImporterKafkaImportArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
+import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import org.apache.commons.io.FileUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -15,21 +21,24 @@ import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka010.ConsumerStrategies;
 import org.apache.spark.streaming.kafka010.KafkaUtils;
 import org.apache.spark.streaming.kafka010.LocationStrategies;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
-import static de.viadee.ki.sparkimporter.KafkaImportApplication.ARGS;
-
 public class KafkaImportRunner extends SparkRunner {
+
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaImportRunner.class);
+    public static SparkImporterKafkaImportArguments ARGS;
 
     private final static String TOPIC_PROCESS_INSTANCE = "processInstance";
     private final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
@@ -41,7 +50,6 @@ public class KafkaImportRunner extends SparkRunner {
 
     private JavaRDD<String> masterRdd = null;
     private Dataset<Row> masterDataset = null;
-    private SparkSession sparkSession = null;
 
     private List<String> receivedQueues = new ArrayList<>();
 
@@ -49,16 +57,100 @@ public class KafkaImportRunner extends SparkRunner {
     private CountDownLatch countDownLatch;
 
     //how many queues are we querying and expecting to be empty in batch mode
-    private int EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (ARGS.getDataLavel().equals("process") ? 2 : 3);
+    private int EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = 2; // default for process
 
     @Override
-    public void run(SparkSession sc) {
+    protected void initialize(String[] arguments) {
+        ARGS = SparkImporterKafkaImportArguments.getInstance();
+
+        // instantiate JCommander
+        // Use JCommander for flexible usage of Parameters
+        final JCommander jCommander = JCommander.newBuilder().addObject(SparkImporterKafkaImportArguments.getInstance()).build();
+        try {
+            jCommander.parse(arguments);
+        } catch (final ParameterException e) {
+            LOG.error("Parsing of parameters failed. Error message: " + e.getMessage());
+            jCommander.usage();
+            System.exit(1);
+        }
+
+        EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (ARGS.getDataLavel().equals("process") ? 2 : 3);
+
+        //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
+        SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
+        SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
+        SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
+
+        dataLevel = ARGS.getDataLavel();
+
+        PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
+
+        // Delete destination files, required to avoid exception during runtime
+        FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
 
         SparkImporterLogger.getInstance().writeInfo("Starting Kafka import "+ (ARGS.isBatchMode() ? "in batch mode " : "") +"from: " + ARGS.getKafkaBroker());
+    }
+
+    private synchronized void processMasterRDD(JavaRDD<String> newRDD, String queue) {
+        if (newRDD.count() == 0) {
+            if(ARGS.isBatchMode()) {
+                SparkImporterLogger.getInstance().writeInfo("Kafka queue '" + queue + "' returned zero entries.");
+
+                if (!emptyQueues.contains(queue)) {
+                    emptyQueues.add(queue);
+                }
+                if(emptyQueues.size() == EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) {
+                    SparkImporterLogger.getInstance().writeInfo("All Kafka queues ("
+                            + emptyQueues.stream().collect(Collectors.joining(","))
+                            + ") returned zero entries once. Stopping as running in batch mode");
+                    countDownLatch.countDown();
+                }
+            }
+
+            return;
+        }
+
+        if (!receivedQueues.contains(queue)) {
+            receivedQueues.add(queue);
+        }
+
+        if (masterDataset == null) {
+            if(receivedQueues.size() == EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) {
+                masterRdd = masterRdd.union(newRDD);
+                Dataset<String> jsonDataset = sparkSession.createDataset(masterRdd.rdd(), Encoders.STRING());
+                masterDataset = sparkSession.read().json(jsonDataset);
+            } else {
+                if(masterRdd == null) {
+                    masterRdd = newRDD;
+                } else {
+                    masterRdd = masterRdd.union(newRDD);
+                }
+
+            }
+        } else {
+            Dataset<String> jsonDataset = sparkSession.createDataset(newRDD.rdd(), Encoders.STRING());
+            Dataset<Row> rowDataset = sparkSession.read().json(jsonDataset);
+            Dataset<Row> unionPrepDataset = sparkSession.createDataFrame(rowDataset.rdd(), masterDataset.schema());
+            masterDataset = unionPrepDataset;
+        }
+    }
+
+    @Override
+    protected List<PipelineStep> buildDefaultPipeline() {
+        List<PipelineStep> pipelineSteps = new ArrayList<>();
+
+        pipelineSteps.add(new PipelineStep(new KafkaImportStep(), ""));
+        pipelineSteps.add(new PipelineStep(new InitialCleanupStep(), "KafkaImportStep"));
+        pipelineSteps.add(new PipelineStep(new WriteToDataSinkStep(), "InitialCleanupStep"));
+
+        return pipelineSteps;
+    }
+
+    @Override
+    protected Dataset<Row> loadInitialDataset() {
 
         final long startMillis = System.currentTimeMillis();
 
-        sparkSession = sc;
         masterRdd = sparkSession.emptyDataset(Encoders.STRING()).javaRDD();
 
         // if we are in batch mode we create the countdown latch so we can shutdown the streaming
@@ -144,7 +236,7 @@ public class KafkaImportRunner extends SparkRunner {
                     });
         }
 
-        // Start the computation
+        // Start the stream
         jssc.start();
 
         if(ARGS.isBatchMode()) {
@@ -156,7 +248,7 @@ public class KafkaImportRunner extends SparkRunner {
             }
             final long endMillis = System.currentTimeMillis();
             SparkImporterLogger.getInstance().writeInfo("Kafka import finished (took " + ((endMillis - startMillis) / 1000) + " seconds in total)");
-            jssc.stop(true);
+            jssc.stop(false);
         } else {
             try {
                 jssc.awaitTermination();
@@ -166,74 +258,7 @@ public class KafkaImportRunner extends SparkRunner {
                 e.printStackTrace();
             }
         }
-    }
 
-    private synchronized void processMasterRDD(JavaRDD<String> newRDD, String queue) {
-        if (newRDD.count() == 0) {
-            if(ARGS.isBatchMode()) {
-                SparkImporterLogger.getInstance().writeInfo("Kafka queue '" + queue + "' returned zero entries.");
-
-                if (!emptyQueues.contains(queue)) {
-                    emptyQueues.add(queue);
-                }
-                if(emptyQueues.size() == EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) {
-                    SparkImporterLogger.getInstance().writeInfo("All Kafka queues ("
-                            + emptyQueues.stream().collect(Collectors.joining(","))
-                            + ") returned zero entries once. Stopping as running in batch mode");
-                    countDownLatch.countDown();
-                }
-            }
-
-            return;
-        }
-
-        if (!receivedQueues.contains(queue)) {
-            receivedQueues.add(queue);
-        }
-
-        if (masterDataset == null) {
-            if(receivedQueues.size() == EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) {
-                masterRdd = masterRdd.union(newRDD);
-                Dataset<String> jsonDataset = sparkSession.createDataset(masterRdd.rdd(), Encoders.STRING());
-                masterDataset = sparkSession.read().json(jsonDataset);
-
-                writeMasterDataset();
-            } else {
-                if(masterRdd == null) {
-                    masterRdd = newRDD;
-                } else {
-                    masterRdd = masterRdd.union(newRDD);
-                }
-
-            }
-        } else {
-            Dataset<String> jsonDataset = sparkSession.createDataset(newRDD.rdd(), Encoders.STRING());
-            Dataset<Row> rowDataset = sparkSession.read().json(jsonDataset);
-            Dataset<Row> unionPrepDataset = sparkSession.createDataFrame(rowDataset.rdd(), masterDataset.schema());
-            masterDataset = unionPrepDataset;
-
-            writeMasterDataset();
-        }
-    }
-
-    private synchronized void writeMasterDataset() {
-
-        //go through pipe elements
-        // Define processing steps to run
-        final PreprocessingRunner preprocessingRunner = new PreprocessingRunner();
-
-        String dataLevel = ARGS.getDataLavel();
-
-        PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
-
-        // it's faster if we do not reduce the dataset columns in the beginning and
-        // rejoin the dataset later, left steps in commented if required later
-        preprocessingRunner.addPreprocessorStep(new KafkaImportStep());
-        preprocessingRunner.addPreprocessorStep(new InitialCleanupStep());
-        preprocessingRunner.addPreprocessorStep(new WriteToDataSinkStep());
-
-        // Run processing runner
-        preprocessingRunner.run(masterDataset, dataLevel);
-
+        return masterDataset;
     }
 }

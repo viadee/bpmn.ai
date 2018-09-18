@@ -6,14 +6,14 @@ import java.util.List;
 
 public class PipelineStepConfiguration {
 
-    @SerializedName("custom_steps")
-    private List<CustomStep> customSteps;
+    @SerializedName("steps")
+    private List<Step> steps;
 
-    public List<CustomStep> getCustomSteps() {
-        return customSteps;
+    public List<Step> getSteps() {
+        return steps;
     }
 
-    public void setCustomSteps(List<CustomStep> customSteps) {
-        this.customSteps = customSteps;
+    public void setSteps(List<Step> steps) {
+        this.steps = steps;
     }
 }

@@ -20,7 +20,7 @@ public class PreprocessingConfiguration {
     private List<ColumnHashConfiguration> columnHashConfiguration = new ArrayList<>();
 
     @SerializedName("pipeline_step_configuration")
-    private PipelineStepConfiguration pipelineStepConfiguration;
+    private PipelineStepConfiguration pipelineStepConfiguration = new PipelineStepConfiguration();
 
     public List<VariableConfiguration> getVariableConfiguration() {
         return variableConfiguration;

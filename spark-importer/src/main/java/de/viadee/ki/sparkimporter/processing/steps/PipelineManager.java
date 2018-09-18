@@ -3,13 +3,14 @@ package de.viadee.ki.sparkimporter.processing.steps;
 import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class PipelineManager {
 
-    private List<PipelineStep> pipelineSteps = new ArrayList<>();
+    private List<PipelineStep> pipelineSteps;
     LinkedList<PipelineStep> orderedPipeline = new LinkedList<>();
 
     public PipelineManager(List<PipelineStep> pipelineSteps) throws FaultyConfigurationException {
@@ -23,7 +24,9 @@ public class PipelineManager {
     }
 
     private void buildPipeline() throws FaultyConfigurationException {
-        boolean containsCycle = false;
+
+        // check for unique IDs
+        Map<String, String> pipelineStepsIdCheck = new HashMap<>();
 
         // first element, search for the ones without a predecessor (should only be one)
         for(PipelineStep ps : pipelineSteps) {
@@ -34,10 +37,19 @@ public class PipelineManager {
                     orderedPipeline.add(ps);
                 }
             }
+            pipelineStepsIdCheck.put(ps.getId(), ps.getClassName());
         }
         if(orderedPipeline.size() == 0) {
-            SparkImporterLogger.getInstance().writeError("No starting processing step found!");
-            throw new FaultyConfigurationException("No starting processing step found!");
+            String message = "No starting processing step found!";
+            SparkImporterLogger.getInstance().writeError(message);
+            throw new FaultyConfigurationException(message);
+        }
+
+        // check for unique IDs - continued
+        if(pipelineSteps.size() != pipelineStepsIdCheck.size()) {
+            String message = "Duplicate step IDs found in step configuration!";
+            SparkImporterLogger.getInstance().writeError(message);
+            throw new FaultyConfigurationException(message);
         }
 
         // add other steps

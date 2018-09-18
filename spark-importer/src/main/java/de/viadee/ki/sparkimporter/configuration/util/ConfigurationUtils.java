@@ -31,6 +31,14 @@ public class ConfigurationUtils {
     }
 
     public Configuration getConfiguration() {
+        return this.getConfiguration(false);
+    }
+
+    public Configuration getConfiguration(boolean reload) {
+
+        if(reload) {
+            this.configuration = null;
+        }
 
         if(this.configuration == null) {
             if (new File(SparkImporterUtils.getWorkingDirectory() +"/"+CONFIGURATION_FILE_NAME).exists()){

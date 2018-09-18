@@ -1,36 +1,97 @@
 package de.viadee.ki.sparkimporter.runner;
 
-import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
+import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggregationFunction;
+import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
+import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.*;
-import de.viadee.ki.sparkimporter.runner.interfaces.SparkRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
+import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static de.viadee.ki.sparkimporter.CSVImportAndProcessingApplication.ARGS;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CSVImportAndProcessingRunner extends SparkRunner {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CSVImportAndProcessingRunner.class);
+    public static SparkImporterCSVArguments ARGS;
+
     @Override
-    public void run(SparkSession sparkSession) {
+    protected void initialize(String[] arguments) {
+        ARGS = SparkImporterCSVArguments.getInstance();
 
-        final long startMillis = System.currentTimeMillis();
-
-        //if there is no configuration file yet, write one in the next steps
-        if(ConfigurationUtils.getInstance().getConfiguration() == null) {
-            PreprocessingRunner.initialConfigToBeWritten = true;
-            ConfigurationUtils.getInstance().createEmptyConfig();
+        // instantiate JCommander
+        // Use JCommander for flexible usage of Parameters
+        final JCommander jCommander = JCommander.newBuilder().addObject(SparkImporterCSVArguments.getInstance()).build();
+        try {
+            jCommander.parse(arguments);
+        } catch (final ParameterException e) {
+            LOG.error("Parsing of parameters failed. Error message: " + e.getMessage());
+            jCommander.usage();
+            System.exit(1);
         }
+
+        //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
+        SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
+        SparkImporterVariables.setDevTypeCastCheckEnabled(ARGS.isDevTypeCastCheckEnabled());
+        SparkImporterVariables.setRevCountEnabled(ARGS.isRevisionCount());
+        SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
+        SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
+
+        dataLevel = "process";
+
+        PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
+
+        // Delete destination files, required to avoid exception during runtime
+        FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
+
+        // register our own aggregation function
+        sparkSession.udf().register("AllButEmptyString", new AllButEmptyStringAggregationFunction());
+        sparkSession.udf().register("ProcessState", new ProcessStatesAggregationFunction());
 
         SparkImporterLogger.getInstance().writeInfo("Starting CSV import and processing");
         SparkImporterLogger.getInstance().writeInfo("Importing CSV file: " + ARGS.getFileSource());
+    }
+
+    @Override
+    protected List<PipelineStep> buildDefaultPipeline() {
+        List<PipelineStep> pipelineSteps = new ArrayList<>();
+
+        pipelineSteps.add(new PipelineStep(new DataFilterStep(), ""));
+        pipelineSteps.add(new PipelineStep(new ColumnRemoveStep(), "DataFilterStep"));
+        pipelineSteps.add(new PipelineStep(new ReduceColumnsDatasetStep(), "ColumnRemoveStep"));
+        pipelineSteps.add(new PipelineStep(new VariableFilterStep(), "ReduceColumnsDatasetStep"));
+        pipelineSteps.add(new PipelineStep(new VariableNameMappingStep(), "VariableFilterStep"));
+        pipelineSteps.add(new PipelineStep(new DetermineVariableTypesStep(), "VariableNameMappingStep"));
+        pipelineSteps.add(new PipelineStep(new VariablesTypeEscalationStep(), "DetermineVariableTypesStep"));
+        pipelineSteps.add(new PipelineStep(new AggregateVariableUpdatesStep(), "VariablesTypeEscalationStep"));
+        pipelineSteps.add(new PipelineStep(new AddVariablesColumnsStep(), "AggregateVariableUpdatesStep"));
+        pipelineSteps.add(new PipelineStep(new AggregateProcessInstancesStep(), "AddVariablesColumnsStep"));
+        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "AggregateProcessInstancesStep"));
+        pipelineSteps.add(new PipelineStep(new JsonVariableFilterStep(), "CreateColumnsFromJsonStep"));
+        pipelineSteps.add(new PipelineStep(new AddReducedColumnsToDatasetStep(), "JsonVariableFilterStep"));
+        pipelineSteps.add(new PipelineStep(new ColumnHashStep(), "AddReducedColumnsToDatasetStep"));
+        pipelineSteps.add(new PipelineStep(new TypeCastStep(), "ColumnHashStep"));
+        pipelineSteps.add(new PipelineStep(new WriteToCSVStep(), "TypeCastStep"));
+
+        return pipelineSteps;
+    }
+
+    @Override
+    protected Dataset<Row> loadInitialDataset() {
 
         //Load source CSV file
         Dataset<Row> dataset = sparkSession.read()
@@ -46,63 +107,9 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
         }
 
-        SparkImporterLogger.getInstance().writeInfo("Starting data processing");
-
         InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
         dataset = initialCleanupStep.runPreprocessingStep(dataset, false, "process", null);
 
-
-        // Define processing steps to run
-        final PreprocessingRunner preprocessingRunner = new PreprocessingRunner();
-        PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
-
-        //add steps
-
-        // user configuration step
-        preprocessingRunner.addPreprocessorStep(new DataFilterStep());
-
-        // user configuration step
-        preprocessingRunner.addPreprocessorStep(new ColumnRemoveStep());
-
-        //generic step
-        preprocessingRunner.addPreprocessorStep(new ReduceColumnsDatasetStep());
-
-        // user configuration step
-        preprocessingRunner.addPreprocessorStep(new VariableFilterStep());
-
-        // user configuration step
-        preprocessingRunner.addPreprocessorStep(new VariableNameMappingStep());
-
-        //generic steps
-        preprocessingRunner.addPreprocessorStep(new DetermineVariableTypesStep());
-        preprocessingRunner.addPreprocessorStep(new VariablesTypeEscalationStep());
-        preprocessingRunner.addPreprocessorStep(new AggregateVariableUpdatesStep());
-        preprocessingRunner.addPreprocessorStep(new AddVariablesColumnsStep());
-        preprocessingRunner.addPreprocessorStep(new AggregateProcessInstancesStep());
-        preprocessingRunner.addPreprocessorStep(new CreateColumnsFromJsonStep());
-        preprocessingRunner.addPreprocessorStep(new JsonVariableFilterStep());
-        preprocessingRunner.addPreprocessorStep(new AddReducedColumnsToDatasetStep());
-
-        // user configuration step
-        preprocessingRunner.addPreprocessorStep(new ColumnHashStep());
-        preprocessingRunner.addPreprocessorStep(new TypeCastStep());
-
-        //generic step
-        preprocessingRunner.addPreprocessorStep(new WriteToCSVStep());
-
-        // Run processing runner
-        preprocessingRunner.run(dataset, "process");
-
-        // Cleanup
-        sparkSession.close();
-
-        //write initial config file
-        if(PreprocessingRunner.initialConfigToBeWritten) {
-            ConfigurationUtils.getInstance().writeConfigurationToFile();
-        }
-
-        final long endMillis = System.currentTimeMillis();
-
-        SparkImporterLogger.getInstance().writeInfo("CSV import and processing finished (took " + ((endMillis - startMillis) / 1000) + " seconds in total)");
+        return dataset;
     }
 }

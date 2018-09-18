@@ -21,7 +21,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
 
         // take columns available initially from helper dataset and select the ones to be added back again
         List<String> existingColumns = Arrays.asList(dataset.columns());
-        Dataset<Row> startColumns = PreprocessingRunner.helper_datasets.get("startColumns");
+        Dataset<Row> startColumns = PreprocessingRunner.helper_datasets.get("startColumns" + "_" + dataLevel);
         List<String> columnNamesString = new ArrayList<>();
         List<Column> columnNames = new ArrayList<>();
         List<String> columnsNotBeAddedAgain = Arrays.asList(new String[]{
@@ -49,7 +49,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         Seq<Column> selectionColumns = SparkImporterUtils.getInstance().asSeq(columnNames);
 
         //get relevant data from initial dataset to be added back again
-        Dataset<Row> initialDataset = PreprocessingRunner.helper_datasets.get(PreprocessingRunner.DATASET_INITIAL);
+        Dataset<Row> initialDataset = PreprocessingRunner.helper_datasets.get(PreprocessingRunner.DATASET_INITIAL + "_" + dataLevel);
         Map<String, String> aggregationMap = new HashMap<>();
         for(String column : columnNamesString) {
             aggregationMap.put(column, "first");

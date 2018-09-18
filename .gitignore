@@ -17,3 +17,7 @@ spark-importer/bin/
 spark-importer/.settings/
 .project
 spark-importer/.classpath
+marketing/Provi Analyse/metastore_db
+.RDataTmp
+.RDataTmp1
+Thumbs.db

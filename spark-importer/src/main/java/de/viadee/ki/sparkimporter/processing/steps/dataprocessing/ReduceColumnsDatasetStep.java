@@ -77,7 +77,7 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
         Dataset<Row> startColumnsDataset = sparkSession.createDataFrame(startColumns, schema).toDF();
 
         // add helper dataset to PreprocessingRunner so we can access it later when adding the columns back
-        PreprocessingRunner.helper_datasets.put("startColumns", startColumnsDataset);
+        PreprocessingRunner.helper_datasets.put("startColumns" + "_" + dataLevel, startColumnsDataset);
 
         // select only relevant columns to continue
         List<Column> columns = new ArrayList<>();
