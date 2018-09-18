@@ -103,8 +103,6 @@ public abstract class SparkRunner {
             }
 
             pipelineStepConfiguration.setSteps(configSteps);
-
-            steps = configSteps;
         } else {
             if (configuration != null) {
                 PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
@@ -112,18 +110,19 @@ public abstract class SparkRunner {
                     PipelineStepConfiguration pipelineStepConfiguration = preprocessingConfiguration.getPipelineStepConfiguration();
                     if (pipelineStepConfiguration != null) {
                         steps = pipelineStepConfiguration.getSteps();
+
+                        if (steps != null) {
+                            for (Step cs : steps) {
+                                pipelineSteps.add(new PipelineStep(cs));
+                            }
+                        }
                     }
                 }
             }
         }
 
         // add steps to pipeline
-        if (steps != null) {
-            for (Step cs : steps) {
-                pipelineSteps.add(new PipelineStep(cs));
-            }
+        pipelineManager = new PipelineManager(pipelineSteps);
 
-            pipelineManager = new PipelineManager(pipelineSteps);
-        }
     }
 }
