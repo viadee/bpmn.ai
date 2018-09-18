@@ -98,7 +98,32 @@ The configuration file has the following structure:
         			"old_name": "",
         			"new_name": ""
       			}
-    		]
+    		],
+    		"column_configuration": [
+		   		{
+		        	"column_name": "",
+		        	"column_type": ""
+		        	"use_column": true,
+		        	"comment": ""
+		      	}
+	    	],
+	    	"column_hash_configuration": [
+		   		{
+		        	"column_name": "",
+		        	"hash_column": true,
+		        	"comment": ""
+		     	}
+		    ],
+		    "pipeline_step_configuration": {
+		    		"steps": [
+		    			{
+		    				"id": "",
+		    				"className": "",
+		    				"dependsOn": "",
+		    				"parameters": {}
+		    			}
+		    		] 
+		    }
       },
       "model_learning": {}
 	}
@@ -226,7 +251,7 @@ Before writing the final result into a CSV-File, columns of data can be selected
 
 Property      |  Description
 --------------|-------------
-column_name | The name of the column
+column_name | The name of the column.
 hash_column  | Should the column be hashed. If set to true, the column will be hashed.
 comment       | A comment if changes have been done to this variable, which will be written into the application log during processing.
 
@@ -244,6 +269,37 @@ Example:
     ...
 ```
 
+### pipline\_step\_configuration
+
+This configuration is used to configure the steps of the pipeline as well as their order. Note that the build in steps should run in the predefined order if there is no explicit reason for doing otherwise. The applciation will give a warning if defualt steps are missing in the pipeline or their are errors in the pipeline definition.
+
+Property      |  Description
+--------------|-------------
+steps | an array of step configuration that make up the pipeline.
+id  | A unique id for the step. It is used for the dependsOn parameter in other steps.
+className       | The full qualified name of the implementing class e.g. "de.viadee.ki.sparkimporter.DataFilterStep". The class need to implement the PreprocessingStepInterface.
+dependsOn  | The id of the step that this step depends on. It will be run after the step it depends on. If more that one step depends on a step order of those dependent steps is random. 
+parameters  | The parameters attribute can hold mutiple key value pairs of parameters relvant for the step. This attribute is generically converted to a Map<String, Object> and given to the step by the parameters attribute in the runPreprocessingStep method of the PreprocessingStepInterface.
+
+Example: 
+
+```json
+    ...
+    "pipeline_step_configuration": {
+	    "steps": [
+	    	{
+	    		"id": "NewStep1",
+	    		"className": "de.viadee.ki.steps.NewStep1",
+	    		"dependsOn": "TypeCastStep",
+	    		"parameters": {
+	    			"parameter1": 23,
+	    			"parameter2": true
+	    		}
+	    	}
+	    ]
+    }
+    ...
+```
 
 ### Model learning
 Section reserved for settings related to the machine learning model.
