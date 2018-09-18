@@ -1,6 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps;
 
-import de.viadee.ki.sparkimporter.configuration.preprocessing.CustomStep;
+import de.viadee.ki.sparkimporter.configuration.preprocessing.Step;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 
@@ -15,7 +15,7 @@ public class PipelineStep {
     private String dependsOn;
     private Map<String, Object> stepParameters;
 
-    public PipelineStep(CustomStep cs) {
+    public PipelineStep(Step cs) {
         Class<? extends PreprocessingStepInterface> step = null;
         try {
             step =
@@ -39,6 +39,14 @@ public class PipelineStep {
         stepParameters = cs.getParameters();
     }
 
+    public PipelineStep(PreprocessingStepInterface s, String dependsOn) {
+        preprocessingStep = s;
+        id = s.getClass().getSimpleName();
+        className = s.getClass().getCanonicalName();
+        this.dependsOn = dependsOn;
+        stepParameters = null;
+    }
+
     public String getId() {
         return id;
     }
@@ -51,16 +59,8 @@ public class PipelineStep {
         return className;
     }
 
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
     public String getDependsOn() {
         return dependsOn;
-    }
-
-    public void setDependsOn(String dependsOn) {
-        this.dependsOn = dependsOn;
     }
 
     public boolean hasPredecessor() {
@@ -73,10 +73,6 @@ public class PipelineStep {
 
     public Map<String, Object> getStepParameters() {
         return stepParameters;
-    }
-
-    public void setStepParameters(Map<String, Object> stepParameters) {
-        this.stepParameters = stepParameters;
     }
 
     @Override

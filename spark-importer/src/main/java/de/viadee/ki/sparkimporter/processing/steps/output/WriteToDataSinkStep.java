@@ -8,8 +8,6 @@ import org.apache.spark.sql.SaveMode;
 
 import java.util.Map;
 
-import static de.viadee.ki.sparkimporter.KafkaImportApplication.ARGS;
-
 public class WriteToDataSinkStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
@@ -18,7 +16,7 @@ public class WriteToDataSinkStep implements PreprocessingStepInterface {
                 .repartition(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID))
                 .write()
                 .mode(SaveMode.Append)
-                .save(ARGS.getFileDestination());
+                .save(SparkImporterVariables.getTargetFolder());
 
         return dataset;
     }

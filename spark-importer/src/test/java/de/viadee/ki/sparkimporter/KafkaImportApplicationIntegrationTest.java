@@ -99,7 +99,7 @@ public class KafkaImportApplicationIntegrationTest {
     @Test
     public void testKafkaStreamingImportProcessLevel() throws Exception {
         //run main class
-        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", IMPORT_TEST_OUTPUT_DIRECTORY_PROCESS, "-bm", "true", "-sr", "false", "-dl", "process"};
+        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", IMPORT_TEST_OUTPUT_DIRECTORY_PROCESS, "-bm", "true", "-sr", "false", "-dl", "process", "-wd", "./src/test/resources/config/kafka_import_process/"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -128,7 +128,7 @@ public class KafkaImportApplicationIntegrationTest {
     @Test
     public void testKafkaStreamingImportActivityLevel() throws Exception {
         //run main class
-        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", IMPORT_TEST_OUTPUT_DIRECTORY_ACTIVITY, "-bm", "true", "-sr", "false", "-dl", "activity"};
+        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", IMPORT_TEST_OUTPUT_DIRECTORY_ACTIVITY, "-bm", "true", "-sr", "false", "-dl", "activity", "-wd", "./src/test/resources/config/kafka_import_activity/"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();

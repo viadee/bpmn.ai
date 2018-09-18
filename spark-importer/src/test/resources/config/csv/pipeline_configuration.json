@@ -1,0 +1,170 @@
+{
+  "data_extraction": {
+    "filter_query": ""
+  },
+  "preprocessing": {
+    "variable_configuration": [
+      {
+        "variable_name": "a",
+        "variable_type": "string",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "c",
+        "variable_type": "long",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "d",
+        "variable_type": "boolean",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "e",
+        "variable_type": "serializable",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "f",
+        "variable_type": "string",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "g",
+        "variable_type": "string",
+        "use_variable": false,
+        "comment": "Not required"
+      },
+      {
+        "variable_name": "i",
+        "variable_type": "date",
+        "parse_format": "yyyy-MM",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "j",
+        "variable_type": "timestamp",
+        "parse_format": "yyyy-MM-dd HH:mm",
+        "use_variable": true,
+        "comment": ""
+      }
+    ],
+    "variable_name_mapping": [
+      {
+        "old_name": "b",
+        "new_name": "f"
+      },
+      {
+        "old_name": "a",
+        "new_name": ""
+      }
+    ],
+    "column_configuration": [
+      {
+        "column_name": "case_execution_id_",
+        "use_column": false,
+        "comment": "Not required anymore"
+      }
+    ],
+    "column_hash_configuration": [
+      {
+        "column_name": "state_",
+        "hash_column": true,
+        "comment": ""
+      }
+    ],
+    "pipeline_step_configuration": {
+      "steps": [
+        {
+          "id": "DataFilterStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.DataFilterStep",
+          "dependsOn": ""
+        },
+        {
+          "id": "ColumnRemoveStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.ColumnRemoveStep",
+          "dependsOn": "DataFilterStep"
+        },
+        {
+          "id": "ReduceColumnsDatasetStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsDatasetStep",
+          "dependsOn": "ColumnRemoveStep"
+        },
+        {
+          "id": "VariableFilterStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableFilterStep",
+          "dependsOn": "ReduceColumnsDatasetStep"
+        },
+        {
+          "id": "VariableNameMappingStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableNameMappingStep",
+          "dependsOn": "VariableFilterStep"
+        },
+        {
+          "id": "DetermineVariableTypesStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineVariableTypesStep",
+          "dependsOn": "VariableNameMappingStep"
+        },
+        {
+          "id": "VariablesTypeEscalationStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep",
+          "dependsOn": "DetermineVariableTypesStep"
+        },
+        {
+          "id": "AggregateVariableUpdatesStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateVariableUpdatesStep",
+          "dependsOn": "VariablesTypeEscalationStep"
+        },
+        {
+          "id": "AddVariablesColumnsStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariablesColumnsStep",
+          "dependsOn": "AggregateVariableUpdatesStep"
+        },
+        {
+          "id": "AggregateProcessInstancesStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateProcessInstancesStep",
+          "dependsOn": "AddVariablesColumnsStep"
+        },
+        {
+          "id": "CreateColumnsFromJsonStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep",
+          "dependsOn": "AggregateProcessInstancesStep"
+        },
+        {
+          "id": "JsonVariableFilterStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.JsonVariableFilterStep",
+          "dependsOn": "CreateColumnsFromJsonStep"
+        },
+        {
+          "id": "AddReducedColumnsToDatasetStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddReducedColumnsToDatasetStep",
+          "dependsOn": "JsonVariableFilterStep"
+        },
+        {
+          "id": "ColumnHashStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.ColumnHashStep",
+          "dependsOn": "AddReducedColumnsToDatasetStep"
+        },
+        {
+          "id": "TypeCastStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.TypeCastStep",
+          "dependsOn": "ColumnHashStep"
+        },
+        {
+          "id": "WriteToCSVStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep",
+          "dependsOn": "TypeCastStep"
+        }
+      ]
+    }
+
+
+  },
+  "model_learning": {}
+}

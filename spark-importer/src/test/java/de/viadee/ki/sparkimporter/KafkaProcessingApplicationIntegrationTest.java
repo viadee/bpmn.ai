@@ -21,7 +21,7 @@ public class KafkaProcessingApplicationIntegrationTest {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
         //run main class
-        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY_PROCESS, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS, "-d", "|", "-sr", "false", "-wd", "./src/test/resources/"};
+        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY_PROCESS, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS, "-d", "|", "-sr", "false", "-wd", "./src/test/resources/config/kafka_processing_process/"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -59,7 +59,7 @@ public class KafkaProcessingApplicationIntegrationTest {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
         //run main class
-        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY_ACTIVITY, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_ACTIVITY, "-d", "|", "-sr", "false", "-dl", "activity", "-wd", "./src/test/resources/"};
+        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY_ACTIVITY, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_ACTIVITY, "-d", "|", "-sr", "false", "-dl", "activity", "-wd", "./src/test/resources/config/kafka_processing_activity/"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();

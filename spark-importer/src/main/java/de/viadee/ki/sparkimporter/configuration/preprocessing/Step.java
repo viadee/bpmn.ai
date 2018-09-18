@@ -1,13 +1,14 @@
 package de.viadee.ki.sparkimporter.configuration.preprocessing;
 
 import java.util.HashMap;
+import java.util.Map;
 
-public class CustomStep {
+public class Step {
 
     private String id;
     private String className;
     private String dependsOn;
-    private HashMap<String, Object> parameters = new HashMap<>();
+    private Map<String, Object> parameters = new HashMap<>();
 
     public String getId() {
         return id;
@@ -33,11 +34,11 @@ public class CustomStep {
         this.dependsOn = dependsOn;
     }
 
-    public HashMap<String, Object> getParameters() {
+    public Map<String, Object> getParameters() {
         return parameters;
     }
 
-    public void setParameters(HashMap<String, Object> parameters) {
+    public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
     }
 }

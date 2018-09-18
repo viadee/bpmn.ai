@@ -1,42 +1,22 @@
 package de.viadee.ki.sparkimporter;
 
+import info.debatty.java.stringsimilarity.NormalizedLevenshtein;
+import org.apache.spark.sql.*;
+import org.apache.spark.sql.api.java.UDF1;
+import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.expressions.Window;
 import org.apache.spark.sql.types.DataTypes;
-
-
-import org.apache.spark.sql.catalyst.encoders.RowEncoder;
-import org.apache.spark.sql.catalyst.expressions.Levenshtein;
-import org.apache.spark.sql.catalyst.expressions.WindowSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
-import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
-import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
-import scala.reflect.reify.phases.Calculate;
-import scala.util.parsing.input.StreamReader;
-
-import org.apache.spark.sql.expressions.Window;
-import javax.validation.constraints.Max;
-import org.apache.spark.sql.*;
-
-import static org.apache.spark.sql.functions.*;
-import org.apache.spark.sql.api.java.UDF1;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 
-import org.apache.spark.api.java.function.ForeachFunction;
-import info.debatty.java.stringsimilarity.*;
+import static org.apache.spark.sql.functions.callUDF;
 
 public class SparkTestApplication {
 

@@ -1,0 +1,29 @@
+{
+  "data_extraction": {},
+  "preprocessing": {
+    "variable_configuration": [],
+    "variable_name_mapping": [],
+    "column_configuration": [],
+    "column_hash_configuration": [],
+    "pipeline_step_configuration": {
+      "steps": [
+        {
+          "id": "KafkaImportStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.importing.KafkaImportStep",
+          "dependsOn": ""
+        },
+        {
+          "id": "InitialCleanupStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep",
+          "dependsOn": "KafkaImportStep"
+        },
+        {
+          "id": "WriteToDataSinkStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep",
+          "dependsOn": "InitialCleanupStep"
+        }
+      ]
+    }
+  },
+  "model_learning": {}
+}
