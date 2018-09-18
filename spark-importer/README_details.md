@@ -25,6 +25,7 @@ Step							| Step type
 [AddVariablesColumns](#addvariablescolumns-generic)			| generic
 [AggregateProcessInstances](#aggregateprocessinstances-generic)	| generic
 [CreateColumnsFromJson](#createcolumnsfromjson-generic)	| generic
+[JsonVariableFilter](#jsonvariablefilter-generic)	| user config
 [AddReducedColumnsToDataset](#addreducedcolumnstodataset-generic)	| generic
 [ColumnHash](#columnhash-user-config) 			      	| user config
 [TypeCast](#typecast-user-config) 			      	| user config
@@ -46,7 +47,8 @@ Step							| Step type
 [AggregateVariableUpdates](#aggregatevariableupdates-generic)	| generic
 [AddVariablesColumns](#addvariablescolumns-generic)			| generic
 [AggregateActivityInstances](#aggregateactivityinstances-generic)	| generic
-[CreateColumnsFromJson](#createcolumnsfromjson-generic)	| generic	
+[CreateColumnsFromJson](#createcolumnsfromjson-generic)	| generic
+[JsonVariableFilter](#jsonvariablefilter-generic)	| user config
 [FillActivityInstancesHistory](#fillactivityinstanceshistory-generic)	| generic	
 [AddReducedColumnsToDataset](#addreducedcolumnstodataset-generic)	| generic
 [ColumnHash](#columnhash-user-config) 			      	| user config
@@ -387,6 +389,42 @@ processInstanceId   | f     | f_name  | f_age |
 --------------------|-------|---------|-------|
 1						| {"name":"hans","age":30,"children":[{"name":"clara"},{"name":"joe"}]} | hans | 30
 2						| {"name":"klaus","age":34}      | klaus | 34
+
+### JsonVariableFilter (user config)
+In this step each variable column that was created in the previous step from a json is now being checked if it is configured to be dropped and if so, it is dropped from the dataset.
+
+processInstanceId   | f     | f_name  | f_age |
+--------------------|-------|---------|-------|
+1						| {"name":"hans","age":30,"children":[{"name":"clara"},{"name":"joe"}]} | hans | 30
+2						| {"name":"klaus","age":34}      | klaus | 34
+
+Let's now assume the following variable_configuration has been defined:
+
+```json
+	...
+	"variable_configuration": [
+		{
+			"variable_name": "f",
+			"variable_type": "string",
+			"use_variable": true,
+			"comment": ""
+		},
+		{
+			"variable_name": "f_name",
+			"variable_type": "string",
+			"use_variable": false,
+			"comment": ""
+		}
+	],
+	...
+```
+
+The following dataset is then returned from this step:
+
+processInstanceId   | f     | f_age |
+--------------------|-------|-------|
+1						| {"name":"hans","age":30,"children":[{"name":"clara"},{"name":"joe"}]} | 30
+2						| {"name":"klaus","age":34}      | 34
 
 
 ### FillActivityInstancesHistory (generic)
