@@ -3,7 +3,6 @@ package de.viadee.ki.sparkimporter;
 import org.apache.spark.sql.expressions.Window;
 import org.apache.spark.sql.types.DataTypes;
 
-
 import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.catalyst.expressions.Levenshtein;
 import org.apache.spark.sql.catalyst.expressions.WindowSpec;
@@ -43,10 +42,10 @@ public class SparkTestApplication {
 	private static final Logger LOG = LoggerFactory.getLogger(SparkTestApplication.class);
 
 	public static void main(String[] arguments) {
-		// configuration is being loaded from Environment (e.g. when using spark-submit)
+
 		final SparkSession sparkSession = SparkSession.builder().master("local[*]").appName("Test").getOrCreate();
 
-		// read dataset
+		// Read dataset
 		Dataset<Row> data = sparkSession.read().option("header", "true").option("delimiter", ";")
 				.csv("C:\\Users\\B77\\Documents\\datasets\\brandsReal.csv");
 		Dataset<Row> testdata = sparkSession.read().option("header", "true").option("delimiter", ";")
@@ -54,18 +53,47 @@ public class SparkTestApplication {
 		data = data.withColumn("id",
 				functions.row_number().over(Window.orderBy(data.col("int_fahrzeugHerstellernameAusVertrag"))));
 
-		// Add geodata to dataset
-		 Dataset locationds = addLocationStep(testdata, true,null);
-		// locationds.show();
-		 
-	
-		Dataset brandds = mapBrandsStep(data, true, null);
+		
+		// save parameters in map
+		Dataset<Row> dataset = sparkSession.read().option("header", "true").option("delimiter", ",").csv("C:\\Users\\B77\\Desktop\\duni\\cleansed_data.csv");
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put( "path", "C:\\Users\\B77\\Desktop\\duni\\Rohdaten\\Profile Print - AI data - finished orders info 20180905.csv"); 
+		parameters.put("mergeCol", "id");
+		parameters.put("datasetCol", "reproID");
 
+		// Test steps
+		// Dataset locationds = addLocationStep(testdata, true,null);
+		// Dataset brandds = mapBrandsStep(data, true, null);
+		Dataset<Row> mergedds = mergeStep(dataset, true, null, parameters);
+		// save dataset into CSV file 
+		mergedds.coalesce(1).write().option("header", "true").option("delimiter", ";") .option("ignoreLeadingWhiteSpace", "false").option("ignoreTrailingWhiteSpace", "false") .mode(SaveMode.Overwrite).csv("C:\\Users\\B77\\Desktop\\mergeOut.csv");
 		sparkSession.close();
 	}
 
+	// merges two tables
+	public static Dataset<Row> mergeStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel,
+			Map<String, Object> parameters) {
+		
+		final SparkSession sparkSession = SparkSession.builder().getOrCreate();
+		
+		// red parameters from map
+		String path = (String) parameters.get("path");
+		String mergeCol = (String) parameters.get("mergeCol");
+		String datasetCol = (String) parameters.get("datasetCol");
+		
+		//read dataset that has to be merged
+		Dataset<?> mergeds = sparkSession.read().option("header", "true").option("delimiter", ";").csv(path);
+		
+		// perform inner join
+		dataset = dataset.join(mergeds, dataset.col(datasetCol).equalTo(mergeds.col(mergeCol)));
+		dataset = dataset.drop("_c0");
+		dataset.show();
+		
+		return dataset;
+	}
+
 	// add geodata
-	public static Dataset addLocationStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
+	public static Dataset<?> addLocationStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
 
 		final SparkSession sparkSession = SparkSession.builder().getOrCreate();
 
@@ -73,11 +101,11 @@ public class SparkTestApplication {
 		String colname = "postleitzahl";
 
 		// read data that has to be mapped
-		Dataset plz = sparkSession.read().option("header", "true").option("delimiter", "\t")
+		Dataset<?> plz = sparkSession.read().option("header", "true").option("delimiter", "\t")
 				.csv("C:\\Users\\B77\\Desktop\\Glasbruch-Mining\\plz\\PLZ.tab");
 
 		// inner join and remove unnecessary columns
-		Dataset joinedds = dataset.join(plz, dataset.col(colname).equalTo(plz.col("plz")), "left");
+		Dataset<?> joinedds = dataset.join(plz, dataset.col(colname).equalTo(plz.col("plz")), "left");
 		joinedds = joinedds.drop("plz").drop("Ort").drop("#loc_id");
 
 		return joinedds;
@@ -101,70 +129,65 @@ public class SparkTestApplication {
 	public static Dataset<Row> LevenshteinMatching(Dataset<Row> ds, SparkSession s, String herstellercolumn) {
 
 		// read matching data in a 2-dim array
-				String fileName = "C:\\Users\\B77\\Desktop\\Glasbruch-Mining\\car_brands.csv";
-				File file = new File(fileName);
+		String fileName = "C:\\Users\\B77\\Desktop\\Glasbruch-Mining\\car_brands.csv";
+		File file = new File(fileName);
 
-				// return a 2-dimensional array of strings
-				List<List<String>> brandsList = new ArrayList<>();
-				Scanner inputStream;
-				try {
-					inputStream = new Scanner(file);
-					while (inputStream.hasNext()) {
-						String line = inputStream.next();
-						String[] values = line.split(";");
-						brandsList.add(Arrays.asList(values));
+		// return a 2-dimensional array of strings
+		List<List<String>> brandsList = new ArrayList<>();
+		Scanner inputStream;
+		try {
+			inputStream = new Scanner(file);
+			while (inputStream.hasNext()) {
+				String line = inputStream.next();
+				String[] values = line.split(";");
+				brandsList.add(Arrays.asList(values));
+			}
+			inputStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		// create user defined function
+		s.udf().register("levenshteinMatching", new UDF1<String, String>() {
+
+			public String call(String column) throws Exception {
+
+				String brandOutput = "SONSTIGE";
+				// discard not useful chars
+				column = column.toUpperCase();
+				column = column.replaceAll("[\\-,1,2,3,4,5,6,7,8,9,0,\\.,\\,\\_,\\+,\\),\\(,/\\s/g]", "");
+
+				int lineNo = 1;
+				double score = 1;
+				NormalizedLevenshtein lev = new NormalizedLevenshtein();
+
+				// traverse brand list and select the brand with the best score
+				for (List<String> line : brandsList) {
+					int columnNo = 1;
+					String brand = line.get(1);
+					double levScore = lev.distance(column, brand);
+
+					if (levScore < score) {
+						score = levScore;
+						brandOutput = brand;
 					}
-					inputStream.close();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
+					lineNo++;
 				}
-				
-						
-	
-				// create user defined function
-				s.udf().register("levenshteinMatching", new UDF1<String, String>() {
-					
-					public String call(String column) throws Exception {
-						
-			
-						String brandOutput = "SONSTIGE";
-						// discard not useful chars
-						column = column.toUpperCase();
-						column = column.replaceAll("[\\-,1,2,3,4,5,6,7,8,9,0,\\.,\\,\\_,\\+,\\),\\(,/\\s/g]", "");
-						
-						
-						int lineNo = 1;
-						double score = 1;
-						NormalizedLevenshtein lev = new NormalizedLevenshtein();
-						
-						// traverse brand list and select the brand with the best score
-						for (List<String> line : brandsList) {
-							int columnNo = 1;
-							String brand = line.get(1);
-							double levScore = lev.distance(column, brand);
-				
-							if(levScore < score) {
-								score = levScore;
-								brandOutput = brand;
-							}			
-							lineNo++;				
-						}
-						if(score > 0.4) {
-							brandOutput = "SONSTIGE";
-						}
-						if(column.equals("") || column.equals("-")) {
-							brandOutput = "UNBEKANNT";
-						}
+				if (score > 0.4) {
+					brandOutput = "SONSTIGE";
+				}
+				if (column.equals("") || column.equals("-")) {
+					brandOutput = "UNBEKANNT";
+				}
 
-						return brandOutput;
-					}
-				}, DataTypes.StringType);
-				
-				// call UDF for specific columns	
-				ds = ds.withColumn("brand",callUDF("levenshteinMatching", ds.col(herstellercolumn)));
-			
-				
-				return ds;
+				return brandOutput;
+			}
+		}, DataTypes.StringType);
+
+		// call UDF for specific columns
+		ds = ds.withColumn("brand", callUDF("levenshteinMatching", ds.col(herstellercolumn)));
+
+		return ds;
 	}
 
 	// applies the regexp functions from a csv file to the brands of the dataset
