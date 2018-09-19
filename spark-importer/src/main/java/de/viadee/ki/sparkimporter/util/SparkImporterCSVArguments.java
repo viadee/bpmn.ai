@@ -43,6 +43,10 @@ public class SparkImporterCSVArguments {
 			"-ld" }, required = false, description = "Folder where the log files should be stored.")
 	private String logDirectory = "./";
 
+	@Parameter(names = { "--save-mode",
+			"-sm" }, required = false, description = "Should the result be appended to the destination or should it be overwritten?")
+	private String saveMode = SparkImporterVariables.SAVE_MODE_APPEND;
+
 	@Parameter(names = { "--dev-type-cast-check",
 			"-devtcc" }, required = false, description = "Development feature: Check for type casting errors of columns.", arity = 1)
 	private boolean devTypeCastCheckEnabled = false;
@@ -81,6 +85,10 @@ public class SparkImporterCSVArguments {
 		return logDirectory;
 	}
 
+	public String getSaveMode() {
+		return saveMode;
+	}
+
 	public boolean isDevTypeCastCheckEnabled() {
 		return devTypeCastCheckEnabled;
 	}
@@ -100,6 +108,7 @@ public class SparkImporterCSVArguments {
 		return "SpringImporterArguments{" + "fileSource='" + fileSource + '\'' + ", delimiter='" + delimiter
 				+ '\'' + ", fileDestination='" + fileDestination + '\'' + ", revisionCount=" + revisionCount
 				+ '\'' + ", workingDirectory=" + workingDirectory
+				+ '\'' + ", saveMode=" + saveMode
 				+ '\'' + ", devTypeCastCheckEnabled=" + devTypeCastCheckEnabled
 				+ '\'' + ", logDirectory=" + logDirectory + '}';
 	}

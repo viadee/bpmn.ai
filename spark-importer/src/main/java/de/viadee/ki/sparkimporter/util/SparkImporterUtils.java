@@ -80,6 +80,8 @@ public class SparkImporterUtils {
             dataSet = dataSet.coalesce(1);
         }
 
+        String path = SparkImporterVariables.getTargetFolder()+"/"+ (subDirectory.equals("result") ? "result" : "intermediate") + "/" + String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory;
+
         //save dataset into CSV file
         dataSet
                 .write()
@@ -87,8 +89,8 @@ public class SparkImporterUtils {
                 .option("delimiter", delimiter)
                 .option("ignoreLeadingWhiteSpace", "false")
                 .option("ignoreTrailingWhiteSpace", "false")
-                .mode(SaveMode.Overwrite)
-                .csv(SparkImporterVariables.getTargetFolder()+"/"+ String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory);
+                .mode(SparkImporterVariables.getSaveMode())
+                .csv(path);
 
         if(aggreateCSVToOneFile && subDirectory.equals("result"))
             moveResultFile();
@@ -96,7 +98,7 @@ public class SparkImporterUtils {
 
     private void moveResultFile() {
         //rename result file to deterministic name
-        String targetFolder = SparkImporterVariables.getTargetFolder()+"/"+ String.format("%02d", PreprocessingRunner.getCounter()) + "_result";
+        String targetFolder = SparkImporterVariables.getTargetFolder()+"/result/"+ String.format("%02d", PreprocessingRunner.getCounter()) + "_result";
         if(targetFolder.startsWith("hdfs")) {
             // data stored in Hadoop
             Path path = new Path(targetFolder);

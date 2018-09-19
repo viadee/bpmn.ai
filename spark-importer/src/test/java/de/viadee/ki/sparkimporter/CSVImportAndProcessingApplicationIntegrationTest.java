@@ -22,7 +22,7 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     private static final String TEST_OUTPUT_FILE_PATH = "integration-test-result-csv/";
 
-    private static final String TEST_OUTPUT_FILE_NAME = "integration-test-result-csv/result.csv";
+    private static final String TEST_OUTPUT_FILE_NAME = "integration-test-result-csv/result/result.csv";
 
     private static final String RESULT_FILE_DELIMITER = "\\|";
 
@@ -32,7 +32,7 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
     public static void setUpBeforeClass() throws IOException {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
-        String args[] = {"-fs", TEST_INPUT_FILE_NAME, "-fd", TEST_OUTPUT_FILE_PATH, "-d", ";", "-sr", "false", "-wd", "./src/test/resources/config/csv/"};
+        String args[] = {"-fs", TEST_INPUT_FILE_NAME, "-fd", TEST_OUTPUT_FILE_PATH, "-d", ";", "-sr", "false", "-sm", "overwrite", "-wd", "./src/test/resources/config/csv/"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -61,12 +61,12 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
     }
 
     @Test
-    public void testMaxNumberOfRows() throws IOException {
+    public void testMaxNumberOfRows() {
         assertTrue(sixthLineValues == null);
     }
 
     @Test
-    public void testColumnHeaders() throws IOException {
+    public void testColumnHeaders() {
         //check if result contains 41 columns as variable g is filtered out and b renamed to f via the user config
         //+ case_execution_id_ is removed by ColumnRemoveStep
         //+ added jsontest variable with 2 json parameters

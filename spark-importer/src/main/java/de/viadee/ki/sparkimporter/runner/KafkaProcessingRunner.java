@@ -16,6 +16,7 @@ import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SaveMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,7 @@ public class KafkaProcessingRunner extends SparkRunner {
         SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
         SparkImporterVariables.setDevTypeCastCheckEnabled(ARGS.isDevTypeCastCheckEnabled());
         SparkImporterVariables.setRevCountEnabled(ARGS.isRevisionCount());
+        SparkImporterVariables.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
         SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
 

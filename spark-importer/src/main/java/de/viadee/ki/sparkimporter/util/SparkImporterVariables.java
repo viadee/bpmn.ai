@@ -1,5 +1,7 @@
 package de.viadee.ki.sparkimporter.util;
 
+import org.apache.spark.sql.SaveMode;
+
 public final class SparkImporterVariables {
 
     public static final String VAR_ID = "id_";
@@ -46,9 +48,13 @@ public final class SparkImporterVariables {
     public static final String DATA_LEVEL_PROCESS = "process";
     public static final String DATA_LEVEL_ACTIVITY = "activity";
 
+    public static final String SAVE_MODE_APPEND = "append";
+    public static final String SAVE_MODE_OVERWRITE = "overwrite";
+
     private static String targetFolder = "";
     private static boolean devTypeCastCheckEnabled = false;
     private static boolean revCountEnabled = false;
+    private static SaveMode saveMode = SaveMode.Append;
 
     public static String getTargetFolder() {
         return targetFolder;
@@ -72,5 +78,13 @@ public final class SparkImporterVariables {
 
     public static void setRevCountEnabled(boolean revCountEnabled) {
         SparkImporterVariables.revCountEnabled = revCountEnabled;
+    }
+
+    public static SaveMode getSaveMode() {
+        return saveMode;
+    }
+
+    public static void setSaveMode(SaveMode saveMode) {
+        SparkImporterVariables.saveMode = saveMode;
     }
 }
