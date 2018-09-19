@@ -33,7 +33,7 @@ public class AddVariablesColumnsStep implements PreprocessingStepInterface {
                     .otherwise(null));
 
             //rev count is only relevant on process level
-            if(dataLevel.equals("process") && SparkImporterVariables.isRevCountEnabled()) {
+            if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) && SparkImporterVariables.isRevCountEnabled()) {
                 dataset = dataset.withColumn(v+"_rev",
                         when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).equalTo(v), dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION))
                         .otherwise("0"));

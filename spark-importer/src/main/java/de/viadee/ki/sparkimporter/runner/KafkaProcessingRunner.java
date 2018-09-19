@@ -50,7 +50,7 @@ public class KafkaProcessingRunner extends SparkRunner {
         SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
 
-        dataLevel = ARGS.getDataLavel();
+        dataLevel = ARGS.getDataLevel();
 
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 
@@ -78,7 +78,7 @@ public class KafkaProcessingRunner extends SparkRunner {
         pipelineSteps.add(new PipelineStep(new AggregateVariableUpdatesStep(), "VariablesTypeEscalationStep"));
         pipelineSteps.add(new PipelineStep(new AddVariablesColumnsStep(), "AggregateVariableUpdatesStep"));
 
-        if(dataLevel.equals("process")) {
+        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             // process level
             pipelineSteps.add(new PipelineStep(new AggregateProcessInstancesStep(), "AddVariablesColumnsStep"));
         } else {
@@ -86,15 +86,15 @@ public class KafkaProcessingRunner extends SparkRunner {
             pipelineSteps.add(new PipelineStep(new AggregateActivityInstancesStep(), "AddVariablesColumnsStep"));
         }
 
-        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), dataLevel.equals("process") ? "AggregateProcessInstancesStep" : "AggregateActivityInstancesStep"));
+        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "AggregateProcessInstancesStep" : "AggregateActivityInstancesStep"));
         pipelineSteps.add(new PipelineStep(new JsonVariableFilterStep(), "CreateColumnsFromJsonStep"));
 
-        if(dataLevel.equals("activity")) {
+        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             // activity level
             pipelineSteps.add(new PipelineStep(new FillActivityInstancesHistoryStep(), "JsonVariableFilterStep"));
         }
 
-        pipelineSteps.add(new PipelineStep(new AddReducedColumnsToDatasetStep(), dataLevel.equals("process") ? "JsonVariableFilterStep" : "FillActivityInstancesHistoryStep"));
+        pipelineSteps.add(new PipelineStep(new AddReducedColumnsToDatasetStep(), dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "JsonVariableFilterStep" : "FillActivityInstancesHistoryStep"));
         pipelineSteps.add(new PipelineStep(new ColumnHashStep(), "AddReducedColumnsToDatasetStep"));
         pipelineSteps.add(new PipelineStep(new TypeCastStep(), "ColumnHashStep"));
         pipelineSteps.add(new PipelineStep(new WriteToCSVStep(), "TypeCastStep"));

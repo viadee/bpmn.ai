@@ -43,7 +43,7 @@ public class SparkImporterKafkaDataProcessingArguments {
 
 	@Parameter(names = { "--data-level",
 			"-dl" }, required = false, description = "Which level sjould the resulting data have. It can be process or activity.")
-	private String dataLavel = "process";
+	private String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
 
 	/**
 	 * Singleton.
@@ -83,8 +83,8 @@ public class SparkImporterKafkaDataProcessingArguments {
 		return devTypeCastCheckEnabled;
 	}
 
-	public String getDataLavel() {
-		return dataLavel;
+	public String getDataLevel() {
+		return dataLevel;
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class SparkImporterKafkaDataProcessingArguments {
 				+ '\'' + ", writeStepResultsToCSV='" + writeStepResultsToCSV
 				+ '\'' + ", workingDirectory=" + workingDirectory
 				+ '\'' + ", devTypeCastCheckEnabled=" + devTypeCastCheckEnabled
-				+ '\'' + ", dataLavel=" + dataLavel
+				+ '\'' + ", dataLavel=" + dataLevel
 				+ '\'' + ", logDirectory=" + logDirectory + '}';
 	}
 }

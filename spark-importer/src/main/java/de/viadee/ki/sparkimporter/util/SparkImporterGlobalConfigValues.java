@@ -5,7 +5,7 @@ public class SparkImporterGlobalConfigValues {
     private static String targetFolder = "";
     private static boolean devTypeCastCheckEnabled = false;
     private static boolean revCountEnabled = false;
-    private static String dataLevel = "process";
+    private static String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
 
     public static String getTargetFolder() {
         return targetFolder;

@@ -51,7 +51,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
         SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
 
-        dataLevel = "process";
+        dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
 
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 
@@ -108,7 +108,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
         }
 
         InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
-        dataset = initialCleanupStep.runPreprocessingStep(dataset, false, "process", null);
+        dataset = initialCleanupStep.runPreprocessingStep(dataset, false, SparkImporterVariables.DATA_LEVEL_PROCESS, null);
 
         return dataset;
     }

@@ -17,7 +17,7 @@ public class SparkImporterCSVArguments {
 
 	@Parameter(names = { "--data-level",
 			"-dl" }, required = false, description = "Which level should the resulting data have. It can be process or activity.")
-	private String dataLavel = "process";
+	private String dataLavel = SparkImporterVariables.DATA_LEVEL_PROCESS;
 
 	@Parameter(names = { "--delimiter",
 			"-d" }, required = true, description = "Character or string that separates fields such as [ ;,  | or ||| ]. Please make sure that these are not contained in your data.")

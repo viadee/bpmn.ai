@@ -10,6 +10,7 @@ import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -27,7 +28,7 @@ public abstract class SparkRunner {
     protected SparkSession sparkSession = null;
 
     private Dataset<Row> dataset;
-    protected String dataLevel = "process";
+    protected String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
     private List<PipelineStep> pipelineSteps = new ArrayList<>();
 
     protected abstract void initialize(String[] arguments);

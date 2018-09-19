@@ -43,6 +43,9 @@ public final class SparkImporterVariables {
     public static final String PROCESS_STATE_ACTIVE = "ACTIVE";
     public static final String PROCESS_STATE_COMPLETED = "COMPLETED";
 
+    public static final String DATA_LEVEL_PROCESS = "process";
+    public static final String DATA_LEVEL_ACTIVITY = "activity";
+
     private static String targetFolder = "";
     private static boolean devTypeCastCheckEnabled = false;
     private static boolean revCountEnabled = false;

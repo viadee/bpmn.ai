@@ -55,7 +55,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
             aggregationMap.put(column, "first");
         }
 
-        if(dataLevel.equals("process")) {
+        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             initialDataset = initialDataset
                     .select(selectionColumns)
                     .filter(initialDataset.col(SparkImporterVariables.VAR_STATE).isNotNull())
@@ -86,7 +86,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         }
 
         // rejoin removed columns to dataset
-        if(dataLevel.equals("process")) {
+        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             dataset = dataset.join(initialDataset,
                     dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).equalTo(initialDataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right")
                     ), "left");
@@ -98,7 +98,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         }
 
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
-        if(dataLevel.equals("activity")) {
+        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             dataset = dataset.drop(SparkImporterVariables.VAR_ACT_INST_ID+"_right");
         }
 

@@ -74,14 +74,14 @@ public class KafkaImportRunner extends SparkRunner {
             System.exit(1);
         }
 
-        EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (ARGS.getDataLavel().equals("process") ? 2 : 3);
+        EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (ARGS.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? 2 : 3);
 
         //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
         SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
         SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
 
-        dataLevel = ARGS.getDataLavel();
+        dataLevel = ARGS.getDataLevel();
 
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 
@@ -212,7 +212,7 @@ public class KafkaImportRunner extends SparkRunner {
                 });
 
 
-        if(ARGS.getDataLavel().equals("activity")) {
+        if(ARGS.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             // list of host:port pairs used for establishing the initial connections to the Kafka cluster
             kafkaConsumerConfigAI.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, ARGS.getKafkaBroker());
             kafkaConsumerConfigAI.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);

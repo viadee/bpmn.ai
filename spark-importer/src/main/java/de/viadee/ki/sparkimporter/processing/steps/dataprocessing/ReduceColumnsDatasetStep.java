@@ -39,7 +39,7 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT);
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT2);
 
-        if(dataLevel.equals("activity")) {
+        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             columnsToKeep.add(SparkImporterVariables.VAR_ACT_INST_ID);
             columnsToKeep.add(SparkImporterVariables.VAR_START_TIME);
             columnsToKeep.add(SparkImporterVariables.VAR_END_TIME);
@@ -91,7 +91,7 @@ public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
         columns.add(new Column(SparkImporterVariables.VAR_TEXT));
         columns.add(new Column(SparkImporterVariables.VAR_TEXT2));
 
-        if(dataLevel.equals("activity")) {
+        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             columns.add(new Column(SparkImporterVariables.VAR_ACT_INST_ID));
             columns.add(new Column(SparkImporterVariables.VAR_START_TIME));
             columns.add(new Column(SparkImporterVariables.VAR_END_TIME));

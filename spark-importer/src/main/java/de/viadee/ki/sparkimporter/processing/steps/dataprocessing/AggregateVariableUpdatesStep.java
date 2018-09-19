@@ -40,11 +40,11 @@ public class AggregateVariableUpdatesStep implements PreprocessingStepInterface 
         Dataset<Row> datasetVUAgg = null;
 
 
-        if(dataLevel.equals("process")) {
-            if (Arrays.asList(dataset.columns()).contains("timestamp_")) {
+        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+            if (Arrays.asList(dataset.columns()).contains(SparkImporterVariables.VAR_TIMESTAMP)) {
                 datasetVUAgg = dataset
                         .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
-                        .orderBy(desc("timestamp_"))
+                        .orderBy(desc(SparkImporterVariables.VAR_TIMESTAMP))
                         .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
                         .agg(aggregationMap);
             } else {
@@ -64,7 +64,7 @@ public class AggregateVariableUpdatesStep implements PreprocessingStepInterface 
         datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
         datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
-        if(dataLevel.equals("activity")) {
+        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_ACT_INST_ID);
         }
 
@@ -79,7 +79,7 @@ public class AggregateVariableUpdatesStep implements PreprocessingStepInterface 
             }
         }
 
-        if(dataLevel.equals("process")) {
+        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             //union again with processInstance rows. we aggregate them as well to have the same columns
             dataset = dataset
                     .select(

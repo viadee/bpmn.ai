@@ -105,7 +105,7 @@ public class TypeCastStep implements PreprocessingStepInterface {
             }
 
             // cast revision columns for former variables, revisions columns only exist on process level
-            if(dataLevel.equals("process") && SparkImporterVariables.isRevCountEnabled() && isVariableColumn) {
+            if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) && SparkImporterVariables.isRevCountEnabled() && isVariableColumn) {
                 dataset = dataset.withColumn(column+"_rev", dataset.col(column+"_rev").cast("integer"));
             }
         }
