@@ -13,11 +13,15 @@ import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class SparkRunner {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SparkRunner.class);
 
     private PipelineManager pipelineManager = null;
     protected SparkSession sparkSession = null;
@@ -71,7 +75,9 @@ public abstract class SparkRunner {
 
         final long endMillis = System.currentTimeMillis();
 
-        SparkImporterLogger.getInstance().writeInfo("Job ran for " + ((endMillis - startMillis) / 1000) + " seconds in total)");
+        String logMessage = "Job ran for " + ((endMillis - startMillis) / 1000) + " seconds in total";
+        LOG.info(logMessage);
+        SparkImporterLogger.getInstance().writeInfo(logMessage);
 
         // Cleanup
         sparkSession.close();

@@ -159,14 +159,6 @@
 			<version>${jackson.version}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/info.debatty/java-string-similarity -->
-		<dependency>
-			<groupId>info.debatty</groupId>
-			<artifactId>java-string-similarity</artifactId>
-			<version>1.1.0</version>
-		</dependency>
-
-
 	</dependencies>
 
 
