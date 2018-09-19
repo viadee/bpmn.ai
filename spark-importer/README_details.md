@@ -31,7 +31,7 @@ Step							| Step type
 [TypeCast](#typecast-user-config) 			      	| user config
 [MatchBrandsStep](#matchbrands-user-config)         | user config
 [AddGeodataStep](#addgeodata-user-config)           | user config
-[WriteToCSV](#writetocsv-generic)					| generic
+[WriteToDisc](#writetodisc-generic)					| generic
 
 ### Activity level
 
@@ -53,7 +53,7 @@ Step							| Step type
 [AddReducedColumnsToDataset](#addreducedcolumnstodataset-generic)	| generic
 [ColumnHash](#columnhash-user-config) 			      	| user config
 [TypeCast](#typecast-user-config) 			      	| user config
-[WriteToCSV](#writetocsv-generic)					| generic
+[WriteToDisc](#writetodisc-generic)					| generic
 
 
 Each step is now described in more detail and a (to a minimum reduced) example is used to better illustrate it.
@@ -514,74 +514,5 @@ processInstanceId   | f     | f_rev | b | b_rev | c | c_rev
 2						| hi    | 0     | false | 1     |1.5| 0
 
 
-### MatchBrands (user config)
-
-In this step the column containing the car brands is adjusted. Therefore two steps are applied. On the one hand the Levenshtein matching score is calculated by comparing the dataset with a list of car brands and on the other hand manually created "regular expressions" are applied to remaining unassigned brands.
-
-
-As an example let's assume the following data is the input for this step:
-
-int_fahrzeugHerstellernameAusVertrag|
-------------------------------------|
-AUDI A1|
-B-M-W|
-MERCEDES-BENZ|
-FORD/EUROPA|
-VW|
-CHRYSLER|
-
-with the following brand matching table:
-
-Brands|
-------|
-AUDI|
-BMW|
-MERCEDES|
-
-and the following regular expression table:
-
-Matching|RegExp
---------|------
-FORD | .*FORD.*
-VOLKSWAGEN| .*VOLK.*|.*VW.*
-MERCEDES | .*MERCE.*|.*MERZ.*|.*MB.*|.*DAIMLER.*|.*CHRYSLER.*|.*DC.*|DAIMLERC|.*DAIMLER.*|.*DB.*|.*BENZ.*
-
-The following dataset is returned by this step:
-
-int_fahrzeugHerstellernameAusVertrag|
-------------------------------------|
-AUDI|
-BMW|
-MERCEDES|
-FORD|
-VOLKSWAGEN|
-MERCEDES|
-
-
-
-
-### AddGeodata (user config)
-
-This step uses the postal code column to add two columns of the corresponding latitudes and longitudes.
-
-As an example let's assume the following data is the input for this step:
-
-plz|
----|
-48149|
-
-with the following plz table:
-
-loc_id|plz|lon|lat|Ort
-------|---|---|---|---
-8147|48149|7.59642537191787|51.9657941405091|Münster
-
-The following dataset is returned by this step:
-
-plz|lon|lat
----|---|---
-48149|7.59642537191787|51.9657941405091
-
-
-### WriteToCSV (generic)
-The resulting dataset is written into a CSV file. It could e.g. also be written to a HDFS filesystem.
+### WriteToDisc (generic)
+The resulting dataset is written into a file. It could e.g. also be written to a HDFS filesystem.

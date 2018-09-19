@@ -104,7 +104,7 @@
       <bpmn:outgoing>SequenceFlow_1bg6fwz</bpmn:outgoing>
     </bpmn:task>
     <bpmn:sequenceFlow id="SequenceFlow_0s0l576" sourceRef="Task_0jzfwaf" targetRef="Task_1udlo3z" />
-    <bpmn:task id="Task_026dclb" name="Write To CSV">
+    <bpmn:task id="Task_026dclb" name="Write To Disc">
       <bpmn:incoming>SequenceFlow_1bg6fwz</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_050uvqr</bpmn:outgoing>
     </bpmn:task>

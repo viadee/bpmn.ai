@@ -47,6 +47,10 @@ public class SparkImporterCSVArguments {
 			"-sm" }, required = false, description = "Should the result be appended to the destination or should it be overwritten?")
 	private String saveMode = SparkImporterVariables.SAVE_MODE_APPEND;
 
+	@Parameter(names = { "--output-format",
+			"-of" }, required = false, description = "In which format should the result be written (parquet or csv)?")
+	private String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
+
 	@Parameter(names = { "--dev-type-cast-check",
 			"-devtcc" }, required = false, description = "Development feature: Check for type casting errors of columns.", arity = 1)
 	private boolean devTypeCastCheckEnabled = false;
@@ -89,6 +93,10 @@ public class SparkImporterCSVArguments {
 		return saveMode;
 	}
 
+	public String getOutputFormat() {
+		return outputFormat;
+	}
+
 	public boolean isDevTypeCastCheckEnabled() {
 		return devTypeCastCheckEnabled;
 	}
@@ -109,6 +117,7 @@ public class SparkImporterCSVArguments {
 				+ '\'' + ", fileDestination='" + fileDestination + '\'' + ", revisionCount=" + revisionCount
 				+ '\'' + ", workingDirectory=" + workingDirectory
 				+ '\'' + ", saveMode=" + saveMode
+				+ '\'' + ", outputFormat=" + outputFormat
 				+ '\'' + ", devTypeCastCheckEnabled=" + devTypeCastCheckEnabled
 				+ '\'' + ", logDirectory=" + logDirectory + '}';
 	}

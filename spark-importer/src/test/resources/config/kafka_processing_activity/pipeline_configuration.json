@@ -162,8 +162,8 @@
           "dependsOn": "ColumnHashStep"
         },
         {
-          "id": "WriteToCSVStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep",
+          "id": "WriteToDiscStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep",
           "dependsOn": "TypeCastStep"
         }
       ]

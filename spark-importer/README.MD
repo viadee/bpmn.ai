@@ -34,6 +34,8 @@ Parameter                 | Description                | mandatory
 -sr or --step-results     | Defines if intermediate results be written into CSV files. | no (default is false)
 -wd or --working-directory| Folder where the configuration files are stored or should be stored. | no (default is the current directory)
 -ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
+-sm or --save-mode        | Should the result be appended to the destination or should it be overwritten? | no (default is append)
+-of or --output-format    | In which format should the result be written (parquet or csv) | no (default is parquet) 
 -devtcc or --dev-type-cast-check | Development feature: Check for type casting errors of columns. | no (default is false)
 
 ## Kafka Import
@@ -72,6 +74,8 @@ Parameter                 | Description                | mandatory
 -sr or --step-results     | Defines if intermediate results be written into CSV files. | no (default is false)
 -wd or --working-directory| Folder where the configuration files are stored or should be stored. | no (default is the current directory)
 -ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
+-sm or --save-mode        | Should the result be appended to the destination or should it be overwritten? | no (default is append)
+-of or --output-format    | In which format should the result be written (parquet or csv) | no (default is parquet) 
 -devtcc or --dev-type-cast-check | Development feature: Check for type casting errors of columns. | no (default is false)
 
 ## Configuration

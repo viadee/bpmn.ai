@@ -3,12 +3,10 @@ package de.viadee.ki.sparkimporter.util;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
-import org.apache.spark.sql.Column;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.*;
 import scala.collection.JavaConversions;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -18,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -25,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class SparkImporterUtils {
 
@@ -68,6 +68,60 @@ public class SparkImporterUtils {
         return DigestUtils.md5Hex(new String(encoded)).toUpperCase();
     }
 
+    public void writeDatasetToParquet(Dataset<Row> dataSet, String subDirectory) {
+
+        String path = SparkImporterVariables.getTargetFolder()+"/";
+        if(subDirectory.equals("result")) {
+            path += "result";
+        } else {
+            path += "intermediate/" + String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory;
+        }
+
+        //save dataset into parquet file
+        dataSet
+                .write()
+                .mode(SparkImporterVariables.getSaveMode())
+                .save(path);
+
+        if(SparkImporterVariables.getOutputFormat().equals(SparkImporterVariables.OUTPUT_FORMAT_CSV) && subDirectory.equals("result")) {
+            SparkSession sparkSession = SparkSession.builder().getOrCreate();
+            Dataset<Row> parquetData = sparkSession.read().load(path);
+            parquetData
+                    .coalesce(1)
+                    .write()
+                    .option("header", "true")
+                    .option("delimiter", "|")
+                    .option("ignoreLeadingWhiteSpace", "false")
+                    .option("ignoreTrailingWhiteSpace", "false")
+                    .mode(SparkImporterVariables.getSaveMode())
+                    .csv(path + "/csv");
+
+            // move resulting csv file
+            //TODO hdfs support
+            File dir = new File(path + "/csv");
+            if (!dir.isDirectory()) throw new IllegalStateException("Cannot find result folder!");
+
+            File targetFile = new File(dir + "/../result.csv");
+            for (File file : dir.listFiles()) {
+                if (file.getName().startsWith("part-")) {
+                    try {
+                        Files.move(file.toPath(), targetFile.toPath());
+                    } catch (IOException e) {
+                        SparkImporterLogger.getInstance().writeError("An error occurred during the renaming of the result file. Exception: " + e.getMessage());
+                    }
+                }
+            }
+
+            // cleanup
+            try {
+                FileUtils.cleanDirectory(dir);
+                Files.move(targetFile.toPath(), new File(dir + "/result.csv").toPath());
+            } catch (IOException e) {
+                SparkImporterLogger.getInstance().writeError("An error occurred during the renaming of the result file. Exception: " + e.getMessage());
+            }
+        }
+    }
+
     public void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory) {
         writeDatasetToCSV(dataSet, subDirectory, "|");
     }
@@ -80,7 +134,12 @@ public class SparkImporterUtils {
             dataSet = dataSet.coalesce(1);
         }
 
-        String path = SparkImporterVariables.getTargetFolder()+"/"+ (subDirectory.equals("result") ? "result" : "intermediate") + "/" + String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory;
+        String path = SparkImporterVariables.getTargetFolder()+"/";
+        if(subDirectory.equals("result")) {
+            path += "result";
+        } else {
+            path += "intermediate/" + String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory;
+        }
 
         //save dataset into CSV file
         dataSet
@@ -96,9 +155,10 @@ public class SparkImporterUtils {
             moveResultFile();
     }
 
+    //TODO delete after adding hdfs support
     private void moveResultFile() {
         //rename result file to deterministic name
-        String targetFolder = SparkImporterVariables.getTargetFolder()+"/result/"+ String.format("%02d", PreprocessingRunner.getCounter()) + "_result";
+        String targetFolder = SparkImporterVariables.getTargetFolder()+"/result";
         if(targetFolder.startsWith("hdfs")) {
             // data stored in Hadoop
             Path path = new Path(targetFolder);
@@ -111,7 +171,7 @@ public class SparkImporterUtils {
                 while(files.hasNext()) {
                     LocatedFileStatus file = files.next();
                     if(file.isFile() && file.getPath().getName().contains("part-0000")) {
-                        FileUtil.copy(fileSystem, file.getPath(), fileSystem, new Path(targetFolder + "/../result.csv"), true, conf);
+                        FileUtil.copy(fileSystem, file.getPath(), fileSystem, new Path(targetFolder + "/result.csv"), true, conf);
                     }
                 }
             } catch (IOException e) {
@@ -120,12 +180,40 @@ public class SparkImporterUtils {
         } else {
             File dir = new File(targetFolder);
             if(!dir.isDirectory()) throw new IllegalStateException("Cannot find result folder!");
-            for(File file : dir.listFiles()) {
-                if(file.getName().startsWith("part-0000")) {
-                    try {
-                        Files.move(file.toPath(), new File(dir + "/../result.csv").toPath());
-                    } catch (IOException e) {
-                        SparkImporterLogger.getInstance().writeError("An error occurred during the renaming of the result file. Exception: " + e.getMessage());
+
+            File targetFile = new File(dir + "/result.csv");
+            if(SparkImporterVariables.getSaveMode().equals(SaveMode.Overwrite)) {
+                for(File file : dir.listFiles()) {
+                    if(file.getName().startsWith("part-")) {
+                        try {
+                            Files.copy(file.toPath(), targetFile.toPath());
+                        } catch (IOException e) {
+                            SparkImporterLogger.getInstance().writeError("An error occurred during the renaming of the result file. Exception: " + e.getMessage());
+                        }
+                    }
+                }
+            } else {
+                //append
+                for(File file : dir.listFiles()) {
+                    if(file.getName().startsWith("part-")) {
+                        try {
+                            if(SparkImporterVariables.getSaveMode().equals(SaveMode.Overwrite) || !targetFile.exists()) {
+                                Files.move(file.toPath(), targetFile.toPath());
+                            } else {
+                                try (Stream<String> stream = Files.lines(Paths.get(file.toURI()))) {
+                                    stream.forEach(line -> {
+                                        try {
+                                            FileUtils.writeStringToFile(targetFile,line, true);
+                                        } catch (IOException e) {
+                                            SparkImporterLogger.getInstance().writeError("Error while appending to result csv file. Exception: " + e.getMessage());
+                                        }
+                                    });
+                                }
+                            }
+
+                        } catch (IOException e) {
+                            SparkImporterLogger.getInstance().writeError("An error occurred during the renaming of the result file. Exception: " + e.getMessage());
+                        }
                     }
                 }
             }

@@ -45,6 +45,10 @@ public class SparkImporterKafkaDataProcessingArguments {
 			"-sm" }, required = false, description = "Should the result be appended to the destination or should it be overwritten?")
 	private String saveMode = SparkImporterVariables.SAVE_MODE_APPEND;
 
+	@Parameter(names = { "--output-format",
+			"-of" }, required = false, description = "In which format should the result be written (parquet or csv)?")
+	private String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
+
 	@Parameter(names = { "--data-level",
 			"-dl" }, required = false, description = "Which level sjould the resulting data have. It can be process or activity.")
 	private String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
@@ -87,6 +91,10 @@ public class SparkImporterKafkaDataProcessingArguments {
 		return saveMode;
 	}
 
+	public String getOutputFormat() {
+		return outputFormat;
+	}
+
 	public boolean isDevTypeCastCheckEnabled() {
 		return devTypeCastCheckEnabled;
 	}
@@ -113,6 +121,7 @@ public class SparkImporterKafkaDataProcessingArguments {
 				+ '\'' + ", workingDirectory=" + workingDirectory
 				+ '\'' + ", devTypeCastCheckEnabled=" + devTypeCastCheckEnabled
 				+ '\'' + ", dataLevel=" + dataLevel
+				+ '\'' + ", outputFormat=" + outputFormat
 				+ '\'' + ", saveMode=" + saveMode
 				+ '\'' + ", logDirectory=" + logDirectory + '}';
 	}

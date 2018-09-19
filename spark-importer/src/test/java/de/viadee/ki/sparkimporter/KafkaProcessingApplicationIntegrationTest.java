@@ -21,7 +21,7 @@ public class KafkaProcessingApplicationIntegrationTest {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
         //run main class
-        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY_PROCESS, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS, "-d", "|", "-sr", "false", "-sm", "overwrite", "-wd", "./src/test/resources/config/kafka_processing_process/"};
+        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY_PROCESS, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS, "-d", "|", "-sr", "false", "-sm", "overwrite", "-of", "csv", "-wd", "./src/test/resources/config/kafka_processing_process/"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -40,7 +40,7 @@ public class KafkaProcessingApplicationIntegrationTest {
                 .option("inferSchema", "true")
                 .option("delimiter","|")
                 .option("header", "true")
-                .csv(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS + "/result/result.csv");
+                .csv(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS + "/result/csv/result.csv");
 
         //check that dataset contains 4 lines
         assertEquals(4, importedDataset.count());
@@ -59,7 +59,7 @@ public class KafkaProcessingApplicationIntegrationTest {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
         //run main class
-        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY_ACTIVITY, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_ACTIVITY, "-d", "|", "-sr", "false", "-dl", "activity", "-sm", "overwrite", "-wd", "./src/test/resources/config/kafka_processing_activity/"};
+        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY_ACTIVITY, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_ACTIVITY, "-d", "|", "-sr", "false", "-dl", "activity", "-sm", "overwrite", "-of", "csv", "-wd", "./src/test/resources/config/kafka_processing_activity/"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -78,7 +78,7 @@ public class KafkaProcessingApplicationIntegrationTest {
                 .option("inferSchema", "true")
                 .option("delimiter","|")
                 .option("header", "true")
-                .csv(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_ACTIVITY + "/result/result.csv");
+                .csv(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_ACTIVITY + "/result/csv/result.csv");
 
         //check that dataset contains 12 lines
         assertEquals(12, importedDataset.count());

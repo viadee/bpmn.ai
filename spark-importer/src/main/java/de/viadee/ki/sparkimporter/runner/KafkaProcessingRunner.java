@@ -7,7 +7,7 @@ import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggreg
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
-import de.viadee.ki.sparkimporter.processing.steps.output.WriteToCSVStep;
+import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.*;
 import de.viadee.ki.sparkimporter.util.SparkImporterKafkaDataProcessingArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
@@ -49,6 +49,7 @@ public class KafkaProcessingRunner extends SparkRunner {
         SparkImporterVariables.setDevTypeCastCheckEnabled(ARGS.isDevTypeCastCheckEnabled());
         SparkImporterVariables.setRevCountEnabled(ARGS.isRevisionCount());
         SparkImporterVariables.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
+        SparkImporterVariables.setOutputFormat(ARGS.getOutputFormat());
         SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
 
@@ -99,7 +100,7 @@ public class KafkaProcessingRunner extends SparkRunner {
         pipelineSteps.add(new PipelineStep(new AddReducedColumnsToDatasetStep(), dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "JsonVariableFilterStep" : "FillActivityInstancesHistoryStep"));
         pipelineSteps.add(new PipelineStep(new ColumnHashStep(), "AddReducedColumnsToDatasetStep"));
         pipelineSteps.add(new PipelineStep(new TypeCastStep(), "ColumnHashStep"));
-        pipelineSteps.add(new PipelineStep(new WriteToCSVStep(), "TypeCastStep"));
+        pipelineSteps.add(new PipelineStep(new WriteToDiscStep(), "TypeCastStep"));
 
         return pipelineSteps;
     }

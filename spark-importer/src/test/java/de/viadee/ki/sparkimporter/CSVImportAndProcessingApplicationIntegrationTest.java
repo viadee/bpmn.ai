@@ -22,7 +22,7 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     private static final String TEST_OUTPUT_FILE_PATH = "integration-test-result-csv/";
 
-    private static final String TEST_OUTPUT_FILE_NAME = "integration-test-result-csv/result/result.csv";
+    private static final String TEST_OUTPUT_FILE_NAME = "integration-test-result-csv/result/csv/result.csv";
 
     private static final String RESULT_FILE_DELIMITER = "\\|";
 
@@ -32,7 +32,7 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
     public static void setUpBeforeClass() throws IOException {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
-        String args[] = {"-fs", TEST_INPUT_FILE_NAME, "-fd", TEST_OUTPUT_FILE_PATH, "-d", ";", "-sr", "false", "-sm", "overwrite", "-wd", "./src/test/resources/config/csv/"};
+        String args[] = {"-fs", TEST_INPUT_FILE_NAME, "-fd", TEST_OUTPUT_FILE_PATH, "-d", ";", "-sr", "false", "-sm", "overwrite", "-of", "csv", "-wd", "./src/test/resources/config/csv/"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -144,11 +144,11 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
 //        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
-        assertEquals("C92162E610883DC02E5558CB949F2D4E", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        assertEquals("F70F6D20ED7605815A2C0E67E89626E3", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        assertEquals("17F1FC4994A0097990C5BA2CE44B3045", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+        assertEquals("54A250FFFBC2D61E7D98C68BACB67572", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+        assertEquals("17F1FC4994A0097990C5BA2CE44B3045", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+        assertEquals("F70F6D20ED7605815A2C0E67E89626E3", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
         assertEquals("FC5C76B8FC93D3F55C9A95832E82F766", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        assertEquals("54A250FFFBC2D61E7D98C68BACB67572", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        assertEquals("C92162E610883DC02E5558CB949F2D4E", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
     }
 
     private static String[] combine(String[] a, String[]... b){
