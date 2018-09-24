@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class SparkRunner {
+public abstract class SparkServiceRunner {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SparkRunner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SparkServiceRunner.class);
 
     private PipelineManager pipelineManager = null;
     protected SparkSession sparkSession = null;
@@ -33,11 +33,9 @@ public abstract class SparkRunner {
     protected String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
     private List<PipelineStep> pipelineSteps = new ArrayList<>();
 
-    protected abstract void initialize(String[] arguments);
+    protected abstract void initialize();
 
     protected abstract List<PipelineStep> buildDefaultPipeline();
-
-    protected abstract Dataset<Row> loadInitialDataset();
 
     private void checkConfig() {
         //if there is no configuration file yet, write one in the next steps
@@ -47,28 +45,16 @@ public abstract class SparkRunner {
         }
     }
 
-    private void writeConfig() {
-        //write initial config file
-        if(PreprocessingRunner.initialConfigToBeWritten) {
-            ConfigurationUtils.getInstance().writeConfigurationToFile();
-        }
-    }
-
     private void registerUDFs() {
         // register our own aggregation function
         sparkSession.udf().register("AllButEmptyString", new AllButEmptyStringAggregationFunction());
         sparkSession.udf().register("ProcessState", new ProcessStatesAggregationFunction());
     }
 
-    public void run(String[] arguments) throws FaultyConfigurationException {
-        // spark configuration is being loaded from Environment (e.g. when using spark-submit)
-        sparkSession = SparkSession.builder().getOrCreate();
-
-        registerUDFs();
-        initialize(arguments);
+    public void run(Dataset dataset) throws FaultyConfigurationException {
+        //initialize(arguments);
         checkConfig();
         configurePipelineSteps();
-        dataset = loadInitialDataset();
 
         //go through pipe elements
         // Define processing steps to run
@@ -88,12 +74,9 @@ public abstract class SparkRunner {
         String logMessage = "Job ran for " + ((endMillis - startMillis) / 1000) + " seconds in total";
         LOG.info(logMessage);
         SparkImporterLogger.getInstance().writeInfo(logMessage);
-
-        // Cleanup
-        sparkSession.close();
-
-        writeConfig();
     }
+
+
 
     public void configurePipelineSteps() throws FaultyConfigurationException {
 
