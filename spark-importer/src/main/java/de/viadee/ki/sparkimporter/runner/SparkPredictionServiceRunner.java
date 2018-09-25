@@ -1,6 +1,7 @@
 package de.viadee.ki.sparkimporter.runner;
 
 import de.viadee.ki.sparkimporter.configuration.Configuration;
+import de.viadee.ki.sparkimporter.configuration.modelprediction.ModelPredictionConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PipelineStepConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.Step;
@@ -11,20 +12,23 @@ import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggreg
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class SparkServiceRunner {
+public abstract class SparkPredictionServiceRunner {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SparkServiceRunner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SparkPredictionServiceRunner.class);
 
     private PipelineManager pipelineManager = null;
     protected SparkSession sparkSession = null;
@@ -45,16 +49,37 @@ public abstract class SparkServiceRunner {
         }
     }
 
-    private void registerUDFs() {
+    private void writeConfig() {
+        //write initial config file
+        if(PreprocessingRunner.initialConfigToBeWritten) {
+            ConfigurationUtils.getInstance().writeConfigurationToFile();
+        }
+    }
+
+    protected void registerUDFs() {
         // register our own aggregation function
         sparkSession.udf().register("AllButEmptyString", new AllButEmptyStringAggregationFunction());
         sparkSession.udf().register("ProcessState", new ProcessStatesAggregationFunction());
     }
 
-    public void run(Dataset dataset) throws FaultyConfigurationException {
-        //initialize(arguments);
+    public void setup() throws FaultyConfigurationException {
+        sparkSession = SparkSession.builder().getOrCreate();
+        initialize();
+        registerUDFs();
         checkConfig();
         configurePipelineSteps();
+    }
+
+    public Dataset<Row> run(Dataset dataset) {
+
+        //only use configured variables for pipeline
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        List<String> predictionVars = configuration.getModelPredictionConfiguration().getPredictionVariables();
+        List<Column> usedColumns = new ArrayList<>();
+        for(String var : predictionVars) {
+            usedColumns.add(new Column(var));
+        }
+        dataset = dataset.select(SparkImporterUtils.getInstance().asSeq(usedColumns));
 
         //go through pipe elements
         // Define processing steps to run
@@ -64,19 +89,13 @@ public abstract class SparkServiceRunner {
             preprocessingRunner.addPreprocessorStep(ps);
         }
 
-        final long startMillis = System.currentTimeMillis();
-
         // Run processing runner
-        preprocessingRunner.run(dataset, dataLevel);
+        Dataset<Row> resultDataset = preprocessingRunner.run(dataset, dataLevel);
 
-        final long endMillis = System.currentTimeMillis();
+        writeConfig();
 
-        String logMessage = "Job ran for " + ((endMillis - startMillis) / 1000) + " seconds in total";
-        LOG.info(logMessage);
-        SparkImporterLogger.getInstance().writeInfo(logMessage);
+        return resultDataset;
     }
-
-
 
     public void configurePipelineSteps() throws FaultyConfigurationException {
 
@@ -87,8 +106,8 @@ public abstract class SparkServiceRunner {
         if(PreprocessingRunner.initialConfigToBeWritten) {
             pipelineSteps = buildDefaultPipeline();
 
-            PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
-            PipelineStepConfiguration pipelineStepConfiguration = preprocessingConfiguration.getPipelineStepConfiguration();
+            ModelPredictionConfiguration modelPredictionConfiguration = configuration.getModelPredictionConfiguration();
+            PipelineStepConfiguration pipelineStepConfiguration = modelPredictionConfiguration.getPipelineStepConfiguration();
 
             List<Step> configSteps = new ArrayList<>();
             for(PipelineStep ps : pipelineSteps) {
@@ -104,9 +123,9 @@ public abstract class SparkServiceRunner {
             pipelineStepConfiguration.setSteps(configSteps);
         } else {
             if (configuration != null) {
-                PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
-                if (preprocessingConfiguration != null) {
-                    PipelineStepConfiguration pipelineStepConfiguration = preprocessingConfiguration.getPipelineStepConfiguration();
+                ModelPredictionConfiguration modelPredictionConfiguration = configuration.getModelPredictionConfiguration();
+                if (modelPredictionConfiguration != null) {
+                    PipelineStepConfiguration pipelineStepConfiguration = modelPredictionConfiguration.getPipelineStepConfiguration();
                     if (pipelineStepConfiguration != null) {
                         steps = pipelineStepConfiguration.getSteps();
 

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.dataextraction.DataExtractionConfiguration;
 import de.viadee.ki.sparkimporter.configuration.modellearning.ModelLearningConfiguration;
+import de.viadee.ki.sparkimporter.configuration.modelprediction.ModelPredictionConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -63,10 +64,13 @@ public class ConfigurationUtils {
 
         ModelLearningConfiguration modelLearningConfiguration = new ModelLearningConfiguration();
 
+        ModelPredictionConfiguration modelPredictionConfiguration = new ModelPredictionConfiguration();
+
         configuration = new Configuration();
         configuration.setDataExtractionConfiguration(dataExtractionConfiguration);
         configuration.setPreprocessingConfiguration(preprocessingConfiguration);
         configuration.setModelLearningConfiguration(modelLearningConfiguration);
+        configuration.setModelPredictionConfiguration(modelPredictionConfiguration);
 
         try (Writer writer = new FileWriter(SparkImporterUtils.getWorkingDirectory()+"/"+CONFIGURATION_FILE_NAME)) {
             gson.toJson(configuration, writer);

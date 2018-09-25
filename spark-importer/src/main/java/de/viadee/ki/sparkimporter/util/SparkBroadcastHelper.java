@@ -34,6 +34,9 @@ public class SparkBroadcastHelper {
     }
 
     public Object getBroadcastVariable(BROADCAST_VARIABLE name) {
-        return BROADCAST_VARIABLES.get(name).value();
+        if(BROADCAST_VARIABLES.get(name) != null)
+            return BROADCAST_VARIABLES.get(name).value();
+        else
+            return null;
     }
 }

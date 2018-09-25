@@ -1,20 +1,40 @@
 package de.viadee.ki.sparkimporter.processing.steps.importing;
 
+import de.viadee.ki.sparkimporter.configuration.Configuration;
+import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
+import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
+import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-public class KafkaImportStep implements PreprocessingStepInterface {
+public class ColumnsPreparationStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
 
+
+        List<String> predictionVariables = new ArrayList<>();
+        if(SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT)) {
+            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+            List<VariableConfiguration> variableConfigurations = configuration.getPreprocessingConfiguration().getVariableConfiguration();
+            for(VariableConfiguration vc : variableConfigurations) {
+                predictionVariables.add(vc.getVariableName());
+            }
+        }
+
         //rename columns
         for(String columnName : dataset.columns()) {
-            dataset = dataset.withColumnRenamed(columnName, columnName.replaceAll("([A-Z])","_$1").concat("_").toLowerCase());
+            if(SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)
+                    || !predictionVariables.contains(columnName)) {
+                dataset = dataset.withColumnRenamed(columnName, columnName.replaceAll("([A-Z])","_$1").concat("_").toLowerCase());
+            }
+
         }
 
         dataset = dataset
