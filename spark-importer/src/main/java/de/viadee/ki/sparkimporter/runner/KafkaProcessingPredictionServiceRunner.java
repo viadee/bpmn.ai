@@ -3,7 +3,6 @@ package de.viadee.ki.sparkimporter.runner;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.ColumnsPreparationStep;
-import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.ColumnHashStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.TypeCastStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
