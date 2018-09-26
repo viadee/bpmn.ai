@@ -4,11 +4,11 @@
     <bpmn:startEvent id="StartEvent_17olzdb" name="Start">
       <bpmn:extensionElements>
         <camunda:formData>
-          <camunda:formField id="kundenNummer" label="Kundennummer" type="long" />
-          <camunda:formField id="name" label="Kundenname" type="string" />
-          <camunda:formField id="alter" label="Kundenalter" type="long" />
-          <camunda:formField id="einkommen" label="Jahreseinkommen" type="long" />
-          <camunda:formField id="kreditsumme" label="Kreditsumme" type="long" />
+          <camunda:formField id="Kundennummer" label="Kundennummer" type="long" />
+          <camunda:formField id="Name" label="Kundenname" type="string" />
+          <camunda:formField id="Kundenalter" label="Kundenalter" type="long" />
+          <camunda:formField id="Jahreseinkommen" label="Jahreseinkommen" type="long" />
+          <camunda:formField id="Kreditsumme" label="Kreditsumme" type="long" />
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:outgoing>SequenceFlow_1o4o3c8</bpmn:outgoing>
@@ -22,7 +22,7 @@
       <bpmn:incoming>SequenceFlow_0qg6hdj</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1o4o3c8" sourceRef="StartEvent_17olzdb" targetRef="Task_0zms432" />
-    <bpmn:serviceTask id="ServiceTask_1eqaaz9" name="Vorhersage speichern" camunda:class="de.viadee.ki.servicecaller.PredictionSave">
+    <bpmn:serviceTask id="ServiceTask_1eqaaz9" name="Vorhersage ausgeben" camunda:class="de.viadee.ki.servicecaller.PredictionSave">
       <bpmn:incoming>SequenceFlow_08sgrb6</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0qg6hdj</bpmn:outgoing>
     </bpmn:serviceTask>

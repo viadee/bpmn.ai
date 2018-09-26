@@ -21,7 +21,8 @@ public class PredictionSave implements JavaDelegate {
 		JSONUtils ju = new JSONUtils();
 		String processVariables = ju.genJSONStr(execution);
 
-		LOGGER.warning(execution.getVariables().size() + "");
+		LOGGER.warning("Variablenanzahl im Prozess: " + execution.getVariables().size() + "");
+		LOGGER.warning("JSON-Darstellung der Prozessvariablen: ");
 		LOGGER.warning(processVariables);
 	}
 

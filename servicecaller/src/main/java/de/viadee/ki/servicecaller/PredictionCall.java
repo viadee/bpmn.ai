@@ -24,14 +24,15 @@ public class PredictionCall implements JavaDelegate {
         String processData = ju.genJSONStr(execution);
 
         //testing stuff
-        LOGGER.warning(execution.getVariables().size() + "");
+        LOGGER.warning("Variablenanzahl im Prozess: " + execution.getVariables().size());
+        LOGGER.warning("JSON-Darstellung der Prozessvariablen: ");
         LOGGER.warning(processData);
 
 
         PostCall pc = new PostCall();
         String prediction = pc.postCall(processData, SERVICE_ADDRESS);
 
-        LOGGER.warning("Prediction: " + prediction);
+        LOGGER.warning("Server response body: " + prediction);
 
         JsonParser parser = new JsonParser();
         JsonObject predictionObject = parser.parse(prediction).getAsJsonObject();
@@ -42,6 +43,7 @@ public class PredictionCall implements JavaDelegate {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create();
 
+        LOGGER.warning("JSON-Darstellung der Prediction: ");
         LOGGER.warning(gson.toJson(predictionObject));
     }
 
