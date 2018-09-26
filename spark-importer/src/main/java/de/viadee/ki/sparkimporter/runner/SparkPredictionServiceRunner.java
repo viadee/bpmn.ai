@@ -34,7 +34,7 @@ public abstract class SparkPredictionServiceRunner {
     protected String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
     private List<PipelineStep> pipelineSteps = new ArrayList<>();
 
-    protected abstract void initialize();
+    protected abstract void initialize(String workDirectory, String logDirectory);
 
     protected abstract List<PipelineStep> buildDefaultPipeline();
 
@@ -59,9 +59,9 @@ public abstract class SparkPredictionServiceRunner {
         sparkSession.udf().register("ProcessState", new ProcessStatesAggregationFunction());
     }
 
-    public void setup() throws FaultyConfigurationException {
+    public void setup(String workDirectory, String logDirectory) throws FaultyConfigurationException {
         sparkSession = SparkSession.builder().getOrCreate();
-        initialize();
+        initialize(workDirectory, logDirectory);
         registerUDFs();
         checkConfig();
         configurePipelineSteps();

@@ -19,10 +19,9 @@ public class KafkaProcessingPredictionServiceRunner extends SparkPredictionServi
     private static final Logger LOG = LoggerFactory.getLogger(KafkaProcessingPredictionServiceRunner.class);
 
     @Override
-    protected void initialize() {
-        //TODO add config
-        SparkImporterUtils.setWorkingDirectory("/Users/mim/Desktop/provi_service_config");
-        SparkImporterLogger.setLogDirectory("/Users/mim/Desktop/provi_service_config");
+    public void initialize(String workDirectory, String logDirectory) {
+        SparkImporterUtils.setWorkingDirectory(workDirectory);
+        SparkImporterLogger.setLogDirectory(logDirectory);
 
         SparkImporterVariables.setPipelineMode(SparkImporterVariables.PIPELINE_MODE_PREDICT);
     }
