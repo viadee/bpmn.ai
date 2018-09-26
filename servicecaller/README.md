@@ -15,7 +15,7 @@ Im Startevent werden Formulardaten abgefragt, die ggf. als Input für die Progno
 
 \* input-Variable für das Prognosemodell.
 
-![alt text](process.png "Logo Title Text 1")
+![alt text](process.PNG "Logo Title Text 1")
 
 Nach Eingabe und Absenden der Formulardaten, wird die Aktivität "Vorhersage holen" aufgerufen. Die Aktivität ist mit der Java-Klasse "PredictionCall" verknüpft. In dieser Klasse wird die DelegateExecution-Instanz, welche alle Prozessvariablen und einige Metadaten enthält, zum Anfragen der Vorhersage verwendet. Das Ergebnis der Vorhersage wird als neue Prozessinstanzvariable gespeichert.
 
