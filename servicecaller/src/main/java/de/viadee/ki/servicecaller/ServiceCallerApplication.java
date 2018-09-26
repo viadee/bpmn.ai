@@ -13,10 +13,13 @@
 
 package de.viadee.ki.servicecaller;
 
-import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@ProcessApplication("Service Caller app")
-public class ServiceCallerApplication extends ServletProcessApplication {
-  // empty implementation
+@SpringBootApplication
+public class ServiceCallerApplication {
+
+    public static void main(String... args) {
+        SpringApplication.run(ServiceCallerApplication.class, args);
+    }
 }

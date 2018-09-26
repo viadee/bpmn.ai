@@ -1,55 +1,48 @@
 package de.viadee.ki.servicecaller;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.logging.Logger;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+import org.springframework.http.HttpHeaders;
 
+/**
+ * Post
+ */
 public class PostCall {
 
     private final static Logger LOGGER = Logger.getLogger("LOAN-REQUESTS");
 
     public String postCall(String payload, String address) {
 
+        String result = null;
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        HttpClient client = builder.build();
+        HttpPost post = new HttpPost(address);
+        post.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+        HttpEntity body = new ByteArrayEntity(payload.getBytes());
+        post.setEntity(body);
+
+        HttpResponse response = null;
+
         try {
-            // "http://localhost:8080/RESTfulExample/json/product/post"
-            URL url = new URL(address);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(true);
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-
-            OutputStream os = conn.getOutputStream();
-            os.write(payload.getBytes());
-            os.flush();
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode());
-            }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (conn.getInputStream())));
-            String output;
-            LOGGER.warning("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                LOGGER.warning(output);
-            }
-            conn.disconnect();
-            return output;
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return null;
+            response = client.execute(post);
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
 
+        try {
+            result = EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+        return result;
     }
 
 

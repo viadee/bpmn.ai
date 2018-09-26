@@ -15,7 +15,14 @@ public class JSONUtils {
 
     public String genJSONStr (DelegateExecution execution) throws Exception {
 
+
         JsonObject processData = new JsonObject();
+
+        JsonObject meta = new JsonObject();
+        processData.add("meta", meta);
+
+        meta.addProperty("procDefID", execution.getProcessDefinitionId());
+        meta.addProperty("procInstID", execution.getProcessInstanceId());
 
         ObjectMapper mapper = new ObjectMapper();
         String processVariables = mapper.writeValueAsString(execution.getVariables());
@@ -23,12 +30,6 @@ public class JSONUtils {
 
         JsonObject content = parser.parse(processVariables).getAsJsonObject();
         processData.add("content", content);
-
-        JsonObject meta = new JsonObject();
-        meta.addProperty("procDefID", execution.getProcessDefinitionId());
-        meta.addProperty("procInstID", execution.getProcessInstanceId());
-
-        processData.add("meta", meta);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create();
 
