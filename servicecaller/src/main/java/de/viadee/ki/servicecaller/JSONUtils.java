@@ -7,7 +7,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import java.util.logging.Logger;
 
 /**
- *
+ * Formatieren der Daten in meta und content für die Vorhersage im JSON Format
  */
 public class JSONUtils {
 
