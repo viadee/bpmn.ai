@@ -19,10 +19,7 @@ public class KafkaProcessingPredictionServiceRunner extends SparkPredictionServi
     private static final Logger LOG = LoggerFactory.getLogger(KafkaProcessingPredictionServiceRunner.class);
 
     @Override
-    public void initialize(String workDirectory, String logDirectory) {
-        SparkImporterUtils.setWorkingDirectory(workDirectory);
-        SparkImporterLogger.setLogDirectory(logDirectory);
-
+    public void initialize() {
         SparkImporterVariables.setPipelineMode(SparkImporterVariables.PIPELINE_MODE_PREDICT);
     }
 
