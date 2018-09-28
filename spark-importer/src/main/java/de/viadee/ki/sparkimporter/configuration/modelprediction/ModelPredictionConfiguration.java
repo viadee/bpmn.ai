@@ -11,21 +11,29 @@ public class ModelPredictionConfiguration {
     @SerializedName("prediction_variables")
     private List<String> predictionVariables = new ArrayList<>();
 
-    @SerializedName("predicition_output_type")
-    private String predictionOutputType;
+    @SerializedName("model_configuration")
+    private ModelConfiguration modelConfiguration;
 
     @SerializedName("pipeline_step_configuration")
     private PipelineStepConfiguration pipelineStepConfiguration = new PipelineStepConfiguration();
+
+    @SerializedName("rolling_data")
+    private RollingDataConfiguration rollingDataConfiguration;
 
     public List<String> getPredictionVariables() {
         return predictionVariables;
     }
 
-    public String getPredictionOutputType() {
-        return predictionOutputType;
+
+    public ModelConfiguration getModelConfiguration() {
+        return modelConfiguration;
     }
 
     public PipelineStepConfiguration getPipelineStepConfiguration() {
         return pipelineStepConfiguration;
+    }
+
+    public RollingDataConfiguration getRollingDataConfiguration() {
+        return rollingDataConfiguration;
     }
 }
