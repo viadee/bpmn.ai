@@ -11,9 +11,9 @@ import java.util.logging.SimpleFormatter;
 public class SparkImporterLogger {
 
     private Logger appLogger;
-    FileHandler logFileHandler = null;
+    private static FileHandler logFileHandler = null;
 
-    private final String LOG_FILE_NAME = "spark-importer.log";
+    private static final String LOG_FILE_NAME = "spark-importer.log";
 
     private static String logDirectory = ".";
 
@@ -61,6 +61,14 @@ public class SparkImporterLogger {
 
     public static void setLogDirectory(String logDirectory) {
         SparkImporterLogger.logDirectory = logDirectory;
+        if(logFileHandler != null) {
+            logFileHandler.close();
+        }
+        try {
+            logFileHandler = new FileHandler(getLogDirectory()+"/"+LOG_FILE_NAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void writeInfo(String message) {
