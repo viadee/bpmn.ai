@@ -5,8 +5,6 @@ import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsF
 import de.viadee.ki.sparkimporter.processing.steps.importing.ColumnsPreparationStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.ColumnHashStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.TypeCastStep;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
-import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
