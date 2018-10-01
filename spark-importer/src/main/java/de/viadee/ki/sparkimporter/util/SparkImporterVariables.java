@@ -53,12 +53,16 @@ public final class SparkImporterVariables {
 
     public static final String OUTPUT_FORMAT_PARQUET = "parquet";
     public static final String OUTPUT_FORMAT_CSV = "csv";
+    
+
 
     private static String targetFolder = "";
     private static boolean devTypeCastCheckEnabled = false;
     private static boolean revCountEnabled = false;
     private static SaveMode saveMode = SaveMode.Append;
     private static String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
+    
+	public static String processDefinitionId = "null";
 
     public static String getTargetFolder() {
         return targetFolder;
@@ -98,5 +102,10 @@ public final class SparkImporterVariables {
 
     public static void setOutputFormat(String outputFormat) {
         SparkImporterVariables.outputFormat = outputFormat;
+    }
+    
+    public static void setFilter(String filter) {
+        SparkImporterVariables.processDefinitionId  = filter;
+       
     }
 }

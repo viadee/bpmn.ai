@@ -53,6 +53,10 @@ public class SparkImporterKafkaDataProcessingArguments {
 			"-dl" }, required = false, description = "Which level sjould the resulting data have. It can be process or activity.")
 	private String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
 
+	@Parameter(names = { "--process-filter",
+	"-pf" }, required = false, description = "Execute pipeline for a specific processDefinitionId.")
+	private String processDefinitionId = null;
+
 	/**
 	 * Singleton.
 	 */
@@ -101,6 +105,10 @@ public class SparkImporterKafkaDataProcessingArguments {
 
 	public String getDataLevel() {
 		return dataLevel;
+	}
+	
+	public String getFilter() {
+		return processDefinitionId;
 	}
 
 	/**

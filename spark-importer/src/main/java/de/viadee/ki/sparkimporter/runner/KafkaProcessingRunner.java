@@ -52,8 +52,12 @@ public class KafkaProcessingRunner extends SparkRunner {
         SparkImporterVariables.setOutputFormat(ARGS.getOutputFormat());
         SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
+        
+        SparkImporterVariables.setFilter(ARGS.getFilter());
+     
 
         dataLevel = ARGS.getDataLevel();
+        
 
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 
