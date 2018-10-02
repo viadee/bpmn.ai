@@ -22,7 +22,7 @@ This application (application class: CSVImportAndProcessingApplication) takes da
 The SQL statement for exporting the data from Camunda is as follows:
 
 	SELECT * FROM ACT_HI_PROCINST a JOIN ACT_HI_VARINST v ON a.PROC_INST_ID_ = v.PROC_INST_ID_ AND a.proc_def_key_ = 'XYZ'
-	
+
 ### Parameters
 
 Parameter                 | Description                | mandatory
@@ -37,6 +37,7 @@ Parameter                 | Description                | mandatory
 -sm or --save-mode        | Should the result be appended to the destination or should it be overwritten? | no (default is append)
 -of or --output-format    | In which format should the result be written (parquet or csv) | no (default is parquet) 
 -devtcc or --dev-type-cast-check | Development feature: Check for type casting errors of columns. | no (default is false)
+--process-filter or -pf | The pipeline can be executed for a reduced datset of a specific processDefinitionId | no (default are all processes) 
 
 ## Kafka Import
 
@@ -138,7 +139,7 @@ It contains three sections:
 	* Data extraction
 	* Preprocessing
 	* Model learning
-	
+
 ### Data extraction
 This section contains configuration applied to the data during loading it for processing.
 
@@ -150,7 +151,7 @@ It takes a SQL expression as an input which is applied to the filter method as d
 Example:
 
 	processDefinitionId == 'p1'
-	
+
 ### Preprocessing
 This section contains configuration applied to the data during processing.
 
@@ -221,7 +222,7 @@ Example:
     ],
     ...
 ```
-    
+
 ### column\_configuration
 
 After the first run this array is filled with all columns found in the data and can be amended by the user for the following runs. Works analogous to the variableConfiguration.
@@ -327,14 +328,14 @@ This defines that Spark should run in local standalone mode and utilise all CPUs
 Here you define the parameters of the respective Spark application. You need to define the parameters as listed above, e.g.
 
 	-fs <path_to_input_csv> -fd <path_to_target_folder_for_results> -d <field_delimiter>
-	
+
 Now you can run the application via the run configuration.
 
 ## Run with spark-submit
 In order to run the application with spark-submit you first need to package the applcation to a JAR file with maven.
 
 	mvn clean package
-	
+
 Then you can run the spark-submit command from the bin folder of your Apache Spark installation by referencing the created JAR file and the Spark application class you would like to run including its parameters.
 
 	bin/spark-submit --class de.viadee.ki.sparkimporter.SparkImporterCSVApplication --master "local[*]" --deploy-mode client --name ViadeeSparkImporter <path_to_packaged_jar> -fs <path_to_input_csv> -fd <path_to_target_folder_for_results> -d <field_delimiter>

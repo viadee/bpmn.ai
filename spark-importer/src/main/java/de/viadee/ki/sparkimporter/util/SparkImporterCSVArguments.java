@@ -54,6 +54,10 @@ public class SparkImporterCSVArguments {
 	@Parameter(names = { "--dev-type-cast-check",
 			"-devtcc" }, required = false, description = "Development feature: Check for type casting errors of columns.", arity = 1)
 	private boolean devTypeCastCheckEnabled = false;
+	
+	@Parameter(names = { "--process-filter",
+	"-pf" }, required = false, description = "Execute pipeline for a specific processDefinitionId.")
+	private String processDefinitionId = null;
 
 	/**
 	 * Singleton.
@@ -99,6 +103,10 @@ public class SparkImporterCSVArguments {
 
 	public boolean isDevTypeCastCheckEnabled() {
 		return devTypeCastCheckEnabled;
+	}
+	
+	public String getFilter() {
+		return processDefinitionId;
 	}
 
 	/**

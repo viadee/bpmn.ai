@@ -80,6 +80,8 @@ public class KafkaImportRunner extends SparkRunner {
         SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
         SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
+        
+        SparkImporterVariables.setFilter(ARGS.getFilter());
 
         dataLevel = ARGS.getDataLevel();
 

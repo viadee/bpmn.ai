@@ -51,6 +51,8 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
         SparkImporterVariables.setOutputFormat(ARGS.getOutputFormat());
         SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
+        
+        SparkImporterVariables.setFilter(ARGS.getFilter());
 
         dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
 

@@ -113,8 +113,7 @@ public final class SparkImporterVariables {
 
     
     public static void setFilter(String filter) {
-        SparkImporterVariables.processDefinitionId  = filter;
-       
+        SparkImporterVariables.processDefinitionId  = filter;  
     }
 
     public static String getPipelineMode() {
