@@ -12,6 +12,7 @@ import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterfa
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
+import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -37,13 +38,19 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         // get variables
         Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
 
-        //convert to String array so it is serializable and can be used in map function
-        Set<String> variables = varMap.keySet();
-        String[] vars = new String[variables.size()];
-        int vc = 0;
-        for(String v : variables) {
-            vars[vc++] = v;
+        String[] vars = null;
+        if(SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
+            //convert to String array so it is serializable and can be used in map function
+            Set<String> variables = varMap.keySet();
+            vars = new String[variables.size()];
+            int vc = 0;
+            for(String v : variables) {
+                vars[vc++] = v;
+            }
         }
+
+        final String[] finalVars = vars;
+
 
         String[] columns = dataset.columns();
         StructType schema = dataset.schema();
@@ -53,7 +60,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         Dataset<Row> newColumnsDataset = dataset.flatMap((FlatMapFunction<Row, Row>) row -> {
             List<Row> newColumns = new ArrayList<>();
             for (String c : columns) {
-                if (Arrays.asList(vars).contains(c)) {
+                if (SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
                     //it was a variable, so try to parse as json
                     ObjectMapper mapper = new ObjectMapper();
                     JsonFactory factory = mapper.getFactory();
@@ -106,7 +113,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
             for(String c : columns) {
                 String columnValue = null;
-                if(Arrays.asList(vars).contains(c)) {
+                if (SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
                     //it was a variable, so try to parse as json
                     ObjectMapper mapper = new ObjectMapper();
                     JsonFactory factory = mapper.getFactory();
@@ -161,53 +168,54 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         }, RowEncoder.apply(newSchema1));
 
 
-        //create new Dataset
-        //write column names into list
-        List<Row> filteredVariablesRows = new ArrayList<>();
+        if (SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
+            //create new Dataset
+            //write column names into list
+            List<Row> filteredVariablesRows = new ArrayList<>();
 
-        for(String name : newColumns) {
-            //these are always string in the beginning
-            String type = "string";
+            for(String name : newColumns) {
+                //these are always string in the beginning
+                String type = "string";
 
-            // add new column to variables list for later processing
-            varMap.put(name, type);
+                // add new column to variables list for later processing
+                varMap.put(name, type);
 
-            filteredVariablesRows.add(RowFactory.create(name, type));
+                filteredVariablesRows.add(RowFactory.create(name, type));
 
-            // add new variables to configuration
-            if(PreprocessingRunner.initialConfigToBeWritten) {
-                Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
-                VariableConfiguration variableConfiguration = new VariableConfiguration();
-                variableConfiguration.setVariableName(name);
-                variableConfiguration.setVariableType(type);
-                variableConfiguration.setUseVariable(true);
-                variableConfiguration.setComment("");
-                configuration.getPreprocessingConfiguration().getVariableConfiguration().add(variableConfiguration);
+                // add new variables to configuration
+                if(PreprocessingRunner.initialConfigToBeWritten) {
+                    Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+                    VariableConfiguration variableConfiguration = new VariableConfiguration();
+                    variableConfiguration.setVariableName(name);
+                    variableConfiguration.setVariableType(type);
+                    variableConfiguration.setUseVariable(true);
+                    variableConfiguration.setComment("");
+                    configuration.getPreprocessingConfiguration().getVariableConfiguration().add(variableConfiguration);
+                }
             }
-        }
 
-        //update variables list with new from json processing
-        SparkBroadcastHelper.getInstance().broadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED, varMap);
-
-
-        StructType schemaVars = new StructType(new StructField[] {
-                new StructField(VAR_PROCESS_INSTANCE_VARIABLE_NAME,
-                        DataTypes.StringType, false,
-                        Metadata.empty()),
-                new StructField(VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
-                        DataTypes.StringType, false,
-                        Metadata.empty())
-        });
-
-        SparkImporterLogger.getInstance().writeInfo("Found " + newColumns.size() + " additional variables during Json processing.");
-
-        SparkSession sparkSession = SparkSession.builder().getOrCreate();
-        Dataset<Row> helpDataSet = sparkSession.createDataFrame(filteredVariablesRows, schemaVars).toDF().orderBy(VAR_PROCESS_INSTANCE_VARIABLE_NAME);
-        SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_after_json_escalated");
+            //update variables list with new from json processing
+            SparkBroadcastHelper.getInstance().broadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED, varMap);
 
 
-        if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "create_columns_from_json");
+            StructType schemaVars = new StructType(new StructField[] {
+                    new StructField(VAR_PROCESS_INSTANCE_VARIABLE_NAME,
+                            DataTypes.StringType, false,
+                            Metadata.empty()),
+                    new StructField(VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
+                            DataTypes.StringType, false,
+                            Metadata.empty())
+            });
+
+            SparkImporterLogger.getInstance().writeInfo("Found " + newColumns.size() + " additional variables during Json processing.");
+
+            SparkSession sparkSession = SparkSession.builder().getOrCreate();
+            Dataset<Row> helpDataSet = sparkSession.createDataFrame(filteredVariablesRows, schemaVars).toDF().orderBy(VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+            SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_after_json_escalated");
+
+            if(writeStepResultIntoFile) {
+                SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "create_columns_from_json");
+            }
         }
 
         //return preprocessed data

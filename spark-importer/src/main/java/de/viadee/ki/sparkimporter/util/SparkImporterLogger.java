@@ -10,21 +10,29 @@ import java.util.logging.SimpleFormatter;
 
 public class SparkImporterLogger {
 
-    private Logger appLogger;
-    FileHandler logFileHandler = null;
+    private static Logger appLogger;
+    private static FileHandler logFileHandler = null;
 
-    private final String LOG_FILE_NAME = "spark-importer.log";
+    private static final String LOG_FILE_NAME = "spark-importer.log";
 
     private static String logDirectory = ".";
 
     private static SparkImporterLogger instance;
 
     private SparkImporterLogger(){
+        setupLogger();
+    }
+
+    private static void setupLogger() {
+        File logDirectory  = new File(getLogDirectory());
+        if(!logDirectory.exists()) {
+            logDirectory.mkdir();
+        }
+        if(logFileHandler != null) {
+            logFileHandler.close();
+        }
         try {
-            File logDirectory  = new File(getLogDirectory());
-            if(!logDirectory.exists()) {
-                logDirectory.mkdir();
-            }
+
             logFileHandler = new FileHandler(getLogDirectory()+"/"+LOG_FILE_NAME);
 
             logFileHandler.setFormatter(new SimpleFormatter() {
@@ -42,10 +50,10 @@ public class SparkImporterLogger {
 
             appLogger = Logger.getLogger("de.viadee.ki.spark.importer");
             appLogger.addHandler(logFileHandler);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     public static synchronized SparkImporterLogger getInstance(){
@@ -61,6 +69,7 @@ public class SparkImporterLogger {
 
     public static void setLogDirectory(String logDirectory) {
         SparkImporterLogger.logDirectory = logDirectory;
+        setupLogger();
     }
 
     public void writeInfo(String message) {

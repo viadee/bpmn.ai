@@ -25,7 +25,7 @@ public class PreprocessingRunner {
 
     public PreprocessingRunner(){}
 
-    public void run(Dataset<Row> dataset, String dataLevel) {
+    public Dataset<Row> run(Dataset<Row> dataset, String dataLevel) {
         helper_datasets.clear();
         helper_datasets.put(DATASET_INITIAL + "_" + dataLevel, dataset);
 
@@ -33,7 +33,7 @@ public class PreprocessingRunner {
             if(ps.getPreprocessingStep() != null)
             dataset = ps.getPreprocessingStep().runPreprocessingStep(dataset, writeStepResultsIntoFile, dataLevel, ps.getStepParameters());
         }
-
+        return dataset;
     }
 
     public void addPreprocessorStep(PipelineStep step) {

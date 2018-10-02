@@ -3,8 +3,6 @@ package de.viadee.ki.sparkimporter.runner;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggregationFunction;
-import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep;
@@ -30,7 +28,7 @@ public class KafkaProcessingRunner extends SparkRunner {
     public static SparkImporterKafkaDataProcessingArguments ARGS;
 
     @Override
-    public void initialize(String[] arguments) {
+    protected void initialize(String[] arguments) {
         ARGS = SparkImporterKafkaDataProcessingArguments.getInstance();
 
         // instantiate JCommander
@@ -63,10 +61,6 @@ public class KafkaProcessingRunner extends SparkRunner {
 
         // Delete destination files, required to avoid exception during runtime
         FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
-
-        // register our own aggregation function
-        sparkSession.udf().register("AllButEmptyString", new AllButEmptyStringAggregationFunction());
-        sparkSession.udf().register("ProcessState", new ProcessStatesAggregationFunction());
 
         SparkImporterLogger.getInstance().writeInfo("Starting data processing with data from: " + ARGS.getFileSource());
     }

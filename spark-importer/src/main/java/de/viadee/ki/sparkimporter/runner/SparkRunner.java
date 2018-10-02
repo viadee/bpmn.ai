@@ -7,6 +7,8 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.Step;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
+import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggregationFunction;
+import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
@@ -52,10 +54,17 @@ public abstract class SparkRunner {
         }
     }
 
+    private void registerUDFs() {
+        // register our own aggregation function
+        sparkSession.udf().register("AllButEmptyString", new AllButEmptyStringAggregationFunction());
+        sparkSession.udf().register("ProcessState", new ProcessStatesAggregationFunction());
+    }
+
     public void run(String[] arguments) throws FaultyConfigurationException {
         // spark configuration is being loaded from Environment (e.g. when using spark-submit)
         sparkSession = SparkSession.builder().getOrCreate();
 
+        registerUDFs();
         initialize(arguments);
         checkConfig();
         configurePipelineSteps();

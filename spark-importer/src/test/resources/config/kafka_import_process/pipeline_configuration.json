@@ -8,14 +8,14 @@
     "pipeline_step_configuration": {
       "steps": [
         {
-          "id": "KafkaImportStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.importing.KafkaImportStep",
+          "id": "ColumnsPreparationStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.importing.ColumnsPreparationStep",
           "dependsOn": ""
         },
         {
           "id": "InitialCleanupStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep",
-          "dependsOn": "KafkaImportStep"
+          "dependsOn": "ColumnsPreparationStep"
         },
         {
           "id": "WriteToDataSinkStep",

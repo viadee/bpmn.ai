@@ -3,6 +3,7 @@ package de.viadee.ki.sparkimporter.configuration;
 import com.google.gson.annotations.SerializedName;
 import de.viadee.ki.sparkimporter.configuration.dataextraction.DataExtractionConfiguration;
 import de.viadee.ki.sparkimporter.configuration.modellearning.ModelLearningConfiguration;
+import de.viadee.ki.sparkimporter.configuration.modelprediction.ModelPredictionConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 
 public class Configuration {
@@ -15,6 +16,9 @@ public class Configuration {
 
     @SerializedName("model_learning")
     private ModelLearningConfiguration modelLearningConfiguration;
+
+    @SerializedName("model_prediction")
+    private ModelPredictionConfiguration modelPredictionConfiguration;
 
     public DataExtractionConfiguration getDataExtractionConfiguration() {
         return dataExtractionConfiguration;
@@ -38,6 +42,14 @@ public class Configuration {
 
     public void setModelLearningConfiguration(ModelLearningConfiguration modelLearningConfiguration) {
         this.modelLearningConfiguration = modelLearningConfiguration;
+    }
+
+    public ModelPredictionConfiguration getModelPredictionConfiguration() {
+        return modelPredictionConfiguration;
+    }
+
+    public void setModelPredictionConfiguration(ModelPredictionConfiguration modelPredictionConfiguration) {
+        this.modelPredictionConfiguration = modelPredictionConfiguration;
     }
 }
 

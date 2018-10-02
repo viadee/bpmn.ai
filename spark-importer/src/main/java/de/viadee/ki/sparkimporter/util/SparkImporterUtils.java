@@ -6,7 +6,10 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
-import org.apache.spark.sql.*;
+import org.apache.spark.sql.Column;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import scala.collection.JavaConversions;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -16,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -24,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 public class SparkImporterUtils {
 
@@ -81,11 +82,11 @@ public class SparkImporterUtils {
         dataSet
                 .write()
                 .mode(SparkImporterVariables.getSaveMode())
-                .save(targetFolder);
+                .save(targetFolder + "/parquet");
 
         if(SparkImporterVariables.getOutputFormat().equals(SparkImporterVariables.OUTPUT_FORMAT_CSV) && subDirectory.equals("result")) {
             SparkSession sparkSession = SparkSession.builder().getOrCreate();
-            Dataset<Row> parquetData = sparkSession.read().load(targetFolder);
+            Dataset<Row> parquetData = sparkSession.read().load(targetFolder + "/parquet");
             parquetData
                     .coalesce(1)
                     .write()

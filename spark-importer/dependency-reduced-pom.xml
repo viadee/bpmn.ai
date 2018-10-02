@@ -170,12 +170,6 @@
       <version>2.6.7.1</version>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>info.debatty</groupId>
-      <artifactId>java-string-similarity</artifactId>
-      <version>1.1.0</version>
-      <scope>compile</scope>
-    </dependency>
   </dependencies>
   <reporting>
     <excludeDefaults>true</excludeDefaults>
@@ -220,7 +214,6 @@
     <kafka.version>0.11.0.3</kafka.version>
     <jcommander.version>1.72</jcommander.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ignite.version>2.6.0</ignite.version>
     <jackson.version>2.6.7.1</jackson.version>
     <spark.version>2.3.1</spark.version>
     <maven.compiler.source>1.8</maven.compiler.source>

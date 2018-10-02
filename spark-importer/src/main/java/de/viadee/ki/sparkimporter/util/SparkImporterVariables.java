@@ -56,13 +56,20 @@ public final class SparkImporterVariables {
     
 
 
+    public static final String PIPELINE_MODE_LEARN = "learn";
+    public static final String PIPELINE_MODE_PREDICT = "predict";
+
     private static String targetFolder = "";
     private static boolean devTypeCastCheckEnabled = false;
     private static boolean revCountEnabled = false;
     private static SaveMode saveMode = SaveMode.Append;
     private static String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
+
     
 	public static String processDefinitionId = "null";
+
+    private static String pipelineMode = SparkImporterVariables.PIPELINE_MODE_LEARN;
+
 
     public static String getTargetFolder() {
         return targetFolder;
@@ -103,9 +110,19 @@ public final class SparkImporterVariables {
     public static void setOutputFormat(String outputFormat) {
         SparkImporterVariables.outputFormat = outputFormat;
     }
+
     
     public static void setFilter(String filter) {
         SparkImporterVariables.processDefinitionId  = filter;
        
+    }
+
+    public static String getPipelineMode() {
+        return pipelineMode;
+    }
+
+    public static void setPipelineMode(String pipelineMode) {
+        SparkImporterVariables.pipelineMode = pipelineMode;
+
     }
 }

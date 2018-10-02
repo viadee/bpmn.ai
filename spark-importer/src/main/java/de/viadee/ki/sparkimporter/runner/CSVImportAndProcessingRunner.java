@@ -3,8 +3,6 @@ package de.viadee.ki.sparkimporter.runner;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
-import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggregationFunction;
-import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
@@ -62,10 +60,6 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
         if(SparkImporterVariables.getSaveMode().equals(SaveMode.Overwrite)) {
             FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
         }
-
-        // register our own aggregation function
-        sparkSession.udf().register("AllButEmptyString", new AllButEmptyStringAggregationFunction());
-        sparkSession.udf().register("ProcessState", new ProcessStatesAggregationFunction());
 
         SparkImporterLogger.getInstance().writeInfo("Starting CSV import and processing");
         SparkImporterLogger.getInstance().writeInfo("Importing CSV file: " + ARGS.getFileSource());
