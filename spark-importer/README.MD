@@ -37,7 +37,7 @@ Parameter                 | Description                | mandatory
 -sm or --save-mode        | Should the result be appended to the destination or should it be overwritten? | no (default is append)
 -of or --output-format    | In which format should the result be written (parquet or csv) | no (default is parquet) 
 -devtcc or --dev-type-cast-check | Development feature: Check for type casting errors of columns. | no (default is false)
---process-filter or -pf | The pipeline can be executed for a reduced datset of a specific processDefinitionId | no (default are all processes) 
+-pf or --process-filter | The pipeline can be executed for a reduced datset of a specific processDefinitionId | no (default are all processes) 
 
 ## Kafka Import
 
@@ -59,6 +59,7 @@ Parameter                 | Description	                | mandatory
 -sr or --step-results     | Defines if intermediate results be written into CSV files. | no (default is false)
 -wd or --working-directory| Folder where the configuration files are stored or should be stored. | no (default is the current directory)
 -ld or --log-directory| Folder where the log files should be stored. | no (default is the current directory)
+-pf or --process-filter | The pipeline can be executed for a reduced datset of a specific processDefinitionId | no (default are all processes) 
 
 ## Kafka Processing
 
@@ -78,8 +79,22 @@ Parameter                 | Description                | mandatory
 -sm or --save-mode        | Should the result be appended to the destination or should it be overwritten? | no (default is append)
 -of or --output-format    | In which format should the result be written (parquet or csv) | no (default is parquet) 
 -devtcc or --dev-type-cast-check | Development feature: Check for type casting errors of columns. | no (default is false)
+-pf or --process-filter | The pipeline can be executed for a reduced datset of a specific processDefinitionId | no (default are all processes) 
+
+### Example
+
+As an example, the following arguments can be set in the "Run Configuration" when running the applications.
+
+Program Arguments: 
+`-fs ".\process" -fd ".\output" -d ";" -rc "false" -sr "true" -wd ".\" -ld ".\" -sm "overwrite" -of "csv" -devtcc "true" -pf "00cee522"`
+
+VM Arguments:
+
+`-Dspark.master=local[*]`
+
 
 ## Configuration
+
 Some steps in the processing can be controlled by the user (see chapter "Data processing steps" for details). The configuration is done in a file named "pipeline_configuration.json" which should be located in the working-directory. If there is no configuration file the applications will create one, filled the variables found in the data and default configurations for them, which would result is no change if run again with this configuration.
 
 The configuration file has the following structure:
