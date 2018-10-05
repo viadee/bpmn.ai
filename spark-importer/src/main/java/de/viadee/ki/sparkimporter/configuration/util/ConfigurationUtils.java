@@ -31,6 +31,10 @@ public class ConfigurationUtils {
         return instance;
     }
 
+    public String getConfigurationFileName() {
+        return CONFIGURATION_FILE_NAME;
+    }
+
     public Configuration getConfiguration() {
         return this.getConfiguration(false);
     }
