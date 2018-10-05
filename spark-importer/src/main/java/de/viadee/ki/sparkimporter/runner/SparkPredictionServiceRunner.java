@@ -17,8 +17,11 @@ import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.api.java.UDF1;
+import org.apache.spark.sql.types.DataTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spark_project.guava.primitives.Longs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +60,25 @@ public abstract class SparkPredictionServiceRunner {
         // register our own aggregation function
         sparkSession.udf().register("AllButEmptyString", new AllButEmptyStringAggregationFunction());
         sparkSession.udf().register("ProcessState", new ProcessStatesAggregationFunction());
+        sparkSession.udf().register("isALong", new UDF1<Object, Boolean>() {
+            @Override
+            public Boolean call(Object o) throws Exception {
+                if(o instanceof Long)
+                    return true;
+                if(o instanceof String && Longs.tryParse((String) o) != null)
+                    return true;
+                return false;
+            }
+        }, DataTypes.BooleanType);
+        sparkSession.udf().register("timestampStringToLong", new UDF1<Object, Long>() {
+            @Override
+            public Long call(Object o) throws Exception {
+                if(o instanceof String && Longs.tryParse((String) o) != null) {
+                    return Longs.tryParse((String) o) / 1000;
+                }
+                return null;
+            }
+        }, DataTypes.LongType);
     }
 
     public void setup() throws FaultyConfigurationException {

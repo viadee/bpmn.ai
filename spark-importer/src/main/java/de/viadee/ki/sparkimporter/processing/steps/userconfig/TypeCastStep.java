@@ -125,16 +125,16 @@ public class TypeCastStep implements PreprocessingStepInterface {
         if(newDataType.equals(DataTypes.DateType)) {
             if(parseFormat != null && !parseFormat.equals("")) {
                 // parse format given in config, so use it
-                newDataset = dataset.withColumn(castColumnName, to_date(dataset.col(columnToCast), parseFormat));
+                newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_date(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))), parseFormat)).otherwise(to_date(dataset.col(columnToCast), parseFormat)));
             } else {
-                newDataset = dataset.withColumn(castColumnName, to_date(dataset.col(columnToCast)));
+                newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_date(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))))).otherwise(to_date(dataset.col(columnToCast))));
             }
         } else if(newDataType.equals(DataTypes.TimestampType)) {
             if(parseFormat != null && !parseFormat.equals("")) {
                 // parse format given in config, so use it
-                newDataset = dataset.withColumn(castColumnName, to_timestamp(dataset.col(columnToCast), parseFormat));
+                newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_timestamp(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))), parseFormat)).otherwise(to_timestamp(dataset.col(columnToCast), parseFormat)));
             } else {
-                newDataset = dataset.withColumn(castColumnName, to_timestamp(dataset.col(columnToCast)));
+                newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_timestamp(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))))).otherwise(to_timestamp(dataset.col(columnToCast))));
             }
         } else {
             newDataset = dataset.withColumn(castColumnName, dataset.col(columnToCast).cast(newDataType));
