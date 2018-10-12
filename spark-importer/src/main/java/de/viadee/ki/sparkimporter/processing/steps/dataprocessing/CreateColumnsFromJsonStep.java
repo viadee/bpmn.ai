@@ -178,8 +178,6 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
                 String type = "string";
 
                 // add new column to variables list for later processing
-                varMap.put(name, type);
-
                 filteredVariablesRows.add(RowFactory.create(name, type));
 
                 // add new variables to configuration
@@ -193,10 +191,6 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
                     configuration.getPreprocessingConfiguration().getVariableConfiguration().add(variableConfiguration);
                 }
             }
-
-            //update variables list with new from json processing
-            SparkBroadcastHelper.getInstance().broadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED, varMap);
-
 
             StructType schemaVars = new StructType(new StructField[] {
                     new StructField(VAR_PROCESS_INSTANCE_VARIABLE_NAME,

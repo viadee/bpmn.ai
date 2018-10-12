@@ -6,6 +6,7 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfi
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -26,6 +27,9 @@ public class TypeCastStep implements PreprocessingStepInterface {
 
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+
+        // get variables
+        Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
 
         List<StructField> datasetFields = Arrays.asList(dataset.schema().fields());
 
@@ -70,7 +74,7 @@ public class TypeCastStep implements PreprocessingStepInterface {
                 // was initially a variable
                 configurationDataType = variableTypeConfigMap.get(column).getVariableType();
                 configurationParseFormat = variableTypeConfigMap.get(column).getParseFormat();
-                isVariableColumn = true;
+                isVariableColumn = varMap.keySet().contains(column);
             } else if(columnTypeConfigMap.keySet().contains(column)){
                 // was initially a column
                 configurationDataType = columnTypeConfigMap.get(column).getColumnType();
