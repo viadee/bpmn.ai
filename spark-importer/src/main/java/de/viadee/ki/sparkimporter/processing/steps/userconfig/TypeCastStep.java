@@ -74,7 +74,11 @@ public class TypeCastStep implements PreprocessingStepInterface {
                 // was initially a variable
                 configurationDataType = variableTypeConfigMap.get(column).getVariableType();
                 configurationParseFormat = variableTypeConfigMap.get(column).getParseFormat();
-                isVariableColumn = varMap.keySet().contains(column);
+                if (SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
+                    isVariableColumn = varMap.keySet().contains(column);
+                } else {
+                    isVariableColumn = true;
+                }
             } else if(columnTypeConfigMap.keySet().contains(column)){
                 // was initially a column
                 configurationDataType = columnTypeConfigMap.get(column).getColumnType();
