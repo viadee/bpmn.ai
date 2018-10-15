@@ -41,6 +41,10 @@ public class SparkImporterKafkaDataProcessingArguments {
 			"-devtcc" }, required = false, description = "Development feature: Check for type casting errors of columns.", arity = 1)
 	private boolean devTypeCastCheckEnabled = false;
 
+	@Parameter(names = { "--dev-process-state-column-workaround",
+			"-devpscw" }, required = false, description = "Development feature: If the process state column is empty in source data (e.g. due to an older Camunda version) the matching is done on variable name column instead. Only works if data level is process!", arity = 1)
+	private boolean devProcessStateColumnWorkaroundEnabled = false;
+
 	@Parameter(names = { "--save-mode",
 			"-sm" }, required = false, description = "Should the result be appended to the destination or should it be overwritten?")
 	private String saveMode = SparkImporterVariables.SAVE_MODE_APPEND;
@@ -103,6 +107,10 @@ public class SparkImporterKafkaDataProcessingArguments {
 		return devTypeCastCheckEnabled;
 	}
 
+	public boolean isDevProcessStateColumnWorkaroundEnabled() {
+		return devProcessStateColumnWorkaroundEnabled;
+	}
+
 	public String getDataLevel() {
 		return dataLevel;
 	}
@@ -128,6 +136,7 @@ public class SparkImporterKafkaDataProcessingArguments {
 				+ '\'' + ", writeStepResultsToCSV='" + writeStepResultsToCSV
 				+ '\'' + ", workingDirectory=" + workingDirectory
 				+ '\'' + ", devTypeCastCheckEnabled=" + devTypeCastCheckEnabled
+				+ '\'' + ", devProcessStateColumnWorkaroundEnabled=" + devProcessStateColumnWorkaroundEnabled
 				+ '\'' + ", dataLevel=" + dataLevel
 				+ '\'' + ", outputFormat=" + outputFormat
 				+ '\'' + ", saveMode=" + saveMode

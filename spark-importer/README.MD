@@ -37,6 +37,7 @@ Parameter                 | Description                | mandatory
 -sm or --save-mode        | Should the result be appended to the destination or should it be overwritten? | no (default is append)
 -of or --output-format    | In which format should the result be written (parquet or csv) | no (default is parquet) 
 -devtcc or --dev-type-cast-check | Development feature: Check for type casting errors of columns. | no (default is false)
+-devpscw or --dev-process-state-column-workaround | Development feature: If the process state column is empty in source data (e.g. due to an older Camunda version) the matching is done on variable name column instead. Only works if data level is process! | no (default is false)
 -pf or --process-filter | The pipeline can be executed for a reduced datset of a specific processDefinitionId | no (default are all processes) 
 
 ## Kafka Import
@@ -79,6 +80,7 @@ Parameter                 | Description                | mandatory
 -sm or --save-mode        | Should the result be appended to the destination or should it be overwritten? | no (default is append)
 -of or --output-format    | In which format should the result be written (parquet or csv) | no (default is parquet) 
 -devtcc or --dev-type-cast-check | Development feature: Check for type casting errors of columns. | no (default is false)
+-devpscw or --dev-process-state-column-workaround | Development feature: If the process state column is empty in source data (e.g. due to an older Camunda version) the matching is done on variable name column instead. Only works if data level is process! | no (default is false)
 -pf or --process-filter | The pipeline can be executed for a reduced datset of a specific processDefinitionId | no (default are all processes) 
 
 ### Example

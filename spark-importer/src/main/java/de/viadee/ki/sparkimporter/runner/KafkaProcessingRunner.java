@@ -2,6 +2,7 @@ package de.viadee.ki.sparkimporter.runner;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
@@ -45,6 +46,7 @@ public class KafkaProcessingRunner extends SparkRunner {
         //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
         SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
         SparkImporterVariables.setDevTypeCastCheckEnabled(ARGS.isDevTypeCastCheckEnabled());
+        SparkImporterVariables.setDevProcessStateColumnWorkaroundEnabled(ARGS.isDevProcessStateColumnWorkaroundEnabled());
         SparkImporterVariables.setRevCountEnabled(ARGS.isRevisionCount());
         SparkImporterVariables.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
         SparkImporterVariables.setOutputFormat(ARGS.getOutputFormat());
@@ -52,10 +54,17 @@ public class KafkaProcessingRunner extends SparkRunner {
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
         
         SparkImporterVariables.setFilter(ARGS.getFilter());
-     
 
         dataLevel = ARGS.getDataLevel();
-        
+
+        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+            try {
+                throw new FaultyConfigurationException("Process state workaround option cannot be used with activity data level.");
+            } catch (FaultyConfigurationException e) {
+                e.printStackTrace();
+                System.exit(-1);
+            }
+        }
 
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 

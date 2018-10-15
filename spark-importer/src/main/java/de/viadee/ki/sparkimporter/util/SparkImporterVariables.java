@@ -61,6 +61,7 @@ public final class SparkImporterVariables {
 
     private static String targetFolder = "";
     private static boolean devTypeCastCheckEnabled = false;
+    private static boolean devProcessStateColumnWorkaroundEnabled = false;
     private static boolean revCountEnabled = false;
     private static SaveMode saveMode = SaveMode.Append;
     private static String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
@@ -85,6 +86,14 @@ public final class SparkImporterVariables {
 
     public static void setDevTypeCastCheckEnabled(boolean devTypeCastCheckEnabled) {
         SparkImporterVariables.devTypeCastCheckEnabled = devTypeCastCheckEnabled;
+    }
+
+    public static boolean isDevProcessStateColumnWorkaroundEnabled() {
+        return devProcessStateColumnWorkaroundEnabled;
+    }
+
+    public static void setDevProcessStateColumnWorkaroundEnabled(boolean devProcessStateColumnWorkaroundEnabled) {
+        SparkImporterVariables.devProcessStateColumnWorkaroundEnabled = devProcessStateColumnWorkaroundEnabled;
     }
 
     public static boolean isRevCountEnabled() {

@@ -3,6 +3,7 @@ package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -33,9 +34,14 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
             }
         }
 
+        Column filter = not(isnull(dataset.col(SparkImporterVariables.VAR_STATE)));
+        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+            filter = isnull(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME));
+        }
+
         //first aggregation
         Dataset<Row> datasetPIAgg = dataset
-                .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_STATE))))
+                .filter(filter)
                 .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
                 .agg(aggregationMap);
 
@@ -51,8 +57,13 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
             }
         }
 
+        filter = isnull(dataset.col(SparkImporterVariables.VAR_STATE));
+        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+            filter = not(isnull(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)));
+        }
+
         dataset = dataset
-                .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
+                .filter(filter)
                 .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
                 .agg(aggregationMap)
                 .union(datasetPIAgg);

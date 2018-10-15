@@ -12,6 +12,8 @@ import scala.collection.Seq;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterface {
 
@@ -25,7 +27,6 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         List<String> columnNamesString = new ArrayList<>();
         List<Column> columnNames = new ArrayList<>();
         List<String> columnsNotBeAddedAgain = Arrays.asList(new String[]{
-                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE,
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION,
                 SparkImporterVariables.VAR_LONG,
@@ -36,6 +37,11 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
                 SparkImporterVariables.VAR_SEQUENCE_COUNTER,
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_INSTANCE_ID
         });
+
+        if(!SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled()) {
+            columnsNotBeAddedAgain = Stream.concat(columnsNotBeAddedAgain.stream(), Stream.of(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)).collect(Collectors.toList());
+        }
+
         columnNames.add(new Column(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID));
         columnNames.add(new Column(SparkImporterVariables.VAR_STATE));
         columnNames.add(new Column(SparkImporterVariables.VAR_ACT_INST_ID));
@@ -55,10 +61,15 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
             aggregationMap.put(column, "first");
         }
 
+        Column filter = initialDataset.col(SparkImporterVariables.VAR_STATE).isNotNull();
+        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+            filter = initialDataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).isNull();
+        }
+
         if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             initialDataset = initialDataset
                     .select(selectionColumns)
-                    .filter(initialDataset.col(SparkImporterVariables.VAR_STATE).isNotNull())
+                    .filter(filter)
                     .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
                     .agg(aggregationMap)
                     .withColumnRenamed(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
@@ -95,6 +106,10 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
                     dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).equalTo(initialDataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right"))
                             .and(dataset.col(SparkImporterVariables.VAR_ACT_INST_ID).equalTo(initialDataset.col(SparkImporterVariables.VAR_ACT_INST_ID+"_right")))
                     , "left");
+        }
+
+        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+            dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
         }
 
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
