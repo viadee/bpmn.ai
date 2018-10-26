@@ -68,7 +68,7 @@ public final class SparkImporterVariables {
     private static String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
 
     
-	public static String processDefinitionId = "null";
+	private static String processFilterDefinitionId = null;
 
     private static String pipelineMode = SparkImporterVariables.PIPELINE_MODE_LEARN;
 
@@ -129,8 +129,12 @@ public final class SparkImporterVariables {
     }
 
     
-    public static void setFilter(String filter) {
-        SparkImporterVariables.processDefinitionId  = filter;  
+    public static void setProcessFilterDefinitionId(String processFilterDefinitionId) {
+        SparkImporterVariables.processFilterDefinitionId  = processFilterDefinitionId;
+    }
+
+    public static String getProcessFilterDefinitionId() {
+        return processFilterDefinitionId;
     }
 
     public static String getPipelineMode() {

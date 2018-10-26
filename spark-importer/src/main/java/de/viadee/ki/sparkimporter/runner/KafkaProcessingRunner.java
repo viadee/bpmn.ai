@@ -52,7 +52,7 @@ public class KafkaProcessingRunner extends SparkRunner {
         SparkImporterVariables.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
         
-        SparkImporterVariables.setFilter(ARGS.getFilter());
+        SparkImporterVariables.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
 
         dataLevel = ARGS.getDataLevel();
 

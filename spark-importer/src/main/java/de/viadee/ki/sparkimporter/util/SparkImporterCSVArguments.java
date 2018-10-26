@@ -113,7 +113,7 @@ public class SparkImporterCSVArguments {
 		return devProcessStateColumnWorkaroundEnabled;
 	}
 
-	public String getFilter() {
+	public String getProcessDefinitionFilterId() {
 		return processDefinitionId;
 	}
 

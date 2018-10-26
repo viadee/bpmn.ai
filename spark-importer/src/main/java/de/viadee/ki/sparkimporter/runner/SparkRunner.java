@@ -86,9 +86,9 @@ public abstract class SparkRunner {
         configurePipelineSteps();
         dataset = loadInitialDataset();
         
-        // filter dataset if only a specific processinstanceid should be preprocessed (-pf)
-        if(SparkImporterVariables.processDefinitionId != null) {
-        	dataset = dataset.filter(dataset.col("proc_inst_id_").equalTo(SparkImporterVariables.processDefinitionId));
+        // filter dataset if only a specific processDefinitionId should be preprocessed (-pf)
+        if(SparkImporterVariables.getProcessFilterDefinitionId() != null) {
+        	dataset = dataset.filter(dataset.col(SparkImporterVariables.VAR_PROCESS_DEF_ID).equalTo(SparkImporterVariables.getProcessFilterDefinitionId()));
         }
         
         

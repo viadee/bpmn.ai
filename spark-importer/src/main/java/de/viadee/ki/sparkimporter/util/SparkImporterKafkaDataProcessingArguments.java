@@ -115,7 +115,7 @@ public class SparkImporterKafkaDataProcessingArguments {
 		return dataLevel;
 	}
 	
-	public String getFilter() {
+	public String getProcessDefinitionFilterId() {
 		return processDefinitionId;
 	}
 
