@@ -29,8 +29,6 @@ import java.util.regex.Pattern;
 
 public class SparkImporterUtils {
 
-    private static String workingDirectory = ".";
-
     private static SparkImporterUtils instance;
 
     private SparkImporterUtils(){}
@@ -40,14 +38,6 @@ public class SparkImporterUtils {
             instance = new SparkImporterUtils();
         }
         return instance;
-    }
-
-    public static String getWorkingDirectory() {
-        return workingDirectory;
-    }
-
-    public static void setWorkingDirectory(String workingDirectory) {
-        SparkImporterUtils.workingDirectory = workingDirectory;
     }
 
     public String md5CecksumOfObject(Object obj) throws IOException, NoSuchAlgorithmException {

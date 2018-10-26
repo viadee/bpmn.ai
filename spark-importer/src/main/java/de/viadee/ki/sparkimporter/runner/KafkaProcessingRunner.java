@@ -10,7 +10,6 @@ import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.*;
 import de.viadee.ki.sparkimporter.util.SparkImporterKafkaDataProcessingArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
-import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.Dataset;
@@ -50,7 +49,7 @@ public class KafkaProcessingRunner extends SparkRunner {
         SparkImporterVariables.setRevCountEnabled(ARGS.isRevisionCount());
         SparkImporterVariables.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
         SparkImporterVariables.setOutputFormat(ARGS.getOutputFormat());
-        SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
+        SparkImporterVariables.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
         
         SparkImporterVariables.setFilter(ARGS.getFilter());

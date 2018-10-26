@@ -51,7 +51,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
         SparkImporterVariables.setRevCountEnabled(ARGS.isRevisionCount());
         SparkImporterVariables.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
         SparkImporterVariables.setOutputFormat(ARGS.getOutputFormat());
-        SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
+        SparkImporterVariables.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
         
         SparkImporterVariables.setFilter(ARGS.getFilter());
