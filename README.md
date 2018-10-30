@@ -1,6 +1,6 @@
 # BPMN.AI
 
-Verwendung von Standard-Prozessdaten (bspw. Camunda) im Rahmen  einer standardisierten Pipeline: Extraktion, Transformation und Aufarbeitung. Anschließend werden die Daten verwendet um ein Machine Learning durchzuführne.
+Verwendung von Standard-Prozessdaten (bspw. Camunda) im Rahmen  einer standardisierten Pipeline: Extraktion, Transformation und Aufarbeitung. Anschließend werden die Daten verwendet, um ein Machine Learning durchzuführen.
 
 Aktuell umfasst BPMN.AI zwei Projekte. Der Spark-Importer ist unsere Lösung für die beschriebene Pipeline. Der Service Caller ist eine Demo, wie ein Abrufen und Verwenden von Prognoseergebnissen in einem Camunda-Workflow aussehen könnte.
 
