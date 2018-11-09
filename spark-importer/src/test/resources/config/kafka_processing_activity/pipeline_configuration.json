@@ -12,7 +12,7 @@
       },
       {
         "variable_name": "c",
-        "variable_type": "long",
+        "variable_type": "date",
         "use_variable": true,
         "comment": ""
       },

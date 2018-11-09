@@ -9,7 +9,6 @@ import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterKafkaImportArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
-import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.commons.io.FileUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -78,8 +77,10 @@ public class KafkaImportRunner extends SparkRunner {
 
         //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
         SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
-        SparkImporterUtils.setWorkingDirectory(ARGS.getWorkingDirectory());
+        SparkImporterVariables.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
+        
+        SparkImporterVariables.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
 
         dataLevel = ARGS.getDataLevel();
 

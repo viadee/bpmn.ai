@@ -16,8 +16,11 @@ import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.api.java.UDF1;
+import org.apache.spark.sql.types.DataTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spark_project.guava.primitives.Longs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +61,19 @@ public abstract class SparkRunner {
         // register our own aggregation function
         sparkSession.udf().register("AllButEmptyString", new AllButEmptyStringAggregationFunction());
         sparkSession.udf().register("ProcessState", new ProcessStatesAggregationFunction());
+        sparkSession.udf().register("isALong", (UDF1<Object, Boolean>) o -> {
+            if(o instanceof Long)
+                return true;
+            if(o instanceof String && Longs.tryParse((String) o) != null)
+                return true;
+            return false;
+        }, DataTypes.BooleanType);
+        sparkSession.udf().register("timestampStringToLong", (UDF1<Object, Long>) o -> {
+            if(o instanceof String && Longs.tryParse((String) o) != null) {
+                return Longs.tryParse((String) o) / 1000;
+            }
+            return null;
+        }, DataTypes.LongType);
     }
 
     public void run(String[] arguments) throws FaultyConfigurationException {
@@ -69,7 +85,13 @@ public abstract class SparkRunner {
         checkConfig();
         configurePipelineSteps();
         dataset = loadInitialDataset();
-
+        
+        // filter dataset if only a specific processDefinitionId should be preprocessed (-pf)
+        if(SparkImporterVariables.getProcessFilterDefinitionId() != null) {
+        	dataset = dataset.filter(dataset.col(SparkImporterVariables.VAR_PROCESS_DEF_ID).equalTo(SparkImporterVariables.getProcessFilterDefinitionId()));
+        }
+        
+        
         //go through pipe elements
         // Define processing steps to run
         final PreprocessingRunner preprocessingRunner = new PreprocessingRunner();
