@@ -53,16 +53,32 @@ public final class SparkImporterVariables {
 
     public static final String OUTPUT_FORMAT_PARQUET = "parquet";
     public static final String OUTPUT_FORMAT_CSV = "csv";
+    
+
 
     public static final String PIPELINE_MODE_LEARN = "learn";
     public static final String PIPELINE_MODE_PREDICT = "predict";
 
+    private static String workingDirectory = ".";
     private static String targetFolder = "";
     private static boolean devTypeCastCheckEnabled = false;
+    private static boolean devProcessStateColumnWorkaroundEnabled = false;
     private static boolean revCountEnabled = false;
     private static SaveMode saveMode = SaveMode.Append;
     private static String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
+
+    
+	private static String processFilterDefinitionId = null;
+
     private static String pipelineMode = SparkImporterVariables.PIPELINE_MODE_LEARN;
+
+    public static String getWorkingDirectory() {
+        return workingDirectory;
+    }
+
+    public static void setWorkingDirectory(String workingDirectory) {
+        SparkImporterVariables.workingDirectory = workingDirectory;
+    }
 
     public static String getTargetFolder() {
         return targetFolder;
@@ -78,6 +94,14 @@ public final class SparkImporterVariables {
 
     public static void setDevTypeCastCheckEnabled(boolean devTypeCastCheckEnabled) {
         SparkImporterVariables.devTypeCastCheckEnabled = devTypeCastCheckEnabled;
+    }
+
+    public static boolean isDevProcessStateColumnWorkaroundEnabled() {
+        return devProcessStateColumnWorkaroundEnabled;
+    }
+
+    public static void setDevProcessStateColumnWorkaroundEnabled(boolean devProcessStateColumnWorkaroundEnabled) {
+        SparkImporterVariables.devProcessStateColumnWorkaroundEnabled = devProcessStateColumnWorkaroundEnabled;
     }
 
     public static boolean isRevCountEnabled() {
@@ -104,11 +128,21 @@ public final class SparkImporterVariables {
         SparkImporterVariables.outputFormat = outputFormat;
     }
 
+    
+    public static void setProcessFilterDefinitionId(String processFilterDefinitionId) {
+        SparkImporterVariables.processFilterDefinitionId  = processFilterDefinitionId;
+    }
+
+    public static String getProcessFilterDefinitionId() {
+        return processFilterDefinitionId;
+    }
+
     public static String getPipelineMode() {
         return pipelineMode;
     }
 
     public static void setPipelineMode(String pipelineMode) {
         SparkImporterVariables.pipelineMode = pipelineMode;
+
     }
 }

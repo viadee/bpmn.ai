@@ -6,6 +6,7 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfi
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -26,6 +27,9 @@ public class TypeCastStep implements PreprocessingStepInterface {
 
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+
+        // get variables
+        Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
 
         List<StructField> datasetFields = Arrays.asList(dataset.schema().fields());
 
@@ -70,7 +74,11 @@ public class TypeCastStep implements PreprocessingStepInterface {
                 // was initially a variable
                 configurationDataType = variableTypeConfigMap.get(column).getVariableType();
                 configurationParseFormat = variableTypeConfigMap.get(column).getParseFormat();
-                isVariableColumn = true;
+                if (SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
+                    isVariableColumn = varMap.keySet().contains(column);
+                } else {
+                    isVariableColumn = true;
+                }
             } else if(columnTypeConfigMap.keySet().contains(column)){
                 // was initially a column
                 configurationDataType = columnTypeConfigMap.get(column).getColumnType();
@@ -125,16 +133,16 @@ public class TypeCastStep implements PreprocessingStepInterface {
         if(newDataType.equals(DataTypes.DateType)) {
             if(parseFormat != null && !parseFormat.equals("")) {
                 // parse format given in config, so use it
-                newDataset = dataset.withColumn(castColumnName, to_date(dataset.col(columnToCast), parseFormat));
+                newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_date(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))), parseFormat)).otherwise(to_date(dataset.col(columnToCast), parseFormat)));
             } else {
-                newDataset = dataset.withColumn(castColumnName, to_date(dataset.col(columnToCast)));
+                newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_date(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))))).otherwise(to_date(dataset.col(columnToCast))));
             }
         } else if(newDataType.equals(DataTypes.TimestampType)) {
             if(parseFormat != null && !parseFormat.equals("")) {
                 // parse format given in config, so use it
-                newDataset = dataset.withColumn(castColumnName, to_timestamp(dataset.col(columnToCast), parseFormat));
+                newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_timestamp(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))), parseFormat)).otherwise(to_timestamp(dataset.col(columnToCast), parseFormat)));
             } else {
-                newDataset = dataset.withColumn(castColumnName, to_timestamp(dataset.col(columnToCast)));
+                newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_timestamp(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))))).otherwise(to_timestamp(dataset.col(columnToCast))));
             }
         } else {
             newDataset = dataset.withColumn(castColumnName, dataset.col(columnToCast).cast(newDataType));
