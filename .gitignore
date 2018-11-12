@@ -52,3 +52,8 @@ service-caller.iml
 hs_err_pid*
 >>>>>>> 928de9da4bfea155dfa5a8da93f3b333b4797981
 >>>>>>> fc9e5a4caa1c1bb86e16031e432e8a3732edcd44
+spark-importer/spark-importer.log.1
+servicecaller/.gitignore
+servicecaller/.settings/org.eclipse.jdt.core.prefs
+servicecaller/.classpath
+servicecaller/.settings/org.eclipse.m2e.core.prefs
