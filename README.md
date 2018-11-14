@@ -47,8 +47,4 @@ Die abgerufenen Daten werden dann an einem definierten Ort als Parkettdateien ge
 
 Diese Anwendung (Anwendungsklasse: SparkImporterKafkaDataProcessingApplication) ruft Daten aus einem Kafka-Import ab. Die Daten durchlaufen die gleichen Schritte wie in der CSV-Import- und Verarbeitungsanwendung, es ist nur eine separate Anwendung, da sie eine andere Eingabe als der CSV-Fall haben.
 
-## servicecaller
-
-Die Service Call Demo ist eine Spring Boot Anwendung, die einen Camunda Workflow initialisiert und eine Vorhersage für ein trainiertes Modell abholt. Die Vorhersage wird im Prozess gespeichert und weiterverarbeitet. 
-
 
