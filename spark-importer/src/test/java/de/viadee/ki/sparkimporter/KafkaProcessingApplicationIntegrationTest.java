@@ -55,7 +55,7 @@ public class KafkaProcessingApplicationIntegrationTest {
 
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("A61E1319982765B7175DB31545B412F0", hash);
+        assertEquals("8D38ADA6BE8524390965767CC6D4C9C9", hash);
 
     }
 
