@@ -56,6 +56,7 @@ public class KafkaProcessingApplicationIntegrationTest {
 
     }
 
+    @Ignore
     @Test
     public void testKafkaDataProcessingActivityLevel() throws Exception {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
