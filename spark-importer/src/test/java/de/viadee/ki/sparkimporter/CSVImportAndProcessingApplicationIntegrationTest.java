@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -136,23 +137,25 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     }
 
-    @Ignore
     @Test
     public void testLineValuesHashes() {
         //check if hashes of line values are correct
         //kept in for easier amendment after test case change
-//        System.out.println(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-//        System.out.println(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-//        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
-//        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-//        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
     	
     	// TODO - this test fails because of the order of tests
-        assertEquals("54A250FFFBC2D61E7D98C68BACB67572", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        assertEquals("17F1FC4994A0097990C5BA2CE44B3045", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        assertEquals("F70F6D20ED7605815A2C0E67E89626E3", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
-        assertEquals("FC5C76B8FC93D3F55C9A95832E82F766", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        assertEquals("C92162E610883DC02E5558CB949F2D4E", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        System.out.println(Arrays.toString(firstLineValues));
+        System.out.println(Arrays.toString(secondLineValues));
+        System.out.println(new Date());
+        assertEquals("6C01E10EF99C363E74D7F3A8822E3CF1", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+        assertEquals("38A80583116ED8B2B9BA1AC68CCA8D91", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+        assertEquals("0547A95D14F000D6670827CF477C245F", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+        assertEquals("17D045C1569DFBA0A2FEF70400F10EAE", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+        assertEquals("08258EB1B294BC973E97B0EB9DCA6CF5", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
     }
     
 
