@@ -61,13 +61,11 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
         resultFileReader.close();
     }
 
-    @Ignore
     @Test
     public void testMaxNumberOfRows() {
         assertTrue(sixthLineValues == null);
     }
 
-    @Ignore
     @Test
     public void testColumnHeaders() {
         //check if result contains 41 columns as variable g is filtered out and b renamed to f via the user config
@@ -138,7 +136,6 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     }
 
-    @Ignore
     @Test
     public void testLineValuesHashes() {
         //check if hashes of line values are correct
