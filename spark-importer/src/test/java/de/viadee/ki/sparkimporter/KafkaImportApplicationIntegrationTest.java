@@ -20,6 +20,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.nio.file.Files;
@@ -96,6 +97,7 @@ public class KafkaImportApplicationIntegrationTest {
         }
     }
 
+    @Ignore
     @Test
     public void testKafkaStreamingImportProcessLevel() throws Exception {
         //run main class
