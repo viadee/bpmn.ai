@@ -82,7 +82,7 @@ public class SparkImporterUtils {
                     .write()
                     .option("header", "true")
                     .option("delimiter", "|")
-                    .option("timestampFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+                    .option("timestampFormat", "yyyy-MM-dd'T'HH:mm:ss.SSS")
                     .option("ignoreLeadingWhiteSpace", "false")
                     .option("ignoreTrailingWhiteSpace", "false")
                     .mode(SparkImporterVariables.getSaveMode())
