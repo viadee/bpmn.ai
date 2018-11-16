@@ -136,7 +136,7 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     }
 
-
+    @Ignore
     @Test
     public void testLineValuesHashes() {
         //check if hashes of line values are correct
