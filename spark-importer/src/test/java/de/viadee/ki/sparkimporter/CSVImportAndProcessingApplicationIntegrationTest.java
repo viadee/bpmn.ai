@@ -14,6 +14,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -32,6 +33,8 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws IOException {
+        System.out.println(Locale.getDefault());
+
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
         String args[] = {"-fs", TEST_INPUT_FILE_NAME, "-fd", TEST_OUTPUT_FILE_PATH, "-d", ";", "-sr", "false", "-sm", "overwrite", "-of", "csv", "-wd", "./src/test/resources/config/csv/"};
