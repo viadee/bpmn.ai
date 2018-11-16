@@ -5,6 +5,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -53,7 +54,8 @@ public class KafkaProcessingApplicationIntegrationTest {
         assertEquals("A61E1319982765B7175DB31545B412F0", hash);
 
     }
-
+    
+    @Ignore
     @Test
     public void testKafkaDataProcessingActivityLevel() throws Exception {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
