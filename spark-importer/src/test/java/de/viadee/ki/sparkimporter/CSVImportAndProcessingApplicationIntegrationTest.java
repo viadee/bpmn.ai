@@ -33,8 +33,6 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws IOException {
-        System.out.println(Locale.getDefault());
-
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
         String args[] = {"-fs", TEST_INPUT_FILE_NAME, "-fd", TEST_OUTPUT_FILE_PATH, "-d", ";", "-sr", "false", "-sm", "overwrite", "-of", "csv", "-wd", "./src/test/resources/config/csv/"};
@@ -154,11 +152,11 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
         System.out.println(Arrays.toString(firstLineValues));
         System.out.println(Arrays.toString(secondLineValues));
         System.out.println(new Date());
-        assertEquals("6C01E10EF99C363E74D7F3A8822E3CF1", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        assertEquals("38A80583116ED8B2B9BA1AC68CCA8D91", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        assertEquals("0547A95D14F000D6670827CF477C245F", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
-        assertEquals("17D045C1569DFBA0A2FEF70400F10EAE", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        assertEquals("08258EB1B294BC973E97B0EB9DCA6CF5", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        assertEquals("3E6095DE1FE7A126C06DA1E8D9A8CE89", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+        assertEquals("2EC87244CB4DDD6721113F3C2F191E27", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+        assertEquals("2C24AF2021F86F095037B4025CF58473", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+        assertEquals("1770FBB373E802EF7B31C841AD034E5D", DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+        assertEquals("CDD9A304FD1C7E9711D2808F98038A10", DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
     }
     
 
