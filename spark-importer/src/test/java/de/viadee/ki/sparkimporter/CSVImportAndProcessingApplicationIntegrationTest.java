@@ -142,16 +142,12 @@ public class CSVImportAndProcessingApplicationIntegrationTest {
     public void testLineValuesHashes() {
         //check if hashes of line values are correct
         //kept in for easier amendment after test case change
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
-    	
-    	// TODO - this test fails because of the order of tests
-        System.out.println(Arrays.toString(firstLineValues));
-        System.out.println(Arrays.toString(secondLineValues));
-        System.out.println(new Date());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(fourthLineValues)).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(Arrays.toString(fifthLineValues)).toUpperCase());
+        
         assertEquals("3E6095DE1FE7A126C06DA1E8D9A8CE89", DigestUtils.md5Hex(Arrays.toString(firstLineValues)).toUpperCase());
         assertEquals("2EC87244CB4DDD6721113F3C2F191E27", DigestUtils.md5Hex(Arrays.toString(secondLineValues)).toUpperCase());
         assertEquals("2C24AF2021F86F095037B4025CF58473", DigestUtils.md5Hex(Arrays.toString(thirdLineValues)).toUpperCase());
