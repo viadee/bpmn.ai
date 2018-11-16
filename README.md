@@ -8,7 +8,7 @@ Bpmn.ai bezeichnet den Ansatz, Standard-Prozessdaten für ein Data Mining aufzub
 Diese können unter anderem zur Optimierung und Automatisierung von Prozessen verwendet werden, sind aber generell für verschiedenste Anwendungen interessant (z.B.
 Engpassanalysen, Prozessdauervorhersagen).
 
-Daraus ergibt sich das folgende Gesamtbild einer Java-fokussierten KI-Infrastruktur [bpmn.ai](https://bpmn.ai), die sich sehr leicht aufsetzen und auch mit großen Datenmengen betreiben lässt:
+Daraus ergibt sich das folgende Gesamtbild einer Java-fokussierten KI-Infrastruktur [bpmn.ai](https://www.viadee.de/bpmnai), die sich sehr leicht aufsetzen und auch mit großen Datenmengen betreiben lässt:
 
 ![](./spark-importer/doc/Pipeline.png)
 
