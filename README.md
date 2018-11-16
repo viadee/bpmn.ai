@@ -4,6 +4,8 @@
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Build Status](https://travis-ci.org/junit-team/junit4.svg?branch=master)](https://travis-ci.org/viadee/bpmn.ai)
 
+*Read this in other languages: [English](README.en.md), [German](README.md).*
+
 Bpmn.ai bezeichnet den Ansatz, Standard-Prozessdaten für ein Data Mining aufzubereiten und zu nutzen. Bpmn.ai umfasst die gesamte Pipeline von der Datenextraktion, über die Transformation und Aufarbeitung der Daten, bis hin zum Anlernen eines geeigneten Machine Learning Algorithmus und dem zur Verfügung stellen, der daraus gewonnen Erkenntnisse.
 Diese können unter anderem zur Optimierung und Automatisierung von Prozessen verwendet werden, sind aber generell für verschiedenste Anwendungen interessant (z.B.
 Engpassanalysen, Prozessdauervorhersagen).
