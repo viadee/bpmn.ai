@@ -17,7 +17,7 @@ public class KafkaProcessingApplicationIntegrationTest {
     private final static String DATA_PROCESSING_TEST_INPUT_DIRECTORY_PROCESS = "./src/test/resources/integration_test_kafka_processing_data_process";
     private final static String DATA_PROCESSING_TEST_INPUT_DIRECTORY_ACTIVITY = "./src/test/resources/integration_test_kafka_processing_data_activity";
 
-    @Ignore
+
     @Test
     public void testKafkaDataProcessingProcessLevel() throws Exception {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
