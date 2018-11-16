@@ -45,7 +45,7 @@ public class KafkaProcessingApplicationIntegrationTest {
                 .csv(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS + "/result/csv/result.csv");
 
 
-        importedDataset.show(5, false‚);
+        importedDataset.show(5, false);
 
         //check that dataset contains 4 lines
         assertEquals(4, importedDataset.count());
