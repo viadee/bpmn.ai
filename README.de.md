@@ -44,7 +44,7 @@ Für die folgenden Anwendungen stehen zur Verfügung:
 
 Jede dieser Anwendungen erfüllt einen anderen Zweck.
 
-Im Order [Tutorial](Tutorial) befinden sich Beispiele zu den Anwendungen.
+Im Order [Tutorial](/tutorials) befinden sich Beispiele zu den Anwendungen.
 
 ### Datenpipeline
 
