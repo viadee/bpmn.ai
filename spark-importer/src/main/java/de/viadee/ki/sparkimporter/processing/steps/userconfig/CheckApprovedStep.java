@@ -33,10 +33,9 @@ public class CheckApprovedStep implements PreprocessingStepInterface {
 	
 			String colName = (String) parameters.get("column");
 					
-
-			return dataset.withColumn("approved2", functions.when(dataset.col(colName).equalTo("true"), "OK").otherwise("NOT OK"));
-
-
+			dataset =  dataset.withColumn("approved2", functions.when(dataset.col(colName).equalTo("true"), "OK").otherwise("NOT OK"));
+						
+			return dataset;
 			}
 
         
