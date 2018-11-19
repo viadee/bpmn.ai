@@ -54,6 +54,9 @@ public class KafkaProcessingApplicationIntegrationTest {
 
         //convert rows to string
         String[] resultLines = (String[]) importedDataset.map(row -> row.mkString(), Encoders.STRING()).collectAsList().toArray();
+        for(String l : resultLines) {
+            System.out.println(l);
+        }
 
         //check if hashes of line values are correct
         //kept in for easier amendment after test case change
