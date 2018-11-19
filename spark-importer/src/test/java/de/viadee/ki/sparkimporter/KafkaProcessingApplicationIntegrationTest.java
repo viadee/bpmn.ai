@@ -22,7 +22,7 @@ public class KafkaProcessingApplicationIntegrationTest {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
         //run main class
-        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY_PROCESS, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS, "-d", "|", "-sr", "false", "-sm", "overwrite", "-of", "csv", "-wd", "./src/test/resources/config/kafka_processing_process/"};
+        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY_PROCESS, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS, "-d", "|", "-sr", "false", "-sm", "overwrite", "-of", "parquet", "-wd", "./src/test/resources/config/kafka_processing_process/"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -39,9 +39,7 @@ public class KafkaProcessingApplicationIntegrationTest {
         //generate Dataset and create hash to compare
         Dataset<Row> importedDataset = sparkSession.read()
                 .option("inferSchema", "true")
-                .option("delimiter","|")
-                .option("header", "true")
-                .csv(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS + "/result/csv/result.csv");
+                .load(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS + "/result/parquet");
 
 
         importedDataset.show(5, false);
@@ -54,7 +52,7 @@ public class KafkaProcessingApplicationIntegrationTest {
 
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("A61E1319982765B7175DB31545B412F0", hash);
+        assertEquals("47EB5B8BF77669E44F6C28F2FD4DF785", hash);
 
     }
 
