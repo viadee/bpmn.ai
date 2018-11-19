@@ -42,7 +42,9 @@ The following applications are available:
 * SparkImporterKafkaImportApplication
 * SparkImporterKafkaDataProcessingApplication
 
-Each of these applications serves a different purpose.
+Each of these applications serves a different purpose. 
+
+Examples of the applications can be found in the folder [Tutorial](Tutorial).
 
 
 ### Data pipeline

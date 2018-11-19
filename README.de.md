@@ -44,6 +44,8 @@ Für die folgenden Anwendungen stehen zur Verfügung:
 
 Jede dieser Anwendungen erfüllt einen anderen Zweck.
 
+Im Order [Tutorial](Tutorial) befinden sich Beispiele zu den Anwendungen.
+
 ### Datenpipeline
 
 Die folgende Grafik zeigt die Pipeline, durch die die Daten von Camunda zur Machine Learning Engine fließen. Jede der drei Anwendungen dient einem bestimmten Zweck und Anwendungsfällen rund um den Import in, die Datenaggregation und -transformation innerhalb und den Export von Daten aus Apache Spark.
