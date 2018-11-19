@@ -97,7 +97,6 @@ public class KafkaImportApplicationIntegrationTest {
         }
     }
 
-    @Ignore
     @Test
     public void testKafkaStreamingImportProcessLevel() throws Exception {
         //run main class

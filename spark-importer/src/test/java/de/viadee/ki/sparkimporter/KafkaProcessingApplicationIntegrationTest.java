@@ -17,7 +17,6 @@ public class KafkaProcessingApplicationIntegrationTest {
     private final static String DATA_PROCESSING_TEST_INPUT_DIRECTORY_PROCESS = "./src/test/resources/integration_test_kafka_processing_data_process";
     private final static String DATA_PROCESSING_TEST_INPUT_DIRECTORY_ACTIVITY = "./src/test/resources/integration_test_kafka_processing_data_activity";
 
-
     @Test
     public void testKafkaDataProcessingProcessLevel() throws Exception {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
@@ -43,6 +42,9 @@ public class KafkaProcessingApplicationIntegrationTest {
                 .option("delimiter","|")
                 .option("header", "true")
                 .csv(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS + "/result/csv/result.csv");
+
+
+        importedDataset.show(5, false);
 
         //check that dataset contains 4 lines
         assertEquals(4, importedDataset.count());
