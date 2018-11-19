@@ -3,12 +3,15 @@ package de.viadee.ki.sparkimporter.configuration.preprocessing;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Step {
 
     private String id;
     private String className;
     private String dependsOn;
     private Map<String, Object> parameters = new HashMap<>();
+    private String comment;
 
     public String getId() {
         return id;
@@ -40,5 +43,13 @@ public class Step {
 
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
+    }
+    
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

@@ -135,7 +135,7 @@ public abstract class SparkPredictionServiceRunner {
                 s.setDependsOn(ps.getDependsOn());
                 s.setId(ps.getId());
                 s.setParameters(ps.getStepParameters());
-
+                s.setComment("");
                 configSteps.add(s);
             }
 
