@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class CheckEndtimeStep implements PreprocessingStepInterface {
+public class CheckApprovedStep implements PreprocessingStepInterface {
     @Override
     	 public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel,
                  Map<String, Object> parameters) {
@@ -29,17 +29,14 @@ public class CheckEndtimeStep implements PreprocessingStepInterface {
 			if (parameters == null) {
 			SparkImporterLogger.getInstance().writeWarn("No parameters found for the CheckEndtimeStep");
 			return dataset;
-			}
-			
-			final SparkSession sparkSession = SparkSession.builder().getOrCreate();
+			}			
+	
 			String colName = (String) parameters.get("column");
-			
-		
-			dataset = dataset.withColumn("finished", functions.when(dataset.col(colName).isNull(), "false").
-					otherwise("true"));
-			
+					
 
-			return dataset;
+			return dataset.withColumn("approved2", functions.when(dataset.col(colName).equalTo("true"), "OK").otherwise("NOT OK"));
+
+
 			}
 
         
