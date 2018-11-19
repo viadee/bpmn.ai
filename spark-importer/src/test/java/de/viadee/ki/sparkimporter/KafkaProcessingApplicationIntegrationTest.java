@@ -7,11 +7,15 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,6 +25,12 @@ public class KafkaProcessingApplicationIntegrationTest {
     private final static String DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_ACTIVITY = "integration-test-result-kafka-processing-activity";
     private final static String DATA_PROCESSING_TEST_INPUT_DIRECTORY_PROCESS = "./src/test/resources/integration_test_kafka_processing_data_process";
     private final static String DATA_PROCESSING_TEST_INPUT_DIRECTORY_ACTIVITY = "./src/test/resources/integration_test_kafka_processing_data_activity";
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        //make sure tests take the same timezone as we work with checksums
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+    }
 
     @Test
     public void testKafkaDataProcessingProcessLevel() throws Exception {
@@ -60,15 +70,15 @@ public class KafkaProcessingApplicationIntegrationTest {
 
         //check if hashes of line values are correct
         //kept in for easier amendment after test case change
-        System.out.println(DigestUtils.md5Hex(resultLines[0]).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(resultLines[1]).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(resultLines[2]).toUpperCase());
-        System.out.println(DigestUtils.md5Hex(resultLines[3]).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(resultLines[0]).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(resultLines[1]).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(resultLines[2]).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(resultLines[3]).toUpperCase());
 
-        assertEquals("529FFF477CF51CC6B13278FDCB9C01BE", DigestUtils.md5Hex(resultLines[0]).toUpperCase());
-        assertEquals("2EAB39D69FAA91E44D89E02F2AD2F9C4", DigestUtils.md5Hex(resultLines[1]).toUpperCase());
-        assertEquals("25B571D80703AC4DB21C2BB07C86E4CA", DigestUtils.md5Hex(resultLines[2]).toUpperCase());
-        assertEquals("B5E96E5352F9E4D191B5105B349D4F6E", DigestUtils.md5Hex(resultLines[3]).toUpperCase());
+        assertEquals("9088849D6374163C3E9DACB3090D4E56", DigestUtils.md5Hex(resultLines[0]).toUpperCase());
+        assertEquals("415A0A505F9A32002C1342171E7649F9", DigestUtils.md5Hex(resultLines[1]).toUpperCase());
+        assertEquals("C83F9CC0618D7FA50D63753FBC429188", DigestUtils.md5Hex(resultLines[2]).toUpperCase());
+        assertEquals("0559C383855FDE566069B483188E06C0", DigestUtils.md5Hex(resultLines[3]).toUpperCase());
     }
 
     @Ignore
