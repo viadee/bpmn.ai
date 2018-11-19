@@ -14,7 +14,7 @@ public class DataFilterStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
 
-    	if (parameters == null) {
+    	if (parameters == null || parameters.size() == 0) {
             SparkImporterLogger.getInstance().writeWarn("No parameters found for the MatchBrandsStep");
             return dataset;
         }

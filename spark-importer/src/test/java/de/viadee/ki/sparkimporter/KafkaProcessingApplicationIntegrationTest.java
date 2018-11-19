@@ -60,15 +60,15 @@ public class KafkaProcessingApplicationIntegrationTest {
 
         //check if hashes of line values are correct
         //kept in for easier amendment after test case change
-//        System.out.println(DigestUtils.md5Hex(resultLines[0]).toUpperCase());
-//        System.out.println(DigestUtils.md5Hex(resultLines[1]).toUpperCase());
-//        System.out.println(DigestUtils.md5Hex(resultLines[2]).toUpperCase());
-//        System.out.println(DigestUtils.md5Hex(resultLines[3]).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(resultLines[0]).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(resultLines[1]).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(resultLines[2]).toUpperCase());
+        System.out.println(DigestUtils.md5Hex(resultLines[3]).toUpperCase());
 
-        assertEquals("12C8C72FB33DFEAB25514736AEEB915B", DigestUtils.md5Hex(resultLines[0]).toUpperCase());
-        assertEquals("7CB6E05AA366A469DB4A4D19895AA5C2", DigestUtils.md5Hex(resultLines[1]).toUpperCase());
-        assertEquals("D777617EF8DFF799BA122E3AB3EDB85C", DigestUtils.md5Hex(resultLines[2]).toUpperCase());
-        assertEquals("9E4F655D37E1C247EE40908A4DFF53E2", DigestUtils.md5Hex(resultLines[3]).toUpperCase());
+        assertEquals("529FFF477CF51CC6B13278FDCB9C01BE", DigestUtils.md5Hex(resultLines[0]).toUpperCase());
+        assertEquals("2EAB39D69FAA91E44D89E02F2AD2F9C4", DigestUtils.md5Hex(resultLines[1]).toUpperCase());
+        assertEquals("25B571D80703AC4DB21C2BB07C86E4CA", DigestUtils.md5Hex(resultLines[2]).toUpperCase());
+        assertEquals("B5E96E5352F9E4D191B5105B349D4F6E", DigestUtils.md5Hex(resultLines[3]).toUpperCase());
     }
 
     @Ignore

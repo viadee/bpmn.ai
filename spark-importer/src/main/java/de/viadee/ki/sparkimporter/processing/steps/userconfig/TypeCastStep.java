@@ -140,9 +140,13 @@ public class TypeCastStep implements PreprocessingStepInterface {
         } else if(newDataType.equals(DataTypes.TimestampType)) {
             if(parseFormat != null && !parseFormat.equals("")) {
                 // parse format given in config, so use it
-                newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_timestamp(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))), parseFormat)).otherwise(to_timestamp(dataset.col(columnToCast), parseFormat)));
+                //newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_timestamp(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))), parseFormat)).otherwise(to_timestamp(dataset.col(columnToCast), parseFormat)));
+                newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_utc_timestamp(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))), "UTC")).otherwise(to_utc_timestamp(dataset.col(columnToCast), "UTC")));
+
             } else {
-                newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_timestamp(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))))).otherwise(to_timestamp(dataset.col(columnToCast))));
+                //newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_timestamp(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))))).otherwise(to_timestamp(dataset.col(columnToCast))));
+                newDataset = dataset.withColumn(castColumnName, when(callUDF("isalong", dataset.col(columnToCast)), to_utc_timestamp(from_unixtime(callUDF("timestampstringtolong", dataset.col(columnToCast))), "UTC")).otherwise(to_utc_timestamp(dataset.col(columnToCast), "UTC")));
+
             }
         } else {
             newDataset = dataset.withColumn(castColumnName, dataset.col(columnToCast).cast(newDataType));
