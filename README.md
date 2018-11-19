@@ -2,7 +2,7 @@
 
 # BPMN.AI
 
-[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Build Status](https://travis-ci.org/junit-team/junit4.svg?branch=develop)](https://travis-ci.org/viadee/bpmn.ai)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Build Status](https://travis-ci.org/junit-team/junit4.svg?branch=develop)](https://travis-ci.org/viadee/bpmn.ai.svg?branch=master)
 
 *Read this in other languages: [English](README.en.md), [German](README.md).*
 
