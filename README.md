@@ -2,9 +2,11 @@
 
 # BPMN.AI
 
-[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Build Status](https://travis-ci.org/viadee/bpmn.ai?branch=%22master%22)](https://travis-ci.org/viadee/bpmn.ai)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) 
+[![Status](http://img.shields.io/travis/rstacruz/REPO/master.svg?style=flat)](https://travis-ci.org/viadee/bpmn.ai "See test builds")
+[![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=com.lapots.breed.judge:judge-rule-engine&metric=alert_status)](https://sonarcloud.io/dashboard?id=de.viadee.ki%3Aspark-importer)
 
-*Read this in other languages: [English](README.en.md), [German](README.md).*
+*Read this in other languages: [English](README.md), [German](README.de.md).*
 
 Bpmn.ai describes the approach of preparing and using standard process data for data mining. Bpmn.ai covers the entire pipeline, which means data extraction, transformation and processing of the data, learning a suitable machine learning algorithm and providing the gained knowledge. 
 These can be used among other things  to optimize and automate processes. Furthermore they are generally of interest for a wide variety of applications (e.g. bottleneck analyses, process duration predictions).
