@@ -44,7 +44,7 @@ The following applications are available:
 
 Each of these applications serves a different purpose. 
 
-Examples of the applications can be found in the folder [Tutorial](Tutorial).
+Examples of the applications can be found in the folder [Tutorial](/tutorials).
 
 
 ### Data pipeline
