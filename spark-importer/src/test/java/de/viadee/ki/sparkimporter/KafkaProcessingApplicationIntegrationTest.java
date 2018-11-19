@@ -1,12 +1,17 @@
 package de.viadee.ki.sparkimporter;
 
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -41,19 +46,26 @@ public class KafkaProcessingApplicationIntegrationTest {
                 .option("inferSchema", "true")
                 .load(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_PROCESS + "/result/parquet");
 
-
-        importedDataset.show(5, false);
-
         //check that dataset contains 4 lines
         assertEquals(4, importedDataset.count());
 
         //check that dataset contains 42 columns
         assertEquals(42, importedDataset.columns().length);
 
-        //check hash of dataset
-        String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("47EB5B8BF77669E44F6C28F2FD4DF785", hash);
+        //convert rows to string
+        String[] resultLines = (String[]) importedDataset.map(row -> row.mkString(), Encoders.STRING()).collectAsList().toArray();
 
+        //check if hashes of line values are correct
+        //kept in for easier amendment after test case change
+//        System.out.println(DigestUtils.md5Hex(resultLines[0]).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(resultLines[1]).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(resultLines[2]).toUpperCase());
+//        System.out.println(DigestUtils.md5Hex(resultLines[3]).toUpperCase());
+
+        assertEquals("12C8C72FB33DFEAB25514736AEEB915B", DigestUtils.md5Hex(resultLines[0]).toUpperCase());
+        assertEquals("7CB6E05AA366A469DB4A4D19895AA5C2", DigestUtils.md5Hex(resultLines[1]).toUpperCase());
+        assertEquals("D777617EF8DFF799BA122E3AB3EDB85C", DigestUtils.md5Hex(resultLines[2]).toUpperCase());
+        assertEquals("9E4F655D37E1C247EE40908A4DFF53E2", DigestUtils.md5Hex(resultLines[3]).toUpperCase());
     }
 
     @Ignore
