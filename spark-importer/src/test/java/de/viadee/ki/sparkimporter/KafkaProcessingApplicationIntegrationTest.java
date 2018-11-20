@@ -81,7 +81,6 @@ public class KafkaProcessingApplicationIntegrationTest {
         assertEquals("0559C383855FDE566069B483188E06C0", DigestUtils.md5Hex(resultLines[3]).toUpperCase());
     }
 
-    @Ignore
     @Test
     public void testKafkaDataProcessingActivityLevel() throws Exception {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
@@ -117,7 +116,7 @@ public class KafkaProcessingApplicationIntegrationTest {
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
         System.out.println(hash);
-        assertEquals("366577196F2B5BBC2368A16EDA429FE7", hash);
+        assertEquals("0E14D297912209965598412523AE3BB1", hash);
 
     }
 }
