@@ -3,8 +3,6 @@ package de.viadee.ki.sparkimporter.configuration.preprocessing;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gson.annotations.SerializedName;
-
 public class Step {
 
     private String id;

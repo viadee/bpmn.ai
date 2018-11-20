@@ -8,13 +8,8 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.util.Arrays;
-import java.util.List;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
@@ -81,13 +76,12 @@ public class KafkaProcessingApplicationIntegrationTest {
         assertEquals("0559C383855FDE566069B483188E06C0", DigestUtils.md5Hex(resultLines[3]).toUpperCase());
     }
 
-    @Ignore
     @Test
     public void testKafkaDataProcessingActivityLevel() throws Exception {
         //System.setProperty("hadoop.home.dir", "C:\\Users\\b60\\Desktop\\hadoop-2.6.0\\hadoop-2.6.0");
 
         //run main class
-        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY_ACTIVITY, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_ACTIVITY, "-d", "|", "-sr", "false", "-dl", "activity", "-sm", "overwrite", "-of", "csv", "-wd", "./src/test/resources/config/kafka_processing_activity/"};
+        String args[] = {"-fs", DATA_PROCESSING_TEST_INPUT_DIRECTORY_ACTIVITY, "-fd", DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_ACTIVITY, "-d", "|", "-sr", "false", "-dl", "activity", "-sm", "overwrite", "-of", "parquet", "-wd", "./src/test/resources/config/kafka_processing_activity/"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -104,9 +98,7 @@ public class KafkaProcessingApplicationIntegrationTest {
         //generate Dataset and create hash to compare
         Dataset<Row> importedDataset = sparkSession.read()
                 .option("inferSchema", "true")
-                .option("delimiter","|")
-                .option("header", "true")
-                .csv(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_ACTIVITY + "/result/csv/result.csv");
+                .load(DATA_PROCESSING_TEST_OUTPUT_DIRECTORY_ACTIVITY + "/result/parquet");
 
         //check that dataset contains 12 lines
         assertEquals(12, importedDataset.count());
@@ -117,7 +109,7 @@ public class KafkaProcessingApplicationIntegrationTest {
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
         System.out.println(hash);
-        assertEquals("366577196F2B5BBC2368A16EDA429FE7", hash);
+        assertEquals("A8BBFC3B17C00C40C9883DA1F396D453", hash);
 
     }
 }
