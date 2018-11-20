@@ -57,3 +57,4 @@ servicecaller/.gitignore
 servicecaller/.settings/org.eclipse.jdt.core.prefs
 servicecaller/.classpath
 servicecaller/.settings/org.eclipse.m2e.core.prefs
+spark-importer/pipeline_configuration.json

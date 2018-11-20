@@ -9,6 +9,7 @@ public class Step {
     private String className;
     private String dependsOn;
     private Map<String, Object> parameters = new HashMap<>();
+    private String comment;
 
     public String getId() {
         return id;
@@ -40,5 +41,13 @@ public class Step {
 
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
+    }
+    
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

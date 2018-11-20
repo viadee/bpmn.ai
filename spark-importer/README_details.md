@@ -76,7 +76,7 @@ processInstanceId  	| processDefinitionId | variableName  |  serializer | text |
 Let's now assume the following filter query has been defined:
 
 	processDefinitionId == 'p1'
-	
+
 The following dataset is then returned by this step:
 
 processInstanceId  	| processDefinitionId | variableName  |  serializer | text | long |  double  |  revision
@@ -84,6 +84,21 @@ processInstanceId  	| processDefinitionId | variableName  |  serializer | text |
 1						| p1                  | a             | string      | hello|      |          | 0
 1						| p1                  | b             | boolean     |      | 1    |          | 1
 1						| p1                  | c             | double      |      |      | 1.5      | 0
+
+The filter query can be passed exemplary to the step as a parameter as follows:
+
+```
+{
+"id": "DataFilterStep",
+"className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.DataFilterStep",
+"dependsOn": "",
+"comment": "",
+	"parameters":{
+		"query": "proc_inst_id_ == '30036355-e994-11e8-85f9-3ca9f4b1daec'"
+	}
+},
+```
+
 
 ### ColumnRemove (user config)
 
@@ -169,7 +184,7 @@ Let's now assume the following variable_configuration has been defined:
 	],
 	...
 ```
-	
+
 The following dataset is then returned from this step:
 
 processInstanceId  	| variableName  |  serializer | text | long |  double  |  revision
@@ -204,7 +219,7 @@ Let's now assume the following variable_configuration has been defined:
     ...
 ```
 
-	
+
 The following dataset is then returned by this step:
 
 processInstanceId  	| variableName  |  serializer | text | long |  double  |  revision
@@ -239,7 +254,7 @@ c             | integer
 c             | double
 f             | string
 
-	
+
 The following unchanged dataset is returned by this step:
 
 processInstanceId  	| variableName  |  serializer | text | long |  double  |  revision
@@ -291,7 +306,7 @@ processInstanceId  	| variableName  |  serializer | text | long |  double  |  re
 2						| b             | boolean     |      | 0    |          | 1         | 14000000
 2						| c             | double      |      |      | 1.5      | 0         | 15000000
 
-	
+
 The following dataset is returned by this step:
 
 processInstanceId  	| variableName  |  serializer | text | long |  double  |  revision | variableUpdateTimestamp
@@ -340,7 +355,7 @@ processInstanceId   | f     | f_rev | b | b_rev | c | c_rev
 2						| hi    | 0     |   |       |   |
 2						|       |       | 0 | 1     |   |
 2						|       |       |   |       |1.5| 0
-    	
+
 The following dataset is returned by this step:
 
 processInstanceId   | f     | f_rev | b | b_rev | c | c_rev  
