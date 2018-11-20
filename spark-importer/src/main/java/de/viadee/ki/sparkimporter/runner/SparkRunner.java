@@ -91,11 +91,11 @@ public abstract class SparkRunner {
         	dataset = dataset.filter(dataset.col(SparkImporterVariables.VAR_PROCESS_DEF_ID).equalTo(SparkImporterVariables.getProcessFilterDefinitionId()));
         }
         
-    
-        // transform all column names to uppercase       
+        // TODO 
+        /* transform all column names to lower case       
         for(String col : dataset.columns()) {
         	dataset = dataset.withColumnRenamed(col, col.toLowerCase());
-        }
+        }*/
       
         
         
