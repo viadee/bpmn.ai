@@ -8,13 +8,8 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.util.Arrays;
-import java.util.List;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
