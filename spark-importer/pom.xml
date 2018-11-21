@@ -24,6 +24,59 @@
 		<jackson.version>2.6.7.1</jackson.version>
 	</properties>
 
+	<url>https://www.viadee.de/bpmnai</url>
+	<organization>
+		<name>viadee Unternehmensberatung AG</name>
+		<url>www.viadee.de</url>
+	</organization>
+
+	<ciManagement>
+		<url>https://travis-ci.org/viadee/bpmn.ai</url>
+		<system>Travis</system>
+	</ciManagement>
+
+	<issueManagement>
+		<url>https://github.com/viadee/bpmn.ai/issues</url>
+		<system>GitHub</system>
+	</issueManagement>
+
+	<scm>
+		<connection>https://github.com/viadee/bpmn.ai</connection>
+		<url>GitHub</url>
+	</scm>
+
+	<name>bpmn.ai</name>
+	<description>Tooling to feed Camunda logs into a data mining pipeline.</description>
+	<inceptionYear>2018</inceptionYear>
+
+	<developers>
+		<developer>
+			<name>Mario Micudaj</name>
+			<email>Mario.Micudaj@viadee.de</email>
+			<organization>viadee Unternehmensberatung AG</organization>
+			<organizationUrl>http://www.viadee.de</organizationUrl>
+		</developer>
+		<developer>
+			<name>Caroline Methner</name>
+			<email>Caroline.Methner@viadee.de</email>
+			<organization>viadee Unternehmensberatung AG</organization>
+			<organizationUrl>http://www.viadee.de</organizationUrl>
+		</developer>
+		<developer>
+			<name>Frank Koehne</name>
+			<email>Frank.Koehne@viadee.de</email>
+			<organization>viadee Unternehmensberatung AG</organization>
+			<organizationUrl>http://www.viadee.de</organizationUrl>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>BSD-3 Clause</name>
+			<url>https://opensource.org/licenses/BSD-3-Clause</url>
+		</license>
+</licenses>
+
 	<repositories>
 		<repository>
 			<id>viadee-snapshots</id>
@@ -189,9 +242,9 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--<plugin> <groupId>org.owasp</groupId> <artifactId>dependency-check-maven</artifactId> 
-				<version>3.3.1</version> <configuration> <failBuildOnCVSS>7</failBuildOnCVSS> 
-				</configuration> <executions> <execution> <goals> <goal>check</goal> </goals> 
+			<!--<plugin> <groupId>org.owasp</groupId> <artifactId>dependency-check-maven</artifactId>
+				<version>3.3.1</version> <configuration> <failBuildOnCVSS>7</failBuildOnCVSS>
+				</configuration> <executions> <execution> <goals> <goal>check</goal> </goals>
 				</execution> </executions> </plugin> -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
@@ -238,39 +291,4 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
-	<organization>
-		<name>viadee Unternehmensberatung GmbH</name>
-		<url>www.viadee.de</url>
-	</organization>
-	<ciManagement>
-		<url>https://portal.intern.viadee.de/jenkins/view/KI/job/KI/job/bpmn.ai%20spark%20importer/</url>
-		<system>Jenkins</system>
-	</ciManagement>
-	<issueManagement>
-		<url>https://jira.intern.viadee.de/secure/RapidBoard.jspa?rapidView=156</url>
-		<system>Jira</system>
-	</issueManagement>
-	<scm>
-		<connection>https://portal.intern.viadee.de/gitlab/viadee/bpmn.ai</connection>
-		<url>Gitlab</url>
-	</scm>
-	<description>Tooling to feed Camunda logs into a data mining pipeline.</description>
-	<inceptionYear>2018</inceptionYear>
-	<name>bpmn.ai</name>
-
-	<developers>
-		<developer>
-			<name>Mario Micudaj</name>
-			<email>Mario.Micudaj@viadee.de</email>
-			<organization>viadee Unternehmensberatung AG</organization>
-			<organizationUrl>http://www.viadee.de</organizationUrl>
-		</developer>
-		<developer>
-			<name>Frank Koehne</name>
-			<email>Frank.Koehne@viadee.de</email>
-			<organization>viadee Unternehmensberatung AG</organization>
-			<organizationUrl>http://www.viadee.de</organizationUrl>
-		</developer>
-	</developers>
 </project>
