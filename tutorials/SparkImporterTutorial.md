@@ -15,17 +15,18 @@ The SQL statement for exporting the data from Camunda is as follows:
 SELECT * FROM ACT_HI_PROCINST a JOIN ACT_HI_VARINST v ON a.PROC_INST_ID_ = v.PROC_INST_ID_ AND a.proc_def_key_ = 'XYZ'
 ```
 
-After selecting the tables, the data must be stored in the format csv.
+After selecting the tables, the data must be stored in the format csv. The pipeline currently expects all column names for the *CSVImportAndProcessingApplication* to be lowercase. If this is not the case in the exported CSV, remember to convert the column names in advance (the example file is already in the correct format).
 
 
 ## 2. Preprocess the exported data
 
-In the following step the exported file will be preprocessed with the help of the spark-importer. Since we have a csv file, this will be done with the CSVImportAndProcessingApplication.
+In the following step the exported file will be preprocessed with the help of the spark-importer. Since we have a csv file, this will be done with the *CSVImportAndProcessingApplication*.
 
 The following installations have to be done in advance:
 *  Java 8 (JRE, JDK)
 *  Development environment (Eclipse or IntelliJ)
 *  Maven
+*  Hadoop (only required for Windows)
 
 Now the application can be executed via the Run Configuration in the development environment.  Therefore, the following arguments have to be passed:
 

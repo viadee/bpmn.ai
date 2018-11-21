@@ -4,9 +4,9 @@ This project contains three Apache Spark applications that serve the task of tak
 
 The following applications three applications are available:
 
-* SparkImporterCSVApplication
-* SparkImporterKafkaImportApplication
-* SparkImporterKafkaDataProcessingApplication
+* CSVImportAndProcessingApplication
+* KafkaImportApplication
+* KafkaProcessingApplication
 
 Each of those applications serves a different purpose.
 
@@ -64,7 +64,7 @@ Parameter                 | Description	                | mandatory
 
 ## Kafka Processing
 
-This application (application class: KafkaImportApplication) retrieves data from a Kafka Import. The --file-source parameter should match the --file-destination parameter of a Kafka Import run. The data runs through the same steps as in the CSV Import and Processing application, it is just a separate application as it has a different input than the CSV case.
+This application (application class: KafkaProcessingApplication) retrieves data from a Kafka Import. The --file-source parameter should match the --file-destination parameter of a Kafka Import run. The data runs through the same steps as in the CSV Import and Processing application, it is just a separate application as it has a different input than the CSV case.
 
 ### Parameters
 
