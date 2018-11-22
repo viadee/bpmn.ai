@@ -42,7 +42,7 @@ The following applications are available:
 
 Each of these applications serves a different purpose.
 
-Examples of the applications can be found in the [Wiki](/viadee/bpmn.ai/wiki/Tutorial-for-Spark-Importer/tutorials).
+Examples of the applications can be found in the [Wiki](/viadee/bpmn.ai/wiki/Tutorial-for-Spark-Importer).
 
 ### Data pipeline
 
