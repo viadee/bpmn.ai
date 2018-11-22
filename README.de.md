@@ -20,7 +20,7 @@ In diesem Repository enthalten ist die (konfigurierbare) Datenaufbereitungs-Pipe
 
 # Zusammenarbeit
 
-Das Projekt wird betrieben und weiterentwickelt von der viadee Unternehmensberatung GmbH in Münster, Westfalen. Ergebnisse aus Abschlussarbeiten an der WWU Münster und der FH Münster sind eingeflossen.
+Das Projekt wird betrieben und weiterentwickelt von der viadee Unternehmensberatung AG in Münster, Westfalen. Ergebnisse aus Abschlussarbeiten an der WWU Münster und der FH Münster sind eingeflossen.
 
 * Weitere Abschlussarbeiten sind geplant: Ansprechpartner dazu ist Dr. Frank Köhne von der viadee.
 * Community-Beiträge zum Projekt sind gern gesehen: Hierzu bitten wir Github-Issues mit Vorschägen (oder PR) zu öffnen, die wir dann im Team bearbeiten können.
