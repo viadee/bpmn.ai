@@ -31,7 +31,7 @@ We are currently collecting feedback and prioritising ideas for further developm
 
 # Components
 
-## Spark-importer
+## Spark-Importer
 
 The Spark Importer contains three Apache Spark applications that are used to translate data from the Camunda engine to a data mining table that consists of one row per process instance with additional columns for each process variable. This data mining table is then used to train a machine learning algorithm to predict certain future events of the process.
 The following applications are available:
@@ -42,7 +42,7 @@ The following applications are available:
 
 Each of these applications serves a different purpose.
 
-Examples of the applications can be found in the [Wiki](/viadee/bpmn.ai/wiki/Tutorial-for-Spark-Importer).
+A tutorial and examples of the applications can be found in the [Wiki](/viadee/bpmn.ai/wiki/Tutorial-for-Spark-Importer).
 
 ### Data pipeline
 
