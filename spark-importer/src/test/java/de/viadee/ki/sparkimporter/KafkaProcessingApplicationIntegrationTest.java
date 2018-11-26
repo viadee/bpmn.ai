@@ -74,6 +74,9 @@ public class KafkaProcessingApplicationIntegrationTest {
         assertEquals("415A0A505F9A32002C1342171E7649F9", DigestUtils.md5Hex(resultLines[1]).toUpperCase());
         assertEquals("C83F9CC0618D7FA50D63753FBC429188", DigestUtils.md5Hex(resultLines[2]).toUpperCase());
         assertEquals("0559C383855FDE566069B483188E06C0", DigestUtils.md5Hex(resultLines[3]).toUpperCase());
+
+        //close Spark session
+        sparkSession.close();
     }
 
     @Test
@@ -111,5 +114,7 @@ public class KafkaProcessingApplicationIntegrationTest {
         System.out.println(hash);
         assertEquals("A8BBFC3B17C00C40C9883DA1F396D453", hash);
 
+        //close Spark session
+        sparkSession.close();
     }
 }
