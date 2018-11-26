@@ -92,7 +92,7 @@ public class VariablesTypeEscalationStep implements PreprocessingStepInterface {
         SparkSession sparkSession = SparkSession.builder().getOrCreate();
         Dataset<Row> helpDataSet = sparkSession.createDataFrame(filteredVariablesRows, schema).toDF().orderBy(VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
-        SparkImporterLogger.getInstance().writeInfo("Found " + helpDataSet.count() + " variables.");
+        SparkImporterLogger.getInstance().writeInfo("Found " + helpDataSet.count() + " process variables.");
 
         SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_escalated");
 

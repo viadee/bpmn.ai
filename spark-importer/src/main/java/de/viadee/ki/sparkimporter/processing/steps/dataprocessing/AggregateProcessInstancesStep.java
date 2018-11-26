@@ -1,6 +1,7 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Column;
@@ -80,6 +81,8 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         //in case we add the CSV we have a name column in the first dataset of the join so we call drop again to make sure it is gone
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
         dataset = dataset.drop(SparkImporterVariables.VAR_ACT_INST_ID);
+
+        SparkImporterLogger.getInstance().writeInfo("Found " + dataset.count() + " process instances.");
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_process_instances");

@@ -201,7 +201,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
                             Metadata.empty())
             });
 
-            SparkImporterLogger.getInstance().writeInfo("Found " + newColumns.size() + " additional variables during Json processing.");
+            SparkImporterLogger.getInstance().writeInfo("Found " + newColumns.size() + " additional process variables during Json processing.");
 
             SparkSession sparkSession = SparkSession.builder().getOrCreate();
             Dataset<Row> helpDataSet = sparkSession.createDataFrame(filteredVariablesRows, schemaVars).toDF().orderBy(VAR_PROCESS_INSTANCE_VARIABLE_NAME);
