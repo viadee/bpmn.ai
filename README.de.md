@@ -4,7 +4,7 @@
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) 
 [![Status](https://travis-ci.org/viadee/bpmn.ai.svg?branch=master)](https://travis-ci.org/viadee/bpmn.ai/branches "See test builds")
-[![Sonarcloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.viadee.ki:spark-importer&metric=coverage)](https://sonarcloud.io/dashboard?id=de.viadee.ki:spark-importer) 
+[![Sonarcloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.viadee:spark-importer&metric=coverage)](https://sonarcloud.io/dashboard?id=de.viadee:spark-importer) 
 
 *Read this in other languages: [English](README.md), [German](README.de.md).*
 
@@ -20,7 +20,7 @@ In diesem Repository enthalten ist die (konfigurierbare) Datenaufbereitungs-Pipe
 
 # Zusammenarbeit
 
-Das Projekt wird betrieben und weiterentwickelt von der viadee Unternehmensberatung GmbH in Münster, Westfalen. Ergebnisse aus Abschlussarbeiten an der WWU Münster und der FH Münster sind eingeflossen.
+Das Projekt wird betrieben und weiterentwickelt von der viadee Unternehmensberatung AG in Münster, Westfalen. Ergebnisse aus Abschlussarbeiten an der WWU Münster und der FH Münster sind eingeflossen.
 
 * Weitere Abschlussarbeiten sind geplant: Ansprechpartner dazu ist Dr. Frank Köhne von der viadee.
 * Community-Beiträge zum Projekt sind gern gesehen: Hierzu bitten wir Github-Issues mit Vorschägen (oder PR) zu öffnen, die wir dann im Team bearbeiten können.
