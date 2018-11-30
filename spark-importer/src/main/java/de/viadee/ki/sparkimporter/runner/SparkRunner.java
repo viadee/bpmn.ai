@@ -144,6 +144,7 @@ public abstract class SparkRunner {
                 s.setId(ps.getId());
                 s.setParameters(ps.getStepParameters());
                 s.setComment("");
+                s.setActive(true);
                 configSteps.add(s);
             }
 
@@ -158,7 +159,9 @@ public abstract class SparkRunner {
 
                         if (steps != null) {
                             for (Step cs : steps) {
-                                pipelineSteps.add(new PipelineStep(cs));
+                            	if(cs.getActive() != false) {
+                            		pipelineSteps.add(new PipelineStep(cs));
+                            	}                               
                             }
                         }
                     }
