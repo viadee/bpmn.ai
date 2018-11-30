@@ -1,5 +1,7 @@
 package de.viadee.ki.sparkimporter.processing.steps.userconfig;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepParameter;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import org.apache.spark.sql.Dataset;
@@ -7,6 +9,8 @@ import org.apache.spark.sql.Row;
 
 import java.util.Map;
 
+@PreprocessingStepDescription(value = "If the configuration contains a filter query (e.g. by limiting the processing only to one process definition id, it is applied in this step to reduce the input data.")
+@PreprocessingStepParameter(name = "query", description = "The Apache Spark filter query to execute in this step")
 public class DataFilterStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
