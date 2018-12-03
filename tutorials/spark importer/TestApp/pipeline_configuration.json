@@ -1,0 +1,288 @@
+{
+  "data_extraction": {},
+  "preprocessing": {
+    "variable_configuration": [
+      {
+        "variable_name": "approver",
+        "variable_type": "string",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "amount",
+        "variable_type": "double",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "approved",
+        "variable_type": "boolean",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "approverGroups",
+        "variable_type": "serializable",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "invoiceNumber",
+        "variable_type": "string",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "invoiceDocument",
+        "variable_type": "file",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "creditor",
+        "variable_type": "string",
+        "use_variable": true,
+        "comment": ""
+      },
+      {
+        "variable_name": "invoiceCategory",
+        "variable_type": "string",
+        "use_variable": true,
+        "comment": ""
+      }
+    ],
+    "variable_name_mapping": [],
+    "column_configuration": [
+      {
+        "column_name": "proc_def_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "super_process_instance_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "delete_reason_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "super_case_instance_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "tenant_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "execution_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "proc_def_key_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "case_execution_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "duration_",
+        "column_type": "integer",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "case_def_key_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "start_user_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "end_act_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "start_act_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "case_def_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "bytearray_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "end_time_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "start_time_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "case_inst_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "business_key_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "task_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      },
+      {
+        "column_name": "act_inst_id_",
+        "column_type": "string",
+        "use_column": true,
+        "comment": ""
+      }
+    ],
+    "column_hash_configuration": [],
+    "pipeline_step_configuration": {
+      "steps": [
+        {
+          "id": "DataFilterStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.DataFilterStep",
+          "dependsOn": ""
+        },
+        {
+          "id": "ColumnRemoveStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.ColumnRemoveStep",
+          "dependsOn": "DataFilterStep"
+        },
+        {
+          "id": "ReduceColumnsDatasetStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsDatasetStep",
+          "dependsOn": "ColumnRemoveStep"
+        },
+        {
+          "id": "VariableFilterStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableFilterStep",
+          "dependsOn": "ReduceColumnsDatasetStep"
+        },
+        {
+          "id": "VariableNameMappingStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableNameMappingStep",
+          "dependsOn": "VariableFilterStep"
+        },
+        {
+          "id": "DetermineVariableTypesStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineVariableTypesStep",
+          "dependsOn": "VariableNameMappingStep"
+        },
+        {
+          "id": "VariablesTypeEscalationStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep",
+          "dependsOn": "DetermineVariableTypesStep"
+        },
+        {
+          "id": "AggregateVariableUpdatesStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateVariableUpdatesStep",
+          "dependsOn": "VariablesTypeEscalationStep"
+        },
+        {
+          "id": "AddVariablesColumnsStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariablesColumnsStep",
+          "dependsOn": "AggregateVariableUpdatesStep"
+        },
+        {
+          "id": "AggregateProcessInstancesStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateProcessInstancesStep",
+          "dependsOn": "AddVariablesColumnsStep"
+        },
+        {
+          "id": "CreateColumnsFromJsonStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep",
+          "dependsOn": "AggregateProcessInstancesStep"
+        },
+        {
+          "id": "JsonVariableFilterStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.JsonVariableFilterStep",
+          "dependsOn": "CreateColumnsFromJsonStep"
+        },
+        {
+          "id": "AddReducedColumnsToDatasetStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddReducedColumnsToDatasetStep",
+          "dependsOn": "JsonVariableFilterStep"
+        },
+        {
+          "id": "ColumnHashStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.ColumnHashStep",
+          "dependsOn": "AddReducedColumnsToDatasetStep"
+        },
+        {
+          "id": "TypeCastStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.userconfig.TypeCastStep",
+          "dependsOn": "ColumnHashStep"
+        },
+        {      
+          "id": "CheckApprovedStep",
+          "className":"de.viadee.ki._SNAPSHOT.CheckApprovedStep",
+          "dependsOn": "TypeCastStep",
+          "parameters":{
+            "column":  "approved"
+          }
+        },
+        {
+          "id": "WriteToDiscStep",
+          "className": "de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep",
+          "dependsOn": "CheckApprovedStep"
+        }
+      ]
+    }
+  },
+  "model_learning": {},
+  "model_prediction": {
+    "prediction_variables": [],
+    "pipeline_step_configuration": {}
+  }
+}

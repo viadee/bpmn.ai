@@ -6,7 +6,7 @@
 [![Status](https://travis-ci.org/viadee/bpmn.ai.svg?branch=master)](https://travis-ci.org/viadee/bpmn.ai/branches "See test builds")
 [![Sonarcloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.viadee:spark-importer&metric=coverage)](https://sonarcloud.io/dashboard?id=de.viadee:spark-importer)
 
-*Read this in other languages: [English](README.md), [German](README.de.md).*
+*Read this in other languages: [German](README.de.md).*
 
 Bpmn.ai describes the approach of preparing and using standard process data for data mining. Bpmn.ai covers the entire pipeline, which means data extraction, transformation and processing of the data, learning a suitable machine learning algorithm and applying the knowledge gained in order to optimize or automate processes: Such process centric Machine Learning Models can be used for wide variety of applications such as e.g. bottleneck analyses, process duration predictions or anomaly detection.
 
@@ -42,7 +42,7 @@ The following applications are available:
 
 Each of these applications serves a different purpose.
 
-A tutorial and examples of the applications can be found in the [Wiki](https://github.com/viadee/bpmn.ai/wiki/Tutorial-for-Spark-Importer).
+A **tutorial** and examples of the applications can be found in the [Wiki](https://github.com/viadee/bpmn.ai/wiki/Tutorial-for-Spark-Importer).
 
 ### Data pipeline
 
@@ -67,3 +67,4 @@ The data retrieved is then stored at a defined location as parquet files. There 
 ### KafkaProcessingApplication
 
 This application (class: KafkaProcessingApplication) retrieves data from a Kafka import. The data goes through the same steps as in the CSV import and processing application, it is a separate application because it has a different input than the CSV case.
+

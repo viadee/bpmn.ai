@@ -10,6 +10,7 @@ public class Step {
     private String dependsOn;
     private Map<String, Object> parameters = new HashMap<>();
     private String comment;
+    private Boolean active = true;
 
     public String getId() {
         return id;
@@ -30,6 +31,10 @@ public class Step {
     public String getDependsOn() {
         return dependsOn;
     }
+    
+    public Boolean getActive() {
+        return active;
+    }
 
     public void setDependsOn(String dependsOn) {
         this.dependsOn = dependsOn;
@@ -49,5 +54,9 @@ public class Step {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+    
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }

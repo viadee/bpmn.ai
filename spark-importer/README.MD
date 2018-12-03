@@ -124,7 +124,7 @@ The configuration file has the following structure:
     		"column_configuration": [
 		   		{
 		        	"column_name": "",
-		        	"column_type": ""
+		        	"column_type": "",
 		        	"use_column": true,
 		        	"comment": ""
 		      	}
@@ -191,7 +191,7 @@ Example:
 		{
 			"variable_name": "a",
 			"variable_type": "string",
-			"parse_format": "yyy"
+			"parse_format": "yyy",
 			"use_variable": true,
 			"comment": ""
 		},
@@ -210,7 +210,7 @@ Example:
 		{
 			"variable_name": "d",
 			"variable_type": "date",
-			"parse_format": "yyyy/MM/dd"
+			"parse_format": "yyyy/MM/dd",
 			"use_variable": true,
 			"comment": ""
 		},
@@ -259,7 +259,7 @@ Example:
     "column_configuration": [
       {
         "column_name": "case_execution_id_",
-        "column_type": "string"
+        "column_type": "string",
         "use_column": false,
         "comment": ""
       }

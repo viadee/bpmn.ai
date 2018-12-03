@@ -51,5 +51,21 @@ public class Configuration {
     public void setModelPredictionConfiguration(ModelPredictionConfiguration modelPredictionConfiguration) {
         this.modelPredictionConfiguration = modelPredictionConfiguration;
     }
+
+    public boolean isEmpty() {
+        boolean result = false;
+
+        if(this.preprocessingConfiguration == null
+                ||
+                (this.preprocessingConfiguration.getVariableConfiguration().size() == 0
+                        && this.preprocessingConfiguration.getColumnConfiguration().size() == 0
+                        && this.preprocessingConfiguration.getPipelineStepConfiguration().getSteps() == null
+                )
+        ) {
+            result = true;
+        }
+
+        return result;
+    }
 }
 

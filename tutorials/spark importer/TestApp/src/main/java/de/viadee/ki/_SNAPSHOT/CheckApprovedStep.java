@@ -1,4 +1,4 @@
-package de.viadee.ki.sparkimporter.processing.steps.userconfig;
+package de.viadee.ki._SNAPSHOT;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
@@ -9,7 +9,7 @@ import org.apache.spark.sql.functions;
 import java.util.Map;
 
 public class CheckApprovedStep implements PreprocessingStepInterface {
-    @Override
+
     	 public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel,
                  Map<String, Object> parameters) {
 

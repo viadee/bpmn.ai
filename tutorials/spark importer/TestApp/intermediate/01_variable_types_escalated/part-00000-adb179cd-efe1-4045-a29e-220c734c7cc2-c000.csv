@@ -1,0 +1,9 @@
+name_|var_type_
+amount|double
+approved|boolean
+approver|string
+approverGroups|serializable
+creditor|string
+invoiceCategory|string
+invoiceDocument|file
+invoiceNumber|string
