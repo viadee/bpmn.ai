@@ -1,0 +1,15 @@
+{
+  "data_extraction": {},
+  "preprocessing": {
+    "variable_configuration": [],
+    "variable_name_mapping": [],
+    "column_configuration": [],
+    "column_hash_configuration": [],
+    "pipeline_step_configuration": {}
+  },
+  "model_learning": {},
+  "model_prediction": {
+    "prediction_variables": [],
+    "pipeline_step_configuration": {}
+  }
+}

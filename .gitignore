@@ -58,3 +58,7 @@ servicecaller/.settings/org.eclipse.jdt.core.prefs
 servicecaller/.classpath
 servicecaller/.settings/org.eclipse.m2e.core.prefs
 spark-importer/pipeline_configuration.json
+spark-importer/spark-importer.log.3
+spark-importer/spark-importer.log.2
+spark-importer/spark-importer.log.1.lck
+spark-importer/spark-importer.log.2.lck
