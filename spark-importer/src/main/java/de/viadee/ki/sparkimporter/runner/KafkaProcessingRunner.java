@@ -42,6 +42,8 @@ public class KafkaProcessingRunner extends SparkRunner {
             System.exit(1);
         }
 
+        SparkImporterVariables.setRunningMode(MODE.KAFKA_PROCESSING);
+
         //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
         SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
         SparkImporterVariables.setDevTypeCastCheckEnabled(ARGS.isDevTypeCastCheckEnabled());
