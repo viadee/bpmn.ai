@@ -6,7 +6,7 @@
 [![Status](https://travis-ci.org/viadee/bpmn.ai.svg?branch=master)](https://travis-ci.org/viadee/bpmn.ai/branches "See test builds")
 [![Sonarcloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.viadee:spark-importer&metric=coverage)](https://sonarcloud.io/dashboard?id=de.viadee:spark-importer) 
 
-*Read this in other languages: [English](README.md), [German](README.de.md).*
+*Read this in other languages: [English](README.md).*
 
 Bpmn.ai bezeichnet den Ansatz, Standard-Prozessdaten für ein Data Mining aufzubereiten und zu nutzen. Bpmn.ai umfasst die gesamte Pipeline von der Datenextraktion, über die Transformation und Aufarbeitung der Daten, bis hin zum Anlernen eines geeigneten Machine Learning Algorithmus und dem zur Verfügung stellen, der daraus gewonnen Erkenntnisse.
 Diese können unter anderem zur Optimierung und Automatisierung von Prozessen verwendet werden, sind aber generell für verschiedenste Anwendungen interessant (z.B.

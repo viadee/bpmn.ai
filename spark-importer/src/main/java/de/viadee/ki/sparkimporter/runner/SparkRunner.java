@@ -43,8 +43,8 @@ public abstract class SparkRunner {
     protected abstract Dataset<Row> loadInitialDataset();
 
     private void checkConfig() {
-        //if there is no configuration file yet, write one in the next steps
-        if(ConfigurationUtils.getInstance().getConfiguration(true) == null) {
+        //if there is no configuration file yet or an completely empty one, write one in the next steps
+        if(ConfigurationUtils.getInstance().getConfiguration(true) == null || ConfigurationUtils.getInstance().getConfiguration(true).isEmpty()) {
             PreprocessingRunner.initialConfigToBeWritten = true;
             ConfigurationUtils.getInstance().createEmptyConfig();
         }
