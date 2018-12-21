@@ -29,7 +29,11 @@ public class DetermineVariableTypesStep implements PreprocessingStepInterface {
         Iterator<Row> it = variablesTypesDataset.toLocalIterator();
         while(it.hasNext()) {
             Row row = it.next();
-            variablesAndTypes.put(row.getString(0), row.getString(1));
+            String name = row.getString(0);
+            String type = row.getString(1);
+            if(type == null)
+                type = "string";
+            variablesAndTypes.put(name, type);
         }
 
         //broadcast variable in Spark
