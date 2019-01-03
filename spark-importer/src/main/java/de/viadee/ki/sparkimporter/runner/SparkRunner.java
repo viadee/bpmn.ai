@@ -13,6 +13,10 @@ import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import org.apache.spark.scheduler.SparkListener;
+import org.apache.spark.scheduler.SparkListenerApplicationEnd;
+import org.apache.spark.scheduler.SparkListenerJobEnd;
+import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -79,6 +83,31 @@ public abstract class SparkRunner {
     public void run(String[] arguments) throws FaultyConfigurationException {
         // spark configuration is being loaded from Environment (e.g. when using spark-submit)
         sparkSession = SparkSession.builder().getOrCreate();
+
+        // listen for application progress and write to console
+        System.out.println("Spark application '" + sparkSession.sparkContext().appName() + "' (ID: " + sparkSession.sparkContext().applicationId() + ") started.");
+        sparkSession.sparkContext().addSparkListener(new SparkListener() {
+            @Override
+            public void onJobEnd(SparkListenerJobEnd jobEnd) {
+                super.onJobEnd(jobEnd);
+
+                System.out.println("... job " + jobEnd.jobId() + " finished.");
+            }
+
+            @Override
+            public void onJobStart(SparkListenerJobStart jobStart) {
+                super.onJobStart(jobStart);
+
+                System.out.print("Spark job " + jobStart.jobId() + " started (has " + jobStart.stageIds().size() + " " + (jobStart.stageIds().size() == 1 ? "stage" : "stages") + ") ...");
+            }
+
+            @Override
+            public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
+                super.onApplicationEnd(applicationEnd);
+
+                System.out.println("Spark application finished.");
+            }
+        });
 
         registerUDFs();
         initialize(arguments);
