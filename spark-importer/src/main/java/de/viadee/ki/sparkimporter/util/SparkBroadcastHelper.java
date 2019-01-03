@@ -11,7 +11,8 @@ public class SparkBroadcastHelper {
 
     public enum BROADCAST_VARIABLE {
         PROCESS_VARIABLES_RAW,
-        PROCESS_VARIABLES_ESCALATED
+        PROCESS_VARIABLES_ESCALATED,
+        PROCESS_INSTANCE_TIMESTAMP_MAP
     }
 
     private static SparkBroadcastHelper instance;

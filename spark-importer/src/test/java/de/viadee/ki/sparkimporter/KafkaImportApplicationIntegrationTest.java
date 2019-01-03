@@ -99,7 +99,7 @@ public class KafkaImportApplicationIntegrationTest {
     @Test
     public void testKafkaStreamingImportProcessLevel() throws Exception {
         //run main class
-        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", IMPORT_TEST_OUTPUT_DIRECTORY_PROCESS, "-bm", "true", "-sr", "false", "-dl", "process", "-wd", "./src/test/resources/config/kafka_import_process/"};
+        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", IMPORT_TEST_OUTPUT_DIRECTORY_PROCESS, "-bm", "true", "-sr", "false", "-dl", "process", "-wd", "./src/test/resources/config/kafka_import_process/", "-sm", "overwrite"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -112,7 +112,7 @@ public class KafkaImportApplicationIntegrationTest {
                 .getOrCreate();
 
         //generate Dataset and create hash to compare
-        Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY_PROCESS);
+        Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY_PROCESS+ "/result/parquet");
 
         //check that dataset contains 43 lines
         assertEquals(43, importedDataset.count());
@@ -128,7 +128,7 @@ public class KafkaImportApplicationIntegrationTest {
     @Test
     public void testKafkaStreamingImportActivityLevel() throws Exception {
         //run main class
-        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", IMPORT_TEST_OUTPUT_DIRECTORY_ACTIVITY, "-bm", "true", "-sr", "false", "-dl", "activity", "-wd", "./src/test/resources/config/kafka_import_activity/"};
+        String args[] = {"-kb", KAFKA_HOST + ":" + KAFKA_PORT, "-fd", IMPORT_TEST_OUTPUT_DIRECTORY_ACTIVITY, "-bm", "true", "-sr", "false", "-dl", "activity", "-wd", "./src/test/resources/config/kafka_import_activity/","-sm", "overwrite"};
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]");
         SparkSession.builder().config(sparkConf).getOrCreate();
@@ -141,7 +141,7 @@ public class KafkaImportApplicationIntegrationTest {
                 .getOrCreate();
 
         //generate Dataset and create hash to compare
-        Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY_ACTIVITY);
+        Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY_ACTIVITY + "/result/parquet");
 
         //check that dataset contains 55 lines
         assertEquals(55, importedDataset.count());

@@ -44,6 +44,11 @@ public class SparkImporterKafkaImportArguments {
 	@Parameter(names = { "--output-format",
 	"-of" }, required = false, description = "In which format should the result be written (parquet or csv)?")
 	private String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
+	
+	@Parameter(names = { "--save-mode",
+	"-sm" }, required = false, description = "Should the result be appended to the destination or should it be overwritten?")
+private String saveMode = SparkImporterVariables.SAVE_MODE_APPEND;
+
 
 	/**
 	 * Singleton.
@@ -90,6 +95,10 @@ public class SparkImporterKafkaImportArguments {
 	
 	public String getOutputFormat() {
 		return outputFormat;
+	}
+	
+	public String getSaveMode() {
+		return saveMode;
 	}
 
 	/**

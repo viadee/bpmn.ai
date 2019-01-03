@@ -70,6 +70,7 @@ public class SparkImporterUtils {
 
         //save dataset into parquet file
         dataSet
+        		.repartition(dataSet.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID))
                 .write()
                 .mode(config.getSaveMode())
                 .save(targetFolder + "/parquet");

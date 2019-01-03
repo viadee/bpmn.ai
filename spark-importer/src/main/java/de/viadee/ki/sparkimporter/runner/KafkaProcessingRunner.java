@@ -94,6 +94,8 @@ public class KafkaProcessingRunner extends SparkRunner {
             pipelineSteps.add(new PipelineStep(new AggregateActivityInstancesStep(), "AddVariableColumnsStep"));
         }
 
+       // pipelineSteps.add(new PipelineStep(new DataFilterOnActivityStep(), "AddVariablesColumnsStep"));
+
         pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "AggregateProcessInstancesStep" : "AggregateActivityInstancesStep"));
 
         if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {

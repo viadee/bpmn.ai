@@ -3,6 +3,8 @@ package de.viadee.ki.sparkimporter.processing.steps.output;
 import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.util.SparkImporterKafkaImportArguments;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
