@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -16,6 +17,7 @@ import java.util.Set;
 
 import static org.apache.spark.sql.functions.when;
 
+@PreprocessingStepDescription(value = "In this step each variable column is filled with values according to the history of the process instance up to the point of activity activity represented in the line.")
 public class FillActivityInstancesHistoryStep implements PreprocessingStepInterface {
 
     @Override

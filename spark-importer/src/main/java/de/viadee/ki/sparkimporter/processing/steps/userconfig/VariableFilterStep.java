@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.userconfig;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@PreprocessingStepDescription(value = "If the configuration contains variable that should not be processed then they are filtered out during this step.")
 public class VariableFilterStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {

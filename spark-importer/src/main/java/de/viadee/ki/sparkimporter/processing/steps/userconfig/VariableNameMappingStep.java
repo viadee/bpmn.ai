@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.userconfig;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableNameMapping;
@@ -17,6 +18,7 @@ import java.util.Map;
 import static org.apache.spark.sql.functions.lit;
 import static org.apache.spark.sql.functions.when;
 
+@PreprocessingStepDescription(value = "If a variable name changed (e.g. in a new process version) the user can configure a mapping in the configuration file so that they are handled as the same variable.")
 public class VariableNameMappingStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {

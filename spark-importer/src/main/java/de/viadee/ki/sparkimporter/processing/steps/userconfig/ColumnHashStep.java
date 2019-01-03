@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.userconfig;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.ColumnHashConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 import static org.apache.spark.sql.functions.sha1;
 
+@PreprocessingStepDescription(value = "In this step the columns that are configured to be hashed for anonymization are run through a SHA-1 hash operation.")
 public class ColumnHashStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {

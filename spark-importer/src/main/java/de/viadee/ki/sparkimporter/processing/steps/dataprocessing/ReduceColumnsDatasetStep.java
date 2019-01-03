@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.ColumnConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@PreprocessingStepDescription(value = "The columns of the input data is reduced to the minimum required for the processing to speed up the processing. The removed columns are added back in the end.")
 public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
 
     @Override

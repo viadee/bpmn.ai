@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
 import static org.apache.spark.sql.functions.isnull;
 import static org.apache.spark.sql.functions.not;
 
+@PreprocessingStepDescription(value = "In this step the data is aggregated in a way so that there is only one line per activity instance per process instance in the dataset.")
 public class AggregateActivityInstancesStep implements PreprocessingStepInterface {
 
     @Override

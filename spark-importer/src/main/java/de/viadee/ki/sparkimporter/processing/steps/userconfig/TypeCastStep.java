@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.userconfig;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.ColumnConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 import static org.apache.spark.sql.functions.*;
 
+@PreprocessingStepDescription(value = "In this step the columns are casted into the data type they have been defined in the configuration. If the cast could not be done by Spark the value is null afterwards.")
 public class TypeCastStep implements PreprocessingStepInterface {
 
     @Override

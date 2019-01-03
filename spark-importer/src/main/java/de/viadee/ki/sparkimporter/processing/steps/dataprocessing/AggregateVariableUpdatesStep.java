@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -15,6 +16,7 @@ import java.util.regex.Pattern;
 
 import static org.apache.spark.sql.functions.*;
 
+@PreprocessingStepDescription(value = "This is the first aggregation step. In this step all variable updates are aggregated per process instance and variable. So if one variable value changed during a process instance it is aggregated to the last value the variable had in the process instance.")
 public class AggregateVariableUpdatesStep implements PreprocessingStepInterface {
 
     @Override

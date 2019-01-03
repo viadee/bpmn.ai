@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 import static org.apache.spark.sql.functions.max;
 
+@PreprocessingStepDescription(value = "All process variables and their data types are detemined here.")
 public class DetermineVariableTypesStep implements PreprocessingStepInterface {
 
     @Override
