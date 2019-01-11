@@ -167,6 +167,9 @@ public abstract class SparkRunner {
          * if the created configuration file is a minimal one, overwrite the steps with the default pipeline
          */
         if (PreprocessingRunner.initialConfigToBeWritten){
+            logMessage = "Filling the minimal configuration pipeline with the applications default pipeline...";
+            LOG.info(logMessage);
+            SparkImporterLogger.getInstance().writeInfo(logMessage);
             logMessage = "Execute again to process data with under the newly created configuration.";
             LOG.info(logMessage);
             SparkImporterLogger.getInstance().writeInfo(logMessage);
