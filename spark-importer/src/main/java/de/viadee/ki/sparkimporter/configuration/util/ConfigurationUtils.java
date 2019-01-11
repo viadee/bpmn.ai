@@ -60,7 +60,7 @@ public class ConfigurationUtils {
 
     public void createEmptyConfig() {
 
-        SparkImporterLogger.getInstance().writeInfo("No config file found. Creating default config file for dataset.");
+        SparkImporterLogger.getInstance().writeInfo("No config file found. Creating minimal config file for dataset.");
 
         PreprocessingConfiguration preprocessingConfiguration = new PreprocessingConfiguration();
 

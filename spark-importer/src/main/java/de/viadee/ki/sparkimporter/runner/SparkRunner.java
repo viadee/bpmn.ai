@@ -11,6 +11,10 @@ import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggreg
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineVariableTypesStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsDatasetStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
@@ -40,11 +44,23 @@ public abstract class SparkRunner {
 
     protected abstract List<PipelineStep> buildDefaultPipeline();
 
+    protected List<PipelineStep> buildMinimalPipeline(){
+        List<PipelineStep> pipelineSteps = new ArrayList<>();
+
+        pipelineSteps.add(new PipelineStep(new ReduceColumnsDatasetStep(), ""));
+        pipelineSteps.add(new PipelineStep(new DetermineVariableTypesStep(), "ReduceColumnsDatasetStep"));
+        pipelineSteps.add(new PipelineStep(new VariablesTypeEscalationStep(), "DetermineVariableTypesStep"));
+        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "VariablesTypeEscalationStep"));
+
+        return pipelineSteps;
+    }
+
     protected abstract Dataset<Row> loadInitialDataset();
 
     private void checkConfig() {
         //if there is no configuration file yet or an completely empty one, write one in the next steps
-        if(ConfigurationUtils.getInstance().getConfiguration(true) == null || ConfigurationUtils.getInstance().getConfiguration(true).isEmpty()) {
+        if(ConfigurationUtils.getInstance().getConfiguration(true) == null
+                || ConfigurationUtils.getInstance().getConfiguration(true).isEmpty()) {
             PreprocessingRunner.initialConfigToBeWritten = true;
             ConfigurationUtils.getInstance().createEmptyConfig();
         }
@@ -118,10 +134,47 @@ public abstract class SparkRunner {
         LOG.info(logMessage);
         SparkImporterLogger.getInstance().writeInfo(logMessage);
 
+        /**
+         * if the created configuration file is a minimal one, overwrite the steps with the default pipeline
+         */
+        if (PreprocessingRunner.initialConfigToBeWritten){
+            logMessage = "Execute again to process data with under the newly created configuration.";
+            LOG.info(logMessage);
+            SparkImporterLogger.getInstance().writeInfo(logMessage);
+            overwritePipelineSteps();
+        }
+
         // Cleanup
         sparkSession.close();
 
         writeConfig();
+    }
+
+    public void overwritePipelineSteps() throws FaultyConfigurationException {
+        List<Step> steps = null;
+
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+
+        if (PreprocessingRunner.initialConfigToBeWritten) {
+            pipelineSteps = buildDefaultPipeline();
+
+            PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
+            PipelineStepConfiguration pipelineStepConfiguration = preprocessingConfiguration.getPipelineStepConfiguration();
+
+            List<Step> configSteps = new ArrayList<>();
+            for (PipelineStep ps : pipelineSteps) {
+                Step s = new Step();
+                s.setClassName(ps.getClassName());
+                s.setDependsOn(ps.getDependsOn());
+                s.setId(ps.getId());
+                s.setParameters(ps.getStepParameters());
+                s.setComment("");
+                s.setActive(true);
+                configSteps.add(s);
+            }
+
+            pipelineStepConfiguration.setSteps(configSteps);
+        }
     }
 
     public void configurePipelineSteps() throws FaultyConfigurationException {
@@ -131,7 +184,7 @@ public abstract class SparkRunner {
         Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
 
         if(PreprocessingRunner.initialConfigToBeWritten) {
-            pipelineSteps = buildDefaultPipeline();
+            pipelineSteps = buildMinimalPipeline();
 
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
             PipelineStepConfiguration pipelineStepConfiguration = preprocessingConfiguration.getPipelineStepConfiguration();
