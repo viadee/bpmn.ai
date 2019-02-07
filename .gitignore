@@ -62,3 +62,7 @@ spark-importer/spark-importer.log.3
 spark-importer/spark-importer.log.2
 spark-importer/spark-importer.log.1.lck
 spark-importer/spark-importer.log.2.lck
+tutorials/spark importer/kafkatutorialproducer/.classpath
+tutorials/spark importer/kafkatutorialproducer/.settings/org.eclipse.jdt.core.prefs
+tutorials/spark importer/kafkatutorialproducer/.gitignore
+tutorials/spark importer/kafkatutorialproducer/.settings/org.eclipse.core.resources.prefs

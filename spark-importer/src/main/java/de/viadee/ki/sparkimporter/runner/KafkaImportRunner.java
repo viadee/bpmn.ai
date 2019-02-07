@@ -7,6 +7,7 @@ import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.ColumnsPreparationStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep;
+import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterKafkaImportArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -79,6 +80,7 @@ public class KafkaImportRunner extends SparkRunner {
         SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
         SparkImporterVariables.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
+        SparkImporterVariables.setOutputFormat(ARGS.getOutputFormat());
         
         SparkImporterVariables.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
 
