@@ -12,10 +12,8 @@ import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregatio
 import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineVariableTypesStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsDatasetStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableFilterStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineProcessVariablesStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.scheduler.SparkListener;
@@ -52,11 +50,9 @@ public abstract class SparkRunner {
     protected List<PipelineStep> buildMinimalPipeline(){
         List<PipelineStep> pipelineSteps = new ArrayList<>();
 
-        pipelineSteps.add(new PipelineStep(new ReduceColumnsDatasetStep(), ""));
-        pipelineSteps.add(new PipelineStep(new VariableFilterStep(), "ReduceColumnsDatasetStep"));
-        pipelineSteps.add(new PipelineStep(new DetermineVariableTypesStep(), "VariableFilterStep"));
-        pipelineSteps.add(new PipelineStep(new VariablesTypeEscalationStep(), "DetermineVariableTypesStep"));
-        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "VariablesTypeEscalationStep"));
+        pipelineSteps.add(new PipelineStep(new ReduceColumnsStep(), ""));
+        pipelineSteps.add(new PipelineStep(new DetermineProcessVariablesStep(), "ReduceColumnsStep"));
+        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "DetermineProcessVariablesStep"));
 
         return pipelineSteps;
     }
