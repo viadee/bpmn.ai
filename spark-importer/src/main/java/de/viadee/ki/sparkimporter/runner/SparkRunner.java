@@ -15,6 +15,7 @@ import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsF
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineVariableTypesStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsDatasetStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
+import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableFilterStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.scheduler.SparkListener;
@@ -52,7 +53,8 @@ public abstract class SparkRunner {
         List<PipelineStep> pipelineSteps = new ArrayList<>();
 
         pipelineSteps.add(new PipelineStep(new ReduceColumnsDatasetStep(), ""));
-        pipelineSteps.add(new PipelineStep(new DetermineVariableTypesStep(), "ReduceColumnsDatasetStep"));
+        pipelineSteps.add(new PipelineStep(new VariableFilterStep(), "ReduceColumnsDatasetStep"));
+        pipelineSteps.add(new PipelineStep(new DetermineVariableTypesStep(), "VariableFilterStep"));
         pipelineSteps.add(new PipelineStep(new VariablesTypeEscalationStep(), "DetermineVariableTypesStep"));
         pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "VariablesTypeEscalationStep"));
 
