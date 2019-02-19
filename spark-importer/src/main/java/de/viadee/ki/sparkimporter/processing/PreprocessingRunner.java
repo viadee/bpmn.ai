@@ -17,7 +17,7 @@ public class PreprocessingRunner {
         KAFKA_RUNNER
     }
 
-    public static RUNNER_MODE RUNNER_MODE = null;
+    public static RUNNER_MODE runnerMode = null;
 
     private final List<PipelineStep> pipelineSteps = new ArrayList<>();
 

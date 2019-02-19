@@ -7,7 +7,6 @@ import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.ColumnsPreparationStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep;
-import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterKafkaImportArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -61,7 +60,7 @@ public class KafkaImportRunner extends SparkRunner {
 
     @Override
     protected void initialize(String[] arguments) {
-        PreprocessingRunner.RUNNER_MODE = PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT;
+        PreprocessingRunner.runnerMode = PreprocessingRunner.runnerMode.KAFKA_IMPORT;
 
         ARGS = SparkImporterKafkaImportArguments.getInstance();
 

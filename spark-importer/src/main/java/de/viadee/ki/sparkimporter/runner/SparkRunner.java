@@ -67,7 +67,7 @@ public abstract class SparkRunner {
         //if there is no configuration file yet or an completely empty one, write one in the next steps
         if(ConfigurationUtils.getInstance().getConfiguration(true) == null
                 || ConfigurationUtils.getInstance().getConfiguration(true).isEmpty()) {
-            if(!PreprocessingRunner.RUNNER_MODE.equals(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT)) {
+            if(!PreprocessingRunner.runnerMode.equals(PreprocessingRunner.runnerMode.KAFKA_IMPORT)) {
                 PreprocessingRunner.minimalPipelineToBeBuild = true;
             }
             PreprocessingRunner.initialConfigToBeWritten = true;
@@ -220,7 +220,7 @@ public abstract class SparkRunner {
         Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
 
         if(PreprocessingRunner.initialConfigToBeWritten) {
-            if(!PreprocessingRunner.RUNNER_MODE.equals(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT)) {
+            if(!PreprocessingRunner.runnerMode.equals(PreprocessingRunner.runnerMode.KAFKA_IMPORT)) {
                 pipelineSteps = buildMinimalPipeline();
             } else {
                 pipelineSteps = buildDefaultPipeline();
