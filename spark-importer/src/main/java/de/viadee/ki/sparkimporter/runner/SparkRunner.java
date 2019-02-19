@@ -103,27 +103,28 @@ public abstract class SparkRunner {
         sparkSession = SparkSession.builder().getOrCreate();
 
         // listen for application progress and write to console
-        System.out.println("Spark application '" + sparkSession.sparkContext().appName() + "' (ID: " + sparkSession.sparkContext().applicationId() + ") started.");
+        LOG.info("Spark application '" + sparkSession.sparkContext().appName() + "' (ID: " + sparkSession.sparkContext().applicationId() + ") started.");
+
         sparkSession.sparkContext().addSparkListener(new SparkListener() {
             @Override
             public void onJobEnd(SparkListenerJobEnd jobEnd) {
                 super.onJobEnd(jobEnd);
 
-                System.out.println("... job " + jobEnd.jobId() + " finished.");
+                LOG.info("... job " + jobEnd.jobId() + " finished.");
             }
 
             @Override
             public void onJobStart(SparkListenerJobStart jobStart) {
                 super.onJobStart(jobStart);
 
-                System.out.print("Spark job " + jobStart.jobId() + " started (has " + jobStart.stageIds().size() + " " + (jobStart.stageIds().size() == 1 ? "stage" : "stages") + ") ...");
+                LOG.info("Spark job " + jobStart.jobId() + " started (has " + jobStart.stageIds().size() + " " + (jobStart.stageIds().size() == 1 ? "stage" : "stages") + ") ...");
             }
 
             @Override
             public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
                 super.onApplicationEnd(applicationEnd);
 
-                System.out.println("Spark application finished.");
+                LOG.info("Spark application finished.");
             }
         });
 
