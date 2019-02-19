@@ -17,7 +17,7 @@ public class PreprocessingRunner {
         KAFKA_RUNNER
     }
 
-    public static RUNNER_MODE runnerMode = null;
+    private static RUNNER_MODE runnerMode = null;
 
     private final List<PipelineStep> pipelineSteps = new ArrayList<>();
 
@@ -56,5 +56,13 @@ public class PreprocessingRunner {
 
     public static synchronized int getCounter() {
         return stepCounter;
+    }
+
+    public static RUNNER_MODE getRunnerMode() {
+        return runnerMode;
+    }
+
+    public static void setRunnerMode(RUNNER_MODE runnerMode) {
+        PreprocessingRunner.runnerMode = runnerMode;
     }
 }

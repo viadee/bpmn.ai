@@ -60,7 +60,7 @@ public class KafkaImportRunner extends SparkRunner {
 
     @Override
     protected void initialize(String[] arguments) {
-        PreprocessingRunner.runnerMode = PreprocessingRunner.runnerMode.KAFKA_IMPORT;
+        PreprocessingRunner.setRunnerMode(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT);
 
         ARGS = SparkImporterKafkaImportArguments.getInstance();
 
