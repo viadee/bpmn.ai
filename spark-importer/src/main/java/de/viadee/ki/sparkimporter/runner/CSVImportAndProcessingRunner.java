@@ -31,6 +31,8 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
 
     @Override
     protected void initialize(String[] arguments) {
+        PreprocessingRunner.RUNNER_MODE = PreprocessingRunner.RUNNER_MODE.CSV_IMPORT_AND_RUNNER;
+
         ARGS = SparkImporterCSVArguments.getInstance();
 
         // instantiate JCommander

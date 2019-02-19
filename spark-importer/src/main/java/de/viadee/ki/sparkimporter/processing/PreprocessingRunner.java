@@ -11,6 +11,14 @@ import java.util.Map;
 
 public class PreprocessingRunner {
 
+    public enum RUNNER_MODE {
+        CSV_IMPORT_AND_RUNNER,
+        KAFKA_IMPORT,
+        KAFKA_RUNNER
+    }
+
+    public static RUNNER_MODE RUNNER_MODE = null;
+
     private final List<PipelineStep> pipelineSteps = new ArrayList<>();
 
     private static int stepCounter = 0;
@@ -22,6 +30,8 @@ public class PreprocessingRunner {
     public static boolean writeStepResultsIntoFile = false;
 
     public static boolean initialConfigToBeWritten = false;
+
+    public static boolean minimalPipelineToBeBuild = false;
 
     public PreprocessingRunner(){}
 

@@ -7,6 +7,7 @@ import de.viadee.ki.sparkimporter.configuration.dataextraction.DataExtractionCon
 import de.viadee.ki.sparkimporter.configuration.modellearning.ModelLearningConfiguration;
 import de.viadee.ki.sparkimporter.configuration.modelprediction.ModelPredictionConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
+import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 
@@ -60,7 +61,11 @@ public class ConfigurationUtils {
 
     public void createEmptyConfig() {
 
-        SparkImporterLogger.getInstance().writeInfo("No config file found. Creating minimal config file for dataset.");
+        String pipelineType = "default";
+        if(!PreprocessingRunner.RUNNER_MODE.equals(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT)) {
+            pipelineType = "minimal";
+        }
+        SparkImporterLogger.getInstance().writeInfo("No config file found. Creating " + pipelineType + " config file for dataset.");
 
         PreprocessingConfiguration preprocessingConfiguration = new PreprocessingConfiguration();
 

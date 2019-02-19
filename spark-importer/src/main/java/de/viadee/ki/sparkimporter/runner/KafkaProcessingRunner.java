@@ -29,6 +29,8 @@ public class KafkaProcessingRunner extends SparkRunner {
 
     @Override
     protected void initialize(String[] arguments) {
+        PreprocessingRunner.RUNNER_MODE = PreprocessingRunner.RUNNER_MODE.KAFKA_RUNNER;
+
         ARGS = SparkImporterKafkaDataProcessingArguments.getInstance();
 
         // instantiate JCommander
