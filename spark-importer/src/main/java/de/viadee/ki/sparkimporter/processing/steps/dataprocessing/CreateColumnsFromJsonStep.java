@@ -38,6 +38,11 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         // get variables
         Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
 
+        //if broadcast variable is not there then we create an empty map. This resolves the dependency from DetermineProcessVariablesStep
+        if(varMap == null) {
+            varMap = new HashMap<>();
+        }
+
         String[] vars = null;
         if(SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
             //convert to String array so it is serializable and can be used in map function
