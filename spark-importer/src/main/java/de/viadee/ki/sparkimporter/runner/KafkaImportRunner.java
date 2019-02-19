@@ -60,6 +60,8 @@ public class KafkaImportRunner extends SparkRunner {
 
     @Override
     protected void initialize(String[] arguments) {
+        PreprocessingRunner.setRunnerMode(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT);
+
         ARGS = SparkImporterKafkaImportArguments.getInstance();
 
         // instantiate JCommander
@@ -79,6 +81,7 @@ public class KafkaImportRunner extends SparkRunner {
         SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
         SparkImporterVariables.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
+        SparkImporterVariables.setOutputFormat(ARGS.getOutputFormat());
         
         SparkImporterVariables.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
 

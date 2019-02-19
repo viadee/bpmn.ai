@@ -10,7 +10,7 @@ import java.util.Map;
 public class WriteToDiscStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
-
+    	
         // remove spaces from column names as parquet does not support them
         for(String columnName : dataset.columns()) {
             if(columnName.contains(" ")) {
