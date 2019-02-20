@@ -1,7 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.output;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterKafkaImportArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -12,9 +11,11 @@ import java.util.Map;
 public class WriteToDataSinkStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
-    	
+
+        /*
+        TODO: Not working yet
     	// if output format is set to "csv" create both: csv and parquet 
-    	if(SparkImporterKafkaImportArguments.getInstance().getOutputFormat().equals("csv")) {
+    	if(SparkImporterKafkaImportArguments.getInstance().getOutputFormat().equals(SparkImporterVariables.OUTPUT_FORMAT_CSV)) {
     		dataset
             .write()
             .option("header", "true")
@@ -24,7 +25,7 @@ public class WriteToDataSinkStep implements PreprocessingStepInterface {
             .mode(SparkImporterVariables.getSaveMode())
             .csv(SparkImporterVariables.getTargetFolder());
     	}
-    	
+    	*/
   
     	dataset
                 //we repartition the data by process instances, which allows spark to better distribute the data between workers as the operations are related to a process instance

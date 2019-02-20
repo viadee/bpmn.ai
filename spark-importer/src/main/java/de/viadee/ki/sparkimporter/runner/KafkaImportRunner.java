@@ -7,7 +7,6 @@ import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.ColumnsPreparationStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep;
-import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterKafkaImportArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -61,6 +60,8 @@ public class KafkaImportRunner extends SparkRunner {
 
     @Override
     protected void initialize(String[] arguments) {
+        PreprocessingRunner.setRunnerMode(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT);
+
         ARGS = SparkImporterKafkaImportArguments.getInstance();
 
         // instantiate JCommander
@@ -75,6 +76,8 @@ public class KafkaImportRunner extends SparkRunner {
         }
 
         EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (ARGS.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? 2 : 3);
+
+        SparkImporterVariables.setRunningMode(MODE.KAFKA_IMPORT);
 
         //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
         SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());

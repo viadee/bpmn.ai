@@ -59,10 +59,29 @@ public abstract class SparkRunner {
 
     protected abstract Dataset<Row> loadInitialDataset();
 
+    public enum MODE {
+        CSV_IMPORT_AND_PROCESSING("csv"),
+        KAFKA_IMPORT("kafka_import"),
+        KAFKA_PROCESSING("kafka_process");
+
+        private String mode;
+
+        MODE(String mode) {
+            this.mode = mode;
+        }
+
+        public String geMode() {
+            return mode;
+        }
+    }
+
     private void checkConfig() {
         //if there is no configuration file yet or an completely empty one, write one in the next steps
         if(ConfigurationUtils.getInstance().getConfiguration(true) == null
                 || ConfigurationUtils.getInstance().getConfiguration(true).isEmpty()) {
+            if(!PreprocessingRunner.getRunnerMode().equals(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT)) {
+                PreprocessingRunner.minimalPipelineToBeBuild = true;
+            }
             PreprocessingRunner.initialConfigToBeWritten = true;
             ConfigurationUtils.getInstance().createEmptyConfig();
         }
@@ -99,27 +118,28 @@ public abstract class SparkRunner {
         sparkSession = SparkSession.builder().getOrCreate();
 
         // listen for application progress and write to console
-        System.out.println("Spark application '" + sparkSession.sparkContext().appName() + "' (ID: " + sparkSession.sparkContext().applicationId() + ") started.");
+        LOG.info("Spark application '" + sparkSession.sparkContext().appName() + "' (ID: " + sparkSession.sparkContext().applicationId() + ") started.");
+
         sparkSession.sparkContext().addSparkListener(new SparkListener() {
             @Override
             public void onJobEnd(SparkListenerJobEnd jobEnd) {
                 super.onJobEnd(jobEnd);
 
-                System.out.println("... job " + jobEnd.jobId() + " finished.");
+                LOG.info("... job " + jobEnd.jobId() + " finished.");
             }
 
             @Override
             public void onJobStart(SparkListenerJobStart jobStart) {
                 super.onJobStart(jobStart);
 
-                System.out.print("Spark job " + jobStart.jobId() + " started (has " + jobStart.stageIds().size() + " " + (jobStart.stageIds().size() == 1 ? "stage" : "stages") + ") ...");
+                LOG.info("Spark job " + jobStart.jobId() + " started (has " + jobStart.stageIds().size() + " " + (jobStart.stageIds().size() == 1 ? "stage" : "stages") + ") ...");
             }
 
             @Override
             public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
                 super.onApplicationEnd(applicationEnd);
 
-                System.out.println("Spark application finished.");
+                LOG.info("Spark application finished.");
             }
         });
 
@@ -164,7 +184,7 @@ public abstract class SparkRunner {
         /**
          * if the created configuration file is a minimal one, overwrite the steps with the default pipeline
          */
-        if (PreprocessingRunner.initialConfigToBeWritten){
+        if (PreprocessingRunner.minimalPipelineToBeBuild){
             logMessage = "Filling the minimal configuration pipeline with the applications default pipeline...";
             LOG.info(logMessage);
             SparkImporterLogger.getInstance().writeInfo(logMessage);
@@ -180,9 +200,7 @@ public abstract class SparkRunner {
         writeConfig();
     }
 
-    public void overwritePipelineSteps() throws FaultyConfigurationException {
-        List<Step> steps = null;
-
+    public void overwritePipelineSteps() {
         Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
 
         if (PreprocessingRunner.initialConfigToBeWritten) {
@@ -214,7 +232,11 @@ public abstract class SparkRunner {
         Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
 
         if(PreprocessingRunner.initialConfigToBeWritten) {
-            pipelineSteps = buildMinimalPipeline();
+            if(!PreprocessingRunner.getRunnerMode().equals(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT)) {
+                pipelineSteps = buildMinimalPipeline();
+            } else {
+                pipelineSteps = buildDefaultPipeline();
+            }
 
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
             PipelineStepConfiguration pipelineStepConfiguration = preprocessingConfiguration.getPipelineStepConfiguration();
