@@ -11,6 +11,7 @@ import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggreg
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariableColumnsStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineProcessVariablesStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsStep;
@@ -52,7 +53,8 @@ public abstract class SparkRunner {
 
         pipelineSteps.add(new PipelineStep(new ReduceColumnsStep(), ""));
         pipelineSteps.add(new PipelineStep(new DetermineProcessVariablesStep(), "ReduceColumnsStep"));
-        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "DetermineProcessVariablesStep"));
+        pipelineSteps.add(new PipelineStep(new AddVariableColumnsStep(), "DetermineProcessVariablesStep"));
+        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "AddVariableColumnsStep"));
 
         return pipelineSteps;
     }

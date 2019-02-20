@@ -68,7 +68,6 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
         final String[] finalVars = vars;
 
-
         String[] columns = dataset.columns();
         StructType schema = dataset.schema();
         StructType newColumnsSchema = new StructType().add("column", DataTypes.StringType);
@@ -84,8 +83,11 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
                     JsonParser parser = null;
                     JsonNode jsonParsed = null;
                     try {
-                        parser = factory.createParser((String) row.getAs(c));
-                        jsonParsed = mapper.readTree(parser);
+                        String varColumn = row.getAs(c);
+                        if(varColumn != null) {
+                            parser = factory.createParser(varColumn);
+                            jsonParsed = mapper.readTree(parser);
+                        }
                     } catch (IOException e) {
                         // do nothing as we check if the result is null later
                     }

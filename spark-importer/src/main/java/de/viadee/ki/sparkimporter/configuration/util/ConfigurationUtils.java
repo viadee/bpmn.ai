@@ -65,7 +65,7 @@ public class ConfigurationUtils {
         if (!SparkImporterVariables.getRunningMode().equals(SparkRunner.RUNNING_MODE.KAFKA_IMPORT)) {
             pipelineType = "minimal";
         }
-        SparkImporterLogger.getInstance().writeInfo("No config file found. Creating " + pipelineType + " config file for dataset.");
+        SparkImporterLogger.getInstance().writeInfo("No config file found. Creating " + pipelineType + " config file for dataset at " + SparkImporterVariables.getWorkingDirectory() + "/" + getConfigurationFileName());
 
         PreprocessingConfiguration preprocessingConfiguration = new PreprocessingConfiguration();
 
