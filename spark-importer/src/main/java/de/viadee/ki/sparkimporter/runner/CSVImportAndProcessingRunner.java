@@ -30,7 +30,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
 
     @Override
     protected void initialize(String[] arguments) {
-        PreprocessingRunner.setRunnerMode(PreprocessingRunner.RUNNER_MODE.CSV_IMPORT_AND_RUNNER);
+        SparkImporterVariables.setRunningMode(RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);
 
         ARGS = SparkImporterCSVArguments.getInstance();
 
@@ -45,7 +45,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
             System.exit(1);
         }
 
-        SparkImporterVariables.setRunningMode(MODE.CSV_IMPORT_AND_PROCESSING);
+        SparkImporterVariables.setRunningMode(RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);
 
         //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
         SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());

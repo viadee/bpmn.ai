@@ -11,14 +11,6 @@ import java.util.Map;
 
 public class PreprocessingRunner {
 
-    public enum RUNNER_MODE {
-        CSV_IMPORT_AND_RUNNER,
-        KAFKA_IMPORT,
-        KAFKA_RUNNER
-    }
-
-    private static RUNNER_MODE runnerMode = null;
-
     private final List<PipelineStep> pipelineSteps = new ArrayList<>();
 
     private static int stepCounter = 0;
@@ -56,13 +48,5 @@ public class PreprocessingRunner {
 
     public static synchronized int getCounter() {
         return stepCounter;
-    }
-
-    public static RUNNER_MODE getRunnerMode() {
-        return runnerMode;
-    }
-
-    public static void setRunnerMode(RUNNER_MODE runnerMode) {
-        PreprocessingRunner.runnerMode = runnerMode;
     }
 }
