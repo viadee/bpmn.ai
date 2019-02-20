@@ -11,8 +11,17 @@ import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggreg
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineVariableTypesStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsDatasetStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
+import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableFilterStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import org.apache.spark.scheduler.SparkListener;
+import org.apache.spark.scheduler.SparkListenerApplicationEnd;
+import org.apache.spark.scheduler.SparkListenerJobEnd;
+import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -40,6 +49,18 @@ public abstract class SparkRunner {
 
     protected abstract List<PipelineStep> buildDefaultPipeline();
 
+    protected List<PipelineStep> buildMinimalPipeline(){
+        List<PipelineStep> steps = new ArrayList<>();
+
+        steps.add(new PipelineStep(new ReduceColumnsDatasetStep(), ""));
+        steps.add(new PipelineStep(new VariableFilterStep(), "ReduceColumnsDatasetStep"));
+        steps.add(new PipelineStep(new DetermineVariableTypesStep(), "VariableFilterStep"));
+        steps.add(new PipelineStep(new VariablesTypeEscalationStep(), "DetermineVariableTypesStep"));
+        steps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "VariablesTypeEscalationStep"));
+
+        return steps;
+    }
+
     protected abstract Dataset<Row> loadInitialDataset();
 
     public enum MODE {
@@ -60,7 +81,11 @@ public abstract class SparkRunner {
 
     private void checkConfig() {
         //if there is no configuration file yet or an completely empty one, write one in the next steps
-        if(ConfigurationUtils.getInstance().getConfiguration(true) == null || ConfigurationUtils.getInstance().getConfiguration(true).isEmpty()) {
+        if(ConfigurationUtils.getInstance().getConfiguration(true) == null
+                || ConfigurationUtils.getInstance().getConfiguration(true).isEmpty()) {
+            if(!PreprocessingRunner.getRunnerMode().equals(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT)) {
+                PreprocessingRunner.minimalPipelineToBeBuild = true;
+            }
             PreprocessingRunner.initialConfigToBeWritten = true;
             ConfigurationUtils.getInstance().createEmptyConfig();
         }
@@ -95,6 +120,32 @@ public abstract class SparkRunner {
     public void run(String[] arguments) throws FaultyConfigurationException {
         // spark configuration is being loaded from Environment (e.g. when using spark-submit)
         sparkSession = SparkSession.builder().getOrCreate();
+
+        // listen for application progress and write to console
+        LOG.info("Spark application '" + sparkSession.sparkContext().appName() + "' (ID: " + sparkSession.sparkContext().applicationId() + ") started.");
+
+        sparkSession.sparkContext().addSparkListener(new SparkListener() {
+            @Override
+            public void onJobEnd(SparkListenerJobEnd jobEnd) {
+                super.onJobEnd(jobEnd);
+
+                LOG.info("... job " + jobEnd.jobId() + " finished.");
+            }
+
+            @Override
+            public void onJobStart(SparkListenerJobStart jobStart) {
+                super.onJobStart(jobStart);
+
+                LOG.info("Spark job " + jobStart.jobId() + " started (has " + jobStart.stageIds().size() + " " + (jobStart.stageIds().size() == 1 ? "stage" : "stages") + ") ...");
+            }
+
+            @Override
+            public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
+                super.onApplicationEnd(applicationEnd);
+
+                LOG.info("Spark application finished.");
+            }
+        });
 
         registerUDFs();
         initialize(arguments);
@@ -134,10 +185,48 @@ public abstract class SparkRunner {
         LOG.info(logMessage);
         SparkImporterLogger.getInstance().writeInfo(logMessage);
 
+        /**
+         * if the created configuration file is a minimal one, overwrite the steps with the default pipeline
+         */
+        if (PreprocessingRunner.minimalPipelineToBeBuild){
+            logMessage = "Filling the minimal configuration pipeline with the applications default pipeline...";
+            LOG.info(logMessage);
+            SparkImporterLogger.getInstance().writeInfo(logMessage);
+            logMessage = "Execute again to process data with under the newly created configuration.";
+            LOG.info(logMessage);
+            SparkImporterLogger.getInstance().writeInfo(logMessage);
+            overwritePipelineSteps();
+        }
+
         // Cleanup
         sparkSession.close();
 
         writeConfig();
+    }
+
+    public void overwritePipelineSteps() {
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+
+        if (PreprocessingRunner.initialConfigToBeWritten) {
+            pipelineSteps = buildDefaultPipeline();
+
+            PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
+            PipelineStepConfiguration pipelineStepConfiguration = preprocessingConfiguration.getPipelineStepConfiguration();
+
+            List<Step> configSteps = new ArrayList<>();
+            for (PipelineStep ps : pipelineSteps) {
+                Step s = new Step();
+                s.setClassName(ps.getClassName());
+                s.setDependsOn(ps.getDependsOn());
+                s.setId(ps.getId());
+                s.setParameters(ps.getStepParameters());
+                s.setComment("");
+                s.setActive(true);
+                configSteps.add(s);
+            }
+
+            pipelineStepConfiguration.setSteps(configSteps);
+        }
     }
 
     public void configurePipelineSteps() throws FaultyConfigurationException {
@@ -147,7 +236,11 @@ public abstract class SparkRunner {
         Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
 
         if(PreprocessingRunner.initialConfigToBeWritten) {
-            pipelineSteps = buildDefaultPipeline();
+            if(!PreprocessingRunner.getRunnerMode().equals(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT)) {
+                pipelineSteps = buildMinimalPipeline();
+            } else {
+                pipelineSteps = buildDefaultPipeline();
+            }
 
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
             PipelineStepConfiguration pipelineStepConfiguration = preprocessingConfiguration.getPipelineStepConfiguration();

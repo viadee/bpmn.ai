@@ -40,6 +40,10 @@ public class SparkImporterKafkaImportArguments {
 	@Parameter(names = { "--process-filter",
 	"-pf" }, required = false, description = "Execute pipeline for a specific processDefinitionId.")
 	private String processDefinitionId = null;
+	
+	@Parameter(names = { "--output-format",
+	"-of" }, required = false, description = "In which format should the result be written (parquet or csv)?")
+	private String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
 
 	/**
 	 * Singleton.
@@ -78,6 +82,10 @@ public class SparkImporterKafkaImportArguments {
 	
 	public String getProcessDefinitionFilterId() {
 		return processDefinitionId;
+	}
+	
+	public String getOutputFormat() {
+		return outputFormat;
 	}
 
 	/**
