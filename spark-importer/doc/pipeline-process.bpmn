@@ -24,7 +24,7 @@
       <bpmn:incoming>SequenceFlow_0m255r4</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1mwq9jh</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:task id="Task_15mhi9h" name="Add Variables Columns">
+    <bpmn:task id="Task_15mhi9h" name="Add Variable Columns">
       <bpmn:incoming>SequenceFlow_1mwq9jh</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_16amt87</bpmn:outgoing>
     </bpmn:task>
