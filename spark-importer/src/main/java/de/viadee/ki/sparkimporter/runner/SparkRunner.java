@@ -63,6 +63,22 @@ public abstract class SparkRunner {
 
     protected abstract Dataset<Row> loadInitialDataset();
 
+    public enum MODE {
+        CSV_IMPORT_AND_PROCESSING("csv"),
+        KAFKA_IMPORT("kafka_import"),
+        KAFKA_PROCESSING("kafka_process");
+
+        private String mode;
+
+        MODE(String mode) {
+            this.mode = mode;
+        }
+
+        public String geMode() {
+            return mode;
+        }
+    }
+
     private void checkConfig() {
         //if there is no configuration file yet or an completely empty one, write one in the next steps
         if(ConfigurationUtils.getInstance().getConfiguration(true) == null
