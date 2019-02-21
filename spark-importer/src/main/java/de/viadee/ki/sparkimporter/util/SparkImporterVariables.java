@@ -73,13 +73,13 @@ public final class SparkImporterVariables {
 
     private static String pipelineMode = SparkImporterVariables.PIPELINE_MODE_LEARN;
 
-    private static SparkRunner.MODE runningMode = null;
+    private static SparkRunner.RUNNING_MODE runningMode = null;
 
-    public static SparkRunner.MODE getRunningMode() {
+    public static SparkRunner.RUNNING_MODE getRunningMode() {
         return runningMode;
     }
 
-    public static void setRunningMode(SparkRunner.MODE runningMode) {
+    public static void setRunningMode(SparkRunner.RUNNING_MODE runningMode) {
         SparkImporterVariables.runningMode = runningMode;
     }
 

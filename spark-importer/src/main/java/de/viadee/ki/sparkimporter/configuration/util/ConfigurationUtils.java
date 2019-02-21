@@ -8,7 +8,6 @@ import de.viadee.ki.sparkimporter.configuration.modellearning.ModelLearningConfi
 import de.viadee.ki.sparkimporter.configuration.modelprediction.ModelPredictionConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.runner.SparkRunner;
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 
@@ -34,7 +33,7 @@ public class ConfigurationUtils {
     }
 
     public String getConfigurationFileName() {
-        return CONFIGURATION_FILE_NAME + "_" + SparkImporterVariables.getRunningMode().geMode() + ".json";
+        return CONFIGURATION_FILE_NAME + "_" + SparkImporterVariables.getRunningMode().getModeString() + ".json";
     }
 
     public Configuration getConfiguration() {
@@ -62,7 +61,11 @@ public class ConfigurationUtils {
 
     public void createEmptyConfig() {
 
-        SparkImporterLogger.getInstance().writeInfo("No config file found. Creating default config file for dataset.");
+        String pipelineType = "default";
+        if (!SparkImporterVariables.getRunningMode().equals(SparkRunner.RUNNING_MODE.KAFKA_IMPORT)) {
+            pipelineType = "minimal";
+        }
+        SparkImporterLogger.getInstance().writeInfo("No config file found. Creating " + pipelineType + " config file for dataset at " + SparkImporterVariables.getWorkingDirectory() + "/" + getConfigurationFileName());
 
         PreprocessingConfiguration preprocessingConfiguration = new PreprocessingConfiguration();
 

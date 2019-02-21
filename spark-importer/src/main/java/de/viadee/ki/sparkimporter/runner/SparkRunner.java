@@ -11,11 +11,10 @@ import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggreg
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariableColumnsStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineVariableTypesStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsDatasetStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableFilterStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineProcessVariablesStep;
+import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.scheduler.SparkListener;
@@ -50,32 +49,31 @@ public abstract class SparkRunner {
     protected abstract List<PipelineStep> buildDefaultPipeline();
 
     protected List<PipelineStep> buildMinimalPipeline(){
-        List<PipelineStep> steps = new ArrayList<>();
+        List<PipelineStep> pipelineSteps = new ArrayList<>();
 
-        steps.add(new PipelineStep(new ReduceColumnsDatasetStep(), ""));
-        steps.add(new PipelineStep(new VariableFilterStep(), "ReduceColumnsDatasetStep"));
-        steps.add(new PipelineStep(new DetermineVariableTypesStep(), "VariableFilterStep"));
-        steps.add(new PipelineStep(new VariablesTypeEscalationStep(), "DetermineVariableTypesStep"));
-        steps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "VariablesTypeEscalationStep"));
+        pipelineSteps.add(new PipelineStep(new ReduceColumnsStep(), ""));
+        pipelineSteps.add(new PipelineStep(new DetermineProcessVariablesStep(), "ReduceColumnsStep"));
+        pipelineSteps.add(new PipelineStep(new AddVariableColumnsStep(), "DetermineProcessVariablesStep"));
+        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "AddVariableColumnsStep"));
 
-        return steps;
+        return pipelineSteps;
     }
 
     protected abstract Dataset<Row> loadInitialDataset();
 
-    public enum MODE {
+    public enum RUNNING_MODE {
         CSV_IMPORT_AND_PROCESSING("csv"),
         KAFKA_IMPORT("kafka_import"),
         KAFKA_PROCESSING("kafka_process");
 
-        private String mode;
+        private String runnerMode;
 
-        MODE(String mode) {
-            this.mode = mode;
+        RUNNING_MODE(String runnerMode) {
+            this.runnerMode = runnerMode;
         }
 
-        public String geMode() {
-            return mode;
+        public String getModeString() {
+            return runnerMode;
         }
     }
 
@@ -83,11 +81,13 @@ public abstract class SparkRunner {
         //if there is no configuration file yet or an completely empty one, write one in the next steps
         if(ConfigurationUtils.getInstance().getConfiguration(true) == null
                 || ConfigurationUtils.getInstance().getConfiguration(true).isEmpty()) {
-            if(!PreprocessingRunner.getRunnerMode().equals(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT)) {
+            if(!SparkImporterVariables.getRunningMode().equals(RUNNING_MODE.KAFKA_IMPORT)) {
                 PreprocessingRunner.minimalPipelineToBeBuild = true;
             }
             PreprocessingRunner.initialConfigToBeWritten = true;
             ConfigurationUtils.getInstance().createEmptyConfig();
+        } else {
+            SparkImporterLogger.getInstance().writeInfo("Configuration file found: " + SparkImporterVariables.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName());
         }
     }
 
@@ -236,7 +236,7 @@ public abstract class SparkRunner {
         Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
 
         if(PreprocessingRunner.initialConfigToBeWritten) {
-            if(!PreprocessingRunner.getRunnerMode().equals(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT)) {
+            if(!SparkImporterVariables.getRunningMode().equals(RUNNING_MODE.KAFKA_IMPORT)) {
                 pipelineSteps = buildMinimalPipeline();
             } else {
                 pipelineSteps = buildDefaultPipeline();

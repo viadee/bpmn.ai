@@ -7,7 +7,6 @@ import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep;
-import de.viadee.ki.sparkimporter.processing.steps.userconfig.*;
 import de.viadee.ki.sparkimporter.util.SparkImporterKafkaDataProcessingArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -29,7 +28,7 @@ public class KafkaProcessingRunner extends SparkRunner {
 
     @Override
     protected void initialize(String[] arguments) {
-        PreprocessingRunner.setRunnerMode(PreprocessingRunner.RUNNER_MODE.KAFKA_RUNNER);
+        SparkImporterVariables.setRunningMode(RUNNING_MODE.KAFKA_PROCESSING);
 
         ARGS = SparkImporterKafkaDataProcessingArguments.getInstance();
 
@@ -44,7 +43,7 @@ public class KafkaProcessingRunner extends SparkRunner {
             System.exit(1);
         }
 
-        SparkImporterVariables.setRunningMode(MODE.KAFKA_PROCESSING);
+        SparkImporterVariables.setRunningMode(RUNNING_MODE.KAFKA_PROCESSING);
 
         //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
         SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
@@ -83,31 +82,26 @@ public class KafkaProcessingRunner extends SparkRunner {
 
         pipelineSteps.add(new PipelineStep(new DataFilterStep(), ""));
         pipelineSteps.add(new PipelineStep(new ColumnRemoveStep(), "DataFilterStep"));
-        pipelineSteps.add(new PipelineStep(new ReduceColumnsDatasetStep(), "ColumnRemoveStep"));
-        pipelineSteps.add(new PipelineStep(new VariableFilterStep(), "ReduceColumnsDatasetStep"));
-        pipelineSteps.add(new PipelineStep(new VariableNameMappingStep(), "VariableFilterStep"));
-        pipelineSteps.add(new PipelineStep(new DetermineVariableTypesStep(), "VariableNameMappingStep"));
-        pipelineSteps.add(new PipelineStep(new VariablesTypeEscalationStep(), "DetermineVariableTypesStep"));
-        pipelineSteps.add(new PipelineStep(new AggregateVariableUpdatesStep(), "VariablesTypeEscalationStep"));
-        pipelineSteps.add(new PipelineStep(new AddVariablesColumnsStep(), "AggregateVariableUpdatesStep"));
+        pipelineSteps.add(new PipelineStep(new ReduceColumnsStep(), "ColumnRemoveStep"));
+        pipelineSteps.add(new PipelineStep(new DetermineProcessVariablesStep(), "ReduceColumnsStep"));
+        pipelineSteps.add(new PipelineStep(new AddVariableColumnsStep(), "DetermineProcessVariablesStep"));
 
         if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             // process level
-            pipelineSteps.add(new PipelineStep(new AggregateProcessInstancesStep(), "AddVariablesColumnsStep"));
+            pipelineSteps.add(new PipelineStep(new AggregateProcessInstancesStep(), "AddVariableColumnsStep"));
         } else {
             // activity level
-            pipelineSteps.add(new PipelineStep(new AggregateActivityInstancesStep(), "AddVariablesColumnsStep"));
+            pipelineSteps.add(new PipelineStep(new AggregateActivityInstancesStep(), "AddVariableColumnsStep"));
         }
 
         pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "AggregateProcessInstancesStep" : "AggregateActivityInstancesStep"));
-        pipelineSteps.add(new PipelineStep(new JsonVariableFilterStep(), "CreateColumnsFromJsonStep"));
 
         if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             // activity level
-            pipelineSteps.add(new PipelineStep(new FillActivityInstancesHistoryStep(), "JsonVariableFilterStep"));
+            pipelineSteps.add(new PipelineStep(new FillActivityInstancesHistoryStep(), "CreateColumnsFromJsonStep"));
         }
 
-        pipelineSteps.add(new PipelineStep(new AddReducedColumnsToDatasetStep(), dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "JsonVariableFilterStep" : "FillActivityInstancesHistoryStep"));
+        pipelineSteps.add(new PipelineStep(new AddReducedColumnsToDatasetStep(), dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "CreateColumnsFromJsonStep" : "FillActivityInstancesHistoryStep"));
         pipelineSteps.add(new PipelineStep(new ColumnHashStep(), "AddReducedColumnsToDatasetStep"));
         pipelineSteps.add(new PipelineStep(new TypeCastStep(), "ColumnHashStep"));
         pipelineSteps.add(new PipelineStep(new WriteToDiscStep(), "TypeCastStep"));

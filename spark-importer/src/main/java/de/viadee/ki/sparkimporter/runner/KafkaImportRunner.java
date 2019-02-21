@@ -60,7 +60,7 @@ public class KafkaImportRunner extends SparkRunner {
 
     @Override
     protected void initialize(String[] arguments) {
-        PreprocessingRunner.setRunnerMode(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT);
+        SparkImporterVariables.setRunningMode(RUNNING_MODE.KAFKA_IMPORT);
 
         ARGS = SparkImporterKafkaImportArguments.getInstance();
 
@@ -77,7 +77,7 @@ public class KafkaImportRunner extends SparkRunner {
 
         EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (ARGS.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? 2 : 3);
 
-        SparkImporterVariables.setRunningMode(MODE.KAFKA_IMPORT);
+        SparkImporterVariables.setRunningMode(RUNNING_MODE.KAFKA_IMPORT);
 
         //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
         SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
