@@ -80,13 +80,16 @@ public class KafkaProcessingRunner extends SparkRunner {
         List<PipelineStep> pipelineSteps = new ArrayList<>();
 
         pipelineSteps.add(new PipelineStep(new DataFilterStep(), ""));
-        pipelineSteps.add(new PipelineStep(new ColumnRemoveStep(), "DataFilterStep"));
+        pipelineSteps.add(new PipelineStep(new DataFilterOnActivityStep(), "DataFilterStep"));
+        pipelineSteps.add(new PipelineStep(new ColumnRemoveStep(), "DataFilterOnActivityStep"));
         pipelineSteps.add(new PipelineStep(new ReduceColumnsDatasetStep(), "ColumnRemoveStep"));
         pipelineSteps.add(new PipelineStep(new VariableFilterStep(), "ReduceColumnsDatasetStep"));
         pipelineSteps.add(new PipelineStep(new VariableNameMappingStep(), "VariableFilterStep"));
         pipelineSteps.add(new PipelineStep(new DetermineVariableTypesStep(), "VariableNameMappingStep"));
         pipelineSteps.add(new PipelineStep(new VariablesTypeEscalationStep(), "DetermineVariableTypesStep"));
+
         pipelineSteps.add(new PipelineStep(new AggregateVariableUpdatesStep(), "VariablesTypeEscalationStep"));
+
         pipelineSteps.add(new PipelineStep(new AddVariablesColumnsStep(), "AggregateVariableUpdatesStep"));
 
         if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
@@ -96,6 +99,8 @@ public class KafkaProcessingRunner extends SparkRunner {
             // activity level
             pipelineSteps.add(new PipelineStep(new AggregateActivityInstancesStep(), "AddVariablesColumnsStep"));
         }
+
+       // pipelineSteps.add(new PipelineStep(new DataFilterOnActivityStep(), "AddVariablesColumnsStep"));
 
         pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "AggregateProcessInstancesStep" : "AggregateActivityInstancesStep"));
         pipelineSteps.add(new PipelineStep(new JsonVariableFilterStep(), "CreateColumnsFromJsonStep"));

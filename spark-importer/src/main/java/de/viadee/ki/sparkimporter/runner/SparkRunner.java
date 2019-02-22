@@ -16,6 +16,7 @@ import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineVaria
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsDatasetStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.VariablesTypeEscalationStep;
 import de.viadee.ki.sparkimporter.processing.steps.userconfig.VariableFilterStep;
+import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.scheduler.SparkListener;
@@ -26,13 +27,16 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.api.java.UDF1;
+import org.apache.spark.sql.api.java.UDF2;
 import org.apache.spark.sql.types.DataTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spark_project.guava.primitives.Longs;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class SparkRunner {
 
@@ -99,6 +103,28 @@ public abstract class SparkRunner {
             }
             return null;
         }, DataTypes.LongType);
+        sparkSession.udf().register("activityBeforeTimestamp", (UDF2<String, String, String>) (s, s2) -> {
+            // get broadcast
+            Map<String, String> activities = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_INSTANCE_TIMESTAMP_MAP);
+            // is pid in dem broadcast enthalten
+            if (activities == null || activities.isEmpty()){
+                return "Error: Broadcast not found";
+            } else {
+                if (activities.containsKey(s)) {
+                    Timestamp tsAct = new Timestamp(Long.parseLong(activities.get(s)));
+                    if(s2 == null || s2.isEmpty()){
+                        return "FALSE";
+                    }
+                    Timestamp tsObject = new Timestamp(Long.parseLong(s2));
+                    if (tsObject.after(tsAct)) {
+                        return "FALSE";
+                    } else {
+                        return "TRUE";
+                    }
+                }
+            }
+            return "FALSE";
+        }, DataTypes.StringType);
     }
 
     public void run(String[] arguments) throws FaultyConfigurationException {
