@@ -105,8 +105,8 @@ public abstract class SparkRunner {
         }, DataTypes.LongType);
         sparkSession.udf().register("activityBeforeTimestamp", (UDF2<String, String, String>) (s, s2) -> {
             // get broadcast
-            Map<String, String> activities = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_INSTANCE_TIMESTAMP_MAP);
-            // is pid in dem broadcast enthalten
+            Map<String, String> activities = (Map<String, String>)
+                    SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_INSTANCE_TIMESTAMP_MAP);
             if (activities == null || activities.isEmpty()){
                 return "Error: Broadcast not found";
             } else {
