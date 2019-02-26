@@ -23,6 +23,8 @@ public class PreprocessingRunner {
 
     public static boolean initialConfigToBeWritten = false;
 
+    public static boolean minimalPipelineToBeBuild = false;
+
     public PreprocessingRunner(){}
 
     public Dataset<Row> run(Dataset<Row> dataset, String dataLevel) {
