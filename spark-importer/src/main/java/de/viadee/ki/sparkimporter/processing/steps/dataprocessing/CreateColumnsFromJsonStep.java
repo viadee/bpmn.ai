@@ -141,8 +141,10 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
                     JsonParser parser = null;
                     JsonNode jsonParsed = null;
                     try {
-                        parser = factory.createParser((String)row.getAs(c));
-                        jsonParsed = mapper.readTree(parser);
+                        if(row.getAs(c) != null) {
+                            parser = factory.createParser((String)row.getAs(c));
+                            jsonParsed = mapper.readTree(parser);
+                        }
                     } catch (IOException e) {
                         //do nothing
                     }
