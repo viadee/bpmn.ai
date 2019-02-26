@@ -98,6 +98,8 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
             return keep;
         });
 
+        dataset = dataset.orderBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "variable_filter");
         }
