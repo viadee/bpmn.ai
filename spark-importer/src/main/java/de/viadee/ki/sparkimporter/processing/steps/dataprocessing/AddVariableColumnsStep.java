@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import static org.apache.spark.sql.functions.*;
 
-@PreprocessingStepDescription(value = "This is the first aggregation step. In this step all variable updates are aggregated per process instance and variable. So if one variable value changed during a process instance it is aggregated to the last value the variable had in the process instance.")
+@PreprocessingStepDescription(value = "In this step all process variables detected in prior steps are added as separate columns to the dataset.")
 public class AddVariableColumnsStep implements PreprocessingStepInterface {
 
     @Override

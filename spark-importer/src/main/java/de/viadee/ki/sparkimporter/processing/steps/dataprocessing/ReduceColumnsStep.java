@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@PreprocessingStepDescription(value = "The columns of the input data is reduced to the minimum required for the processing to speed up the processing. The removed columns are added back in the end.")x
+@PreprocessingStepDescription(value = "The columns of the input data is reduced to the minimum required for the processing to speed up the processing. The removed columns are added back in the end.")
 public class ReduceColumnsStep implements PreprocessingStepInterface {
 
     @Override
