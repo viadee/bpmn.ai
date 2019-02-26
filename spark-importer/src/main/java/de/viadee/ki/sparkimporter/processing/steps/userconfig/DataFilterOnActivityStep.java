@@ -30,19 +30,18 @@ public class DataFilterOnActivityStep implements PreprocessingStepInterface {
         String query = (String) parameters.get("query");
         SparkImporterLogger.getInstance().writeInfo("Filtering data with activity instance filter query: " + query + ".");
 
-        //repartition by process instance and order by start_time for this operation
-        dataSet = dataSet.repartition(dataSet.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)).sortWithinPartitions(SparkImporterVariables.VAR_START_TIME);
         Dataset<Row> variables = dataSet.filter(col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE).isNotNull());
         //find first occurrence of activity instance
-        final Dataset<Row> dsTmp = dataSet.filter(dataSet.col(SparkImporterVariables.VAR_ACT_ID).like(query)).filter(dataSet.col(SparkImporterVariables.VAR_END_TIME).isNull()); //TODO: ENSURING THAT THIS ISN'T A VARIABLE ROW
+        final Dataset<Row> dsTmp = dataSet.filter(dataSet.col(SparkImporterVariables.VAR_ACT_ID).equalTo(query)).filter(dataSet.col(SparkImporterVariables.VAR_END_TIME).isNull()); //TODO: ENSURING THAT THIS ISN'T A VARIABLE ROW
 
         List<Row> activityRows = dsTmp.select(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_START_TIME).collectAsList();
         Map<String,String> activities = activityRows.stream().collect(Collectors.toMap(
                 r -> r.getAs(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID),r -> r.getAs(SparkImporterVariables.VAR_START_TIME)));
         SparkBroadcastHelper.getInstance().broadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_INSTANCE_TIMESTAMP_MAP, activities);
+
         System.out.println(dataSet.count());
 
-        Dataset<Row> activityDataSet = dsTmp.withColumn("data_filter_on_activity", callUDF("activityBeforeTimestamp",dsTmp.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID),dsTmp.col(SparkImporterVariables.VAR_START_TIME)));
+        Dataset<Row> activityDataSet = dataSet.withColumn("data_filter_on_activity", callUDF("activityBeforeTimestamp",dsTmp.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID),dsTmp.col(SparkImporterVariables.VAR_START_TIME)));
         activityDataSet = activityDataSet.filter(col("data_filter_on_activity").like("TRUE"));
         activityDataSet = activityDataSet.drop("data_filter_on_activity");
 
@@ -50,10 +49,12 @@ public class DataFilterOnActivityStep implements PreprocessingStepInterface {
         System.out.println("VAR: "+variables.count());
 
         activityDataSet = activityDataSet.withColumnRenamed(SparkImporterVariables.VAR_ACT_INST_ID, SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT");
-        variables = variables.join(activityDataSet.select(SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT"),variables.col(SparkImporterVariables.VAR_ACT_INST_ID).equalTo(activityDataSet.col(SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT")),"inner");
+
+        variables = variables.join(activityDataSet.select(SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT").distinct(), variables.col(SparkImporterVariables.VAR_ACT_INST_ID).equalTo(activityDataSet.col(SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT")),"inner");
 
         SparkImporterUtils.getInstance().writeDatasetToCSV(variables, "data_filter_on_activity_step");
 
+        activityDataSet = activityDataSet.withColumnRenamed(SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT", SparkImporterVariables.VAR_ACT_INST_ID);
         variables = variables.drop(SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT");
         System.out.println("VAR+ACT: "+variables.count());
         dataSet = activityDataSet.union(variables);
