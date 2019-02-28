@@ -5,5 +5,6 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PreprocessingStepDescription {
-    String value();
+    String name() default "";
+    String description();
 }

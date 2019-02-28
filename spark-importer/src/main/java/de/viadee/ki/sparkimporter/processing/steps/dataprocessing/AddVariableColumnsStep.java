@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import static org.apache.spark.sql.functions.*;
 
-@PreprocessingStepDescription(value = "In this step all process variables detected in prior steps are added as separate columns to the dataset.")
+@PreprocessingStepDescription(name = "Add variable columns", description = "In this step all process variables detected in prior steps are added as separate columns to the dataset.")
 public class AddVariableColumnsStep implements PreprocessingStepInterface {
 
     @Override

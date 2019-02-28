@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import static org.apache.spark.sql.functions.isnull;
 import static org.apache.spark.sql.functions.not;
 
-@PreprocessingStepDescription(value = "In this step the data is aggregated in a way so that there is only one line per activity instance per process instance in the dataset.")
+@PreprocessingStepDescription(name = "Aggregate activity instances", description = "In this step the data is aggregated in a way so that there is only one line per activity instance per process instance in the dataset.")
 public class AggregateActivityInstancesStep implements PreprocessingStepInterface {
 
     @Override

@@ -24,7 +24,7 @@ import java.util.Map;
 
 import static org.apache.spark.sql.functions.*;
 
-@PreprocessingStepDescription(value = "In this step the columns are casted into the data type they have been defined in the configuration. If the cast could not be done by Spark the value is null afterwards.")
+@PreprocessingStepDescription(name = "Type cast", description = "In this step the columns are casted into the data type they have been defined in the configuration. If the cast could not be done by Spark the description is null afterwards.")
 public class TypeCastStep implements PreprocessingStepInterface {
 
     @Override

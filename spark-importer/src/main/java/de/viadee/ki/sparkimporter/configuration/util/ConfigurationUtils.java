@@ -40,6 +40,10 @@ public class ConfigurationUtils {
         return this.getConfiguration(false);
     }
 
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     public Configuration getConfiguration(boolean reload) {
 
         if(reload) {

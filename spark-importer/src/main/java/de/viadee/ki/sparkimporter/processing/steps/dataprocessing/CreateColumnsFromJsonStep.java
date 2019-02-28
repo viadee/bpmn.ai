@@ -32,7 +32,7 @@ import java.util.*;
 import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME;
 import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE;
 
-@PreprocessingStepDescription(value = "In this step each variable column is checked if it contains a json and if so, the first level of attributes is transformed into separate columns. No object or array parameters are converted.")
+@PreprocessingStepDescription(name = "Create columns from Json", description = "In this step each variable column is checked if it contains a json and if so, the first level of attributes is transformed into separate columns. No object or array parameters are converted.")
 public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
     @Override

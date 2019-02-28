@@ -23,7 +23,7 @@ public class AnnotationCollectorTest {
 
             PreprocessingStepDescription description = c.getAnnotation(PreprocessingStepDescription.class);
             if(description != null)
-                System.out.println("    description: " + description.value());
+                System.out.println("    description: " + description.description());
 
             PreprocessingStepParameters parameters = c.getAnnotation(PreprocessingStepParameters.class);
             if(parameters != null) {

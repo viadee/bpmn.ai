@@ -9,7 +9,7 @@ import org.apache.spark.sql.SaveMode;
 
 import java.util.Map;
 
-@PreprocessingStepDescription(value = "The resulting dataset is written into a file. It could e.g. also be written to a HDFS filesystem.")
+@PreprocessingStepDescription(name = "Write to data sink", description = "The resulting dataset is written into a file. It could e.g. also be written to a HDFS filesystem.")
 public class WriteToDataSinkStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {

@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
@@ -29,6 +30,7 @@ import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS
 import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE;
 import static org.apache.spark.sql.functions.*;
 
+@PreprocessingStepDescription(name = "Determine process variables", description = "Determines all process variables.")
 public class DetermineProcessVariablesStep implements PreprocessingStepInterface {
 
     @Override

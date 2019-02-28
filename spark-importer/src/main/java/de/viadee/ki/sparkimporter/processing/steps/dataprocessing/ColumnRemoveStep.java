@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-@PreprocessingStepDescription(value = "In this step input columns are removed accoording to the configuration before the processing to the data is done.")
+@PreprocessingStepDescription(name = "Remove column", description = "In this step input columns are removed accoording to the configuration before the processing to the data is done.")
 public class ColumnRemoveStep implements PreprocessingStepInterface {
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {

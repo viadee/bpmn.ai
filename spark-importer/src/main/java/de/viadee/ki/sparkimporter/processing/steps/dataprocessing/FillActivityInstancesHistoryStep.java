@@ -17,7 +17,7 @@ import java.util.Set;
 
 import static org.apache.spark.sql.functions.when;
 
-@PreprocessingStepDescription(value = "In this step each variable column is filled with values according to the history of the process instance up to the point of activity activity represented in the line.")
+@PreprocessingStepDescription(name = "Fill activity instances history", description = "In this step each variable column is filled with values according to the history of the process instance up to the point of activity activity represented in the line.")
 public class FillActivityInstancesHistoryStep implements PreprocessingStepInterface {
 
     @Override
