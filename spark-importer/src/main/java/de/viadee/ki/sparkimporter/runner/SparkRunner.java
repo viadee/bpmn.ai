@@ -223,14 +223,14 @@ public abstract class SparkRunner {
             overwritePipelineSteps();
         }
 
-        if(sparkRunnerListener != null) {
-            sparkRunnerListener.onFinished(true);
-        }
-
         // Cleanup
         sparkSession.close();
 
         writeConfig();
+
+        if(sparkRunnerListener != null) {
+            sparkRunnerListener.onFinished(true);
+        }
     }
 
     public void overwritePipelineSteps() {
