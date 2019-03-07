@@ -61,6 +61,7 @@ public final class SparkImporterVariables {
     public static final String PIPELINE_MODE_PREDICT = "predict";
 
     private static String workingDirectory = ".";
+    private static String sourceFolder = "";
     private static String targetFolder = "";
     private static boolean devTypeCastCheckEnabled = false;
     private static boolean devProcessStateColumnWorkaroundEnabled = false;
@@ -89,6 +90,14 @@ public final class SparkImporterVariables {
 
     public static void setWorkingDirectory(String workingDirectory) {
         SparkImporterVariables.workingDirectory = workingDirectory;
+    }
+
+    public static String getSourceFolder() {
+        return sourceFolder;
+    }
+
+    public static void setSourceFolder(String sourceFolder) {
+        SparkImporterVariables.sourceFolder = sourceFolder;
     }
 
     public static String getTargetFolder() {

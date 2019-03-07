@@ -36,6 +36,10 @@ public class ConfigurationUtils {
         return CONFIGURATION_FILE_NAME + "_" + SparkImporterVariables.getRunningMode().getModeString() + ".json";
     }
 
+    public String getConfigurationFilePath() {
+        return SparkImporterVariables.getWorkingDirectory()+"/"+getConfigurationFileName();
+    }
+
     public Configuration getConfiguration() {
         return this.getConfiguration(false);
     }
@@ -51,8 +55,8 @@ public class ConfigurationUtils {
         }
 
         if(this.configuration == null) {
-            if (new File(SparkImporterVariables.getWorkingDirectory() +"/"+getConfigurationFileName()).exists()){
-                try (Reader reader = new FileReader(SparkImporterVariables.getWorkingDirectory()+"/"+getConfigurationFileName())) {
+            if (new File(getConfigurationFilePath()).exists()){
+                try (Reader reader = new FileReader(getConfigurationFilePath())) {
                     configuration = gson.fromJson(reader, Configuration.class);
                 } catch (IOException e) {
                     SparkImporterLogger.getInstance().writeError("An error occurred while reading the configuration file: " + e.getMessage());
