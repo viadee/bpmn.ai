@@ -1,72 +1,91 @@
 package de.viadee.ki.sparkimporter.processing.steps;
 
-import de.viadee.ki.sparkimporter.annotation.AnnotationCollectorTest;
 import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.annotation.PreprocessingStepParameter;
 import de.viadee.ki.sparkimporter.annotation.PreprocessingStepParameters;
-import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import org.reflections.Reflections;
+import io.github.classgraph.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class PipelineStepCollector {
 
     public static List<PipelineStepDefinition> collectAllAvailablePipelineSteps() {
         List<PipelineStepDefinition> pipelineSteps = new ArrayList<>();
-        String packageName = AnnotationCollectorTest.class.getPackage().getName();
 
-        Reflections reflections = new Reflections("de.viadee");
+        String pkg = "de.viadee";
+        try (ScanResult scanResult =
+                     new ClassGraph()
+                             .enableClassInfo()
+                             .enableAnnotationInfo()
+                             .whitelistPackages(pkg)      // Scan com.xyz and subpackages (omit to scan all packages)
+                             .scan()) {                   // Start the scan
+            for (ClassInfo routeClassInfo : scanResult.getClassesWithAnnotation(PreprocessingStepDescription.class.getCanonicalName())) {
+                AnnotationInfo annotationInfo = routeClassInfo.getAnnotationInfo(PreprocessingStepDescription.class.getCanonicalName());
+                List<AnnotationParameterValue> paramVals = annotationInfo.getParameterValues();
 
-        Set<Class<? extends PreprocessingStepInterface>> subTypes = reflections.getSubTypesOf(PreprocessingStepInterface.class);
+                PipelineStepDefinition step = new PipelineStepDefinition();
+                step.setId(routeClassInfo.getSimpleName());
 
-        for(Class<? extends PreprocessingStepInterface> c : subTypes) {
-
-            PipelineStepDefinition step = new PipelineStepDefinition();
-            step.setId(c.getSimpleName());
-
-            PreprocessingStepDescription description = c.getAnnotation(PreprocessingStepDescription.class);
-            if(description != null) {
-                step.setName(description.name());
-                step.setDescription(description.description());
-            }
-
-            PreprocessingStepParameters parameters = c.getAnnotation(PreprocessingStepParameters.class);
-            if(parameters != null) {
-                PreprocessingStepParameter[] params = parameters.value();
-                List<ParameterDefinition> stepParameters = new ArrayList<>();
-                for(PreprocessingStepParameter parameter : params) {
-                    ParameterDefinition stepParam = new ParameterDefinition();
-                    stepParam.setName(parameter.name());
-                    stepParam.setDescription(parameter.description());
-                    stepParam.setDataType(parameter.dataType());
-                    stepParam.setRequired(parameter.required());
-
-                    stepParameters.add(stepParam);
+                for(AnnotationParameterValue parameterValue : paramVals) {
+                    if(parameterValue.getName().equals("name")) {
+                        step.setName((String) parameterValue.getValue());
+                    } else if(parameterValue.getName().equals("description")) {
+                        step.setDescription((String) parameterValue.getValue());
+                    }
                 }
-                step.setParameters(stepParameters);
-            }
 
-            PreprocessingStepParameter parameter = c.getAnnotation(PreprocessingStepParameter.class);
-            if(parameter != null) {
-                List<ParameterDefinition> stepParameters = new ArrayList<>();
+                annotationInfo = routeClassInfo.getAnnotationInfo(PreprocessingStepParameter.class.getCanonicalName());
+                if(annotationInfo != null) {
+                    paramVals = annotationInfo.getParameterValues();
+                    List<ParameterDefinition> stepParameters = new ArrayList<>();
+                    ParameterDefinition stepParam = new ParameterDefinition();
+                    for(AnnotationParameterValue parameterValue : paramVals) {
+                        if(parameterValue.getName().equals("name")) {
+                            stepParam.setName((String) parameterValue.getValue());
+                        } else if(parameterValue.getName().equals("description")) {
+                            stepParam.setDescription((String) parameterValue.getValue());
+                        } else if(parameterValue.getName().equals("required")) {
+                            stepParam.setRequired((Boolean) parameterValue.getValue());
+                        } else if(parameterValue.getName().equals("dataType")) {
+                            stepParam.setDataType((PreprocessingStepParameter.DATA_TYPE) ((AnnotationEnumValue) parameterValue.getValue()).loadClassAndReturnEnumValue());
+                        }
+                    }
+                    stepParameters.add(stepParam);
+                    step.setParameters(stepParameters);
+                }
 
-                ParameterDefinition stepParam = new ParameterDefinition();
-                stepParam.setName(parameter.name());
-                stepParam.setDescription(parameter.description());
-                stepParam.setDataType(parameter.dataType());
-                stepParam.setRequired(parameter.required());
-
-                stepParameters.add(stepParam);
-
-                step.setParameters(stepParameters);
-            }
-
-            if(step.getName() != null)
+                annotationInfo = routeClassInfo.getAnnotationInfo(PreprocessingStepParameters.class.getCanonicalName());
+                if(annotationInfo != null) {
+                    paramVals = annotationInfo.getParameterValues();
+                    for(AnnotationParameterValue parameterValue : paramVals) {
+                        List<ParameterDefinition> stepParameters = new ArrayList<>();
+                        Object[] params = (Object[]) parameterValue.getValue();
+                        for(Object p : params) {
+                            AnnotationInfo annoInfo = (AnnotationInfo) p;
+                            ParameterDefinition stepParam = new ParameterDefinition();
+                            if(annoInfo != null) {
+                                paramVals = annoInfo.getParameterValues();
+                                for(AnnotationParameterValue pv : paramVals) {
+                                    if(pv.getName().equals("name")) {
+                                        stepParam.setName((String) pv.getValue());
+                                    } else if(pv.getName().equals("description")) {
+                                        stepParam.setDescription((String) pv.getValue());
+                                    } else if(pv.getName().equals("required")) {
+                                        stepParam.setRequired((Boolean) pv.getValue());
+                                    } else if(pv.getName().equals("dataType")) {
+                                        stepParam.setDataType((PreprocessingStepParameter.DATA_TYPE) ((AnnotationEnumValue) pv.getValue()).loadClassAndReturnEnumValue());
+                                    }
+                                }
+                            }
+                            stepParameters.add(stepParam);
+                        }
+                        step.setParameters(stepParameters);
+                    }
+                }
                 pipelineSteps.add(step);
+            }
         }
-
         return pipelineSteps;
     }
 }
