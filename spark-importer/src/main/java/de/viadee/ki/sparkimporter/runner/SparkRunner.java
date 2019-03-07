@@ -6,21 +6,18 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfi
 import de.viadee.ki.sparkimporter.configuration.preprocessing.Step;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
+import de.viadee.ki.sparkimporter.listener.SparkRunnerListener;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariableColumnsStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineProcessVariablesStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsStep;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
-import org.apache.spark.scheduler.SparkListener;
-import org.apache.spark.scheduler.SparkListenerApplicationEnd;
-import org.apache.spark.scheduler.SparkListenerJobEnd;
-import org.apache.spark.scheduler.SparkListenerJobStart;
+import org.apache.spark.scheduler.*;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -32,6 +29,7 @@ import org.spark_project.guava.primitives.Longs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class SparkRunner {
 
@@ -54,7 +52,7 @@ public abstract class SparkRunner {
         pipelineSteps.add(new PipelineStep(new ReduceColumnsStep(), ""));
         pipelineSteps.add(new PipelineStep(new DetermineProcessVariablesStep(), "ReduceColumnsStep"));
         pipelineSteps.add(new PipelineStep(new AddVariableColumnsStep(), "DetermineProcessVariablesStep"));
-        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "AddVariableColumnsStep"));
+        //pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "AddVariableColumnsStep"));
 
         return pipelineSteps;
     }
@@ -118,6 +116,10 @@ public abstract class SparkRunner {
     }
 
     public void run(String[] arguments) throws FaultyConfigurationException {
+        run(arguments, null);
+    }
+
+    public void run(String[] arguments, SparkRunnerListener sparkRunnerListener) throws FaultyConfigurationException {
         // spark configuration is being loaded from Environment (e.g. when using spark-submit)
         sparkSession = SparkSession.builder().getOrCreate();
 
@@ -146,6 +148,29 @@ public abstract class SparkRunner {
                 LOG.info("Spark application finished.");
             }
         });
+
+        AtomicInteger tasksTotal = new AtomicInteger();
+        AtomicInteger tasksDone = new AtomicInteger();
+
+        if(sparkRunnerListener != null) {
+            sparkSession.sparkContext().addSparkListener(new SparkListener() {
+                @Override
+                public void onStageSubmitted(SparkListenerStageSubmitted stageSubmitted) {
+                    super.onStageSubmitted(stageSubmitted);
+
+                    tasksTotal.getAndAdd(stageSubmitted.stageInfo().numTasks());
+                    sparkRunnerListener.onProgressUpdate(null, tasksDone.get(), tasksTotal.get());
+                }
+
+                @Override
+                public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
+                    super.onStageCompleted(stageCompleted);
+
+                    sparkRunnerListener.onProgressUpdate(null, tasksDone.get(), tasksTotal.get());
+                    tasksDone.getAndAdd(stageCompleted.stageInfo().numTasks());
+                }
+            });
+        }
 
         registerUDFs();
         initialize(arguments);
@@ -196,6 +221,10 @@ public abstract class SparkRunner {
             LOG.info(logMessage);
             SparkImporterLogger.getInstance().writeInfo(logMessage);
             overwritePipelineSteps();
+        }
+
+        if(sparkRunnerListener != null) {
+            sparkRunnerListener.onFinished(true);
         }
 
         // Cleanup
