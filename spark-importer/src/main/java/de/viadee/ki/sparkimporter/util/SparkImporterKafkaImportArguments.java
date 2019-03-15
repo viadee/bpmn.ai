@@ -68,6 +68,10 @@ public class SparkImporterKafkaImportArguments {
 		return batchMode;
 	}
 
+	public void setBatchMode(boolean batchMode) {
+		this.batchMode = batchMode;
+	}
+
 	public String getWorkingDirectory() {
 		return workingDirectory;
 	}
