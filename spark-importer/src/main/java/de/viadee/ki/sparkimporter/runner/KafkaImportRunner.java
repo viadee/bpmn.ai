@@ -20,6 +20,7 @@ import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -84,7 +85,7 @@ public class KafkaImportRunner extends SparkRunner {
         SparkImporterVariables.setWorkingDirectory(ARGS.getWorkingDirectory());
         SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
         SparkImporterVariables.setOutputFormat(ARGS.getOutputFormat());
-        
+        SparkImporterVariables.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
         SparkImporterVariables.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
 
         dataLevel = ARGS.getDataLevel();
@@ -92,7 +93,10 @@ public class KafkaImportRunner extends SparkRunner {
         PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
 
         // Delete destination files, required to avoid exception during runtime
-        FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
+        if(SparkImporterVariables.getSaveMode().equals(SaveMode.Overwrite)) {
+        	FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
+        }
+        
 
         SparkImporterLogger.getInstance().writeInfo("Starting Kafka import "+ (ARGS.isBatchMode() ? "in batch mode " : "") +"from: " + ARGS.getKafkaBroker());
     }
