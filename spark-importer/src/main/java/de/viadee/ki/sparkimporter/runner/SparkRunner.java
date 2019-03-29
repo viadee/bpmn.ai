@@ -15,6 +15,7 @@ import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariableCol
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineProcessVariablesStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsStep;
+import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.scheduler.SparkListener;
