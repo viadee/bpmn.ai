@@ -1,6 +1,7 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
@@ -76,6 +77,8 @@ public class AggregateActivityInstancesStep implements PreprocessingStepInterfac
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
         dataset = dataset.sort(SparkImporterVariables.VAR_START_TIME);
+
+        SparkImporterLogger.getInstance().writeInfo("Found " + dataset.count() + " activity instances.");
 
         if(writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_activity_instances");

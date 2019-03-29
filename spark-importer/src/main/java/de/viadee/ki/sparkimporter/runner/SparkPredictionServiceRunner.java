@@ -11,6 +11,7 @@ import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggreg
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Column;
@@ -46,6 +47,8 @@ public abstract class SparkPredictionServiceRunner {
         if(ConfigurationUtils.getInstance().getConfiguration(true) == null) {
             PreprocessingRunner.initialConfigToBeWritten = true;
             ConfigurationUtils.getInstance().createEmptyConfig();
+        } else {
+            SparkImporterLogger.getInstance().writeInfo("Configuration file found: " + SparkImporterVariables.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName());
         }
     }
 

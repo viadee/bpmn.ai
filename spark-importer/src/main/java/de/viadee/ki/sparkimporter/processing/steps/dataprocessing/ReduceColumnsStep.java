@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class ReduceColumnsDatasetStep implements PreprocessingStepInterface {
+public class ReduceColumnsStep implements PreprocessingStepInterface {
 
     @Override
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {

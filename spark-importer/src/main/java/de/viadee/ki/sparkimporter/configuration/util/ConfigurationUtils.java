@@ -7,7 +7,7 @@ import de.viadee.ki.sparkimporter.configuration.dataextraction.DataExtractionCon
 import de.viadee.ki.sparkimporter.configuration.modellearning.ModelLearningConfiguration;
 import de.viadee.ki.sparkimporter.configuration.modelprediction.ModelPredictionConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
+import de.viadee.ki.sparkimporter.runner.SparkRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 
@@ -16,7 +16,7 @@ import java.io.*;
 public class ConfigurationUtils {
 
     private final Gson gson;
-    private final String CONFIGURATION_FILE_NAME = "pipeline_configuration.json";
+    private final String CONFIGURATION_FILE_NAME = "pipeline_configuration";
     private Configuration configuration = null;
 
     private static ConfigurationUtils instance;
@@ -33,7 +33,7 @@ public class ConfigurationUtils {
     }
 
     public String getConfigurationFileName() {
-        return CONFIGURATION_FILE_NAME;
+        return CONFIGURATION_FILE_NAME + "_" + SparkImporterVariables.getRunningMode().getModeString() + ".json";
     }
 
     public Configuration getConfiguration() {
@@ -47,8 +47,8 @@ public class ConfigurationUtils {
         }
 
         if(this.configuration == null) {
-            if (new File(SparkImporterVariables.getWorkingDirectory() +"/"+CONFIGURATION_FILE_NAME).exists()){
-                try (Reader reader = new FileReader(SparkImporterVariables.getWorkingDirectory()+"/"+CONFIGURATION_FILE_NAME)) {
+            if (new File(SparkImporterVariables.getWorkingDirectory() +"/"+getConfigurationFileName()).exists()){
+                try (Reader reader = new FileReader(SparkImporterVariables.getWorkingDirectory()+"/"+getConfigurationFileName())) {
                     configuration = gson.fromJson(reader, Configuration.class);
                 } catch (IOException e) {
                     SparkImporterLogger.getInstance().writeError("An error occurred while reading the configuration file: " + e.getMessage());
@@ -62,10 +62,10 @@ public class ConfigurationUtils {
     public void createEmptyConfig() {
 
         String pipelineType = "default";
-        if(!PreprocessingRunner.getRunnerMode().equals(PreprocessingRunner.RUNNER_MODE.KAFKA_IMPORT)) {
+        if (!SparkImporterVariables.getRunningMode().equals(SparkRunner.RUNNING_MODE.KAFKA_IMPORT)) {
             pipelineType = "minimal";
         }
-        SparkImporterLogger.getInstance().writeInfo("No config file found. Creating " + pipelineType + " config file for dataset.");
+        SparkImporterLogger.getInstance().writeInfo("No config file found. Creating " + pipelineType + " config file for dataset at " + SparkImporterVariables.getWorkingDirectory() + "/" + getConfigurationFileName());
 
         PreprocessingConfiguration preprocessingConfiguration = new PreprocessingConfiguration();
 
@@ -81,7 +81,7 @@ public class ConfigurationUtils {
         configuration.setModelLearningConfiguration(modelLearningConfiguration);
         configuration.setModelPredictionConfiguration(modelPredictionConfiguration);
 
-        try (Writer writer = new FileWriter(SparkImporterVariables.getWorkingDirectory()+"/"+CONFIGURATION_FILE_NAME)) {
+        try (Writer writer = new FileWriter(SparkImporterVariables.getWorkingDirectory()+"/"+getConfigurationFileName())) {
             gson.toJson(configuration, writer);
         } catch (IOException e) {
             SparkImporterLogger.getInstance().writeError("An error occurred while writing the configuration file: " + e.getMessage());
@@ -89,7 +89,7 @@ public class ConfigurationUtils {
     }
 
     public void writeConfigurationToFile() {
-        try (Writer writer = new FileWriter(SparkImporterVariables.getWorkingDirectory()+"/"+CONFIGURATION_FILE_NAME)) {
+        try (Writer writer = new FileWriter(SparkImporterVariables.getWorkingDirectory()+"/"+getConfigurationFileName())) {
             gson.toJson(configuration, writer);
         } catch (IOException e) {
             SparkImporterLogger.getInstance().writeError("An error occurred while writing the configuration file: " + e.getMessage());

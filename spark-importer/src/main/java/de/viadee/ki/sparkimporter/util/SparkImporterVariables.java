@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.util;
 
+import de.viadee.ki.sparkimporter.runner.SparkRunner;
 import org.apache.spark.sql.SaveMode;
 
 public final class SparkImporterVariables {
@@ -71,6 +72,16 @@ public final class SparkImporterVariables {
 	private static String processFilterDefinitionId = null;
 
     private static String pipelineMode = SparkImporterVariables.PIPELINE_MODE_LEARN;
+
+    private static SparkRunner.RUNNING_MODE runningMode = null;
+
+    public static SparkRunner.RUNNING_MODE getRunningMode() {
+        return runningMode;
+    }
+
+    public static void setRunningMode(SparkRunner.RUNNING_MODE runningMode) {
+        SparkImporterVariables.runningMode = runningMode;
+    }
 
     public static String getWorkingDirectory() {
         return workingDirectory;
