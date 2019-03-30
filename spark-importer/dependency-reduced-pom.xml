@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>de.viadee.ki</groupId>
+  <groupId>de.viadee</groupId>
   <artifactId>spark-importer</artifactId>
   <name>bpmn.ai</name>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.2.0-SNAPSHOT</version>
   <description>Tooling to feed Camunda logs into a data mining pipeline.</description>
+  <url>https://www.viadee.de/bpmnai</url>
   <issueManagement>
-    <system>Jira</system>
-    <url>https://jira.intern.viadee.de/secure/RapidBoard.jspa?rapidView=156</url>
+    <system>GitHub</system>
+    <url>https://github.com/viadee/bpmn.ai/issues</url>
   </issueManagement>
   <ciManagement>
-    <system>Jenkins</system>
-    <url>https://portal.intern.viadee.de/jenkins/view/KI/job/KI/job/bpmn.ai%20spark%20importer/</url>
+    <system>Travis</system>
+    <url>https://travis-ci.org/viadee/bpmn.ai</url>
   </ciManagement>
   <inceptionYear>2018</inceptionYear>
   <developers>
@@ -23,18 +24,30 @@
       <organizationUrl>http://www.viadee.de</organizationUrl>
     </developer>
     <developer>
+      <name>Caroline Methner</name>
+      <email>Caroline.Methner@viadee.de</email>
+      <organization>viadee Unternehmensberatung AG</organization>
+      <organizationUrl>http://www.viadee.de</organizationUrl>
+    </developer>
+    <developer>
       <name>Frank Koehne</name>
       <email>Frank.Koehne@viadee.de</email>
       <organization>viadee Unternehmensberatung AG</organization>
       <organizationUrl>http://www.viadee.de</organizationUrl>
     </developer>
   </developers>
+  <licenses>
+    <license>
+      <name>BSD-3 Clause</name>
+      <url>https://opensource.org/licenses/BSD-3-Clause</url>
+    </license>
+  </licenses>
   <scm>
-    <connection>https://portal.intern.viadee.de/gitlab/viadee/bpmn.ai</connection>
-    <url>Gitlab</url>
+    <connection>https://github.com/viadee/bpmn.ai</connection>
+    <url>GitHub</url>
   </scm>
   <organization>
-    <name>viadee Unternehmensberatung GmbH</name>
+    <name>viadee Unternehmensberatung AG</name>
     <url>www.viadee.de</url>
   </organization>
   <build>
@@ -43,7 +56,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.1.1</version>
+        <version>3.2.1</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -58,6 +71,7 @@
                   <include>javax.cache:**</include>
                   <include>org.apache.kafka:kafka-clients</include>
                   <include>org.apache.spark:spark-streaming-kafka-0-10_${spark-scala.version}</include>
+                  <include>io.github.classgraph:classgraph</include>
                 </includes>
               </artifactSet>
             </configuration>
@@ -83,24 +97,54 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.0.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.4</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <snapshots />
-      <id>viadee-snapshots</id>
-      <name>viadee Snapshots</name>
-      <url>http://nexus.intern.viadee.de/repository/maven-snapshots/</url>
-    </repository>
-    <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>viadee-releases</id>
-      <name>viadee releases</name>
-      <url>http://nexus.intern.viadee.de/repository/maven-releases/</url>
-    </repository>
-  </repositories>
+  <profiles>
+    <profile>
+      <id>release-sign-artifacts</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   <dependencies>
     <dependency>
       <groupId>org.apache.spark</groupId>
@@ -147,20 +191,20 @@
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka_2.11</artifactId>
-      <version>0.11.0.3</version>
+      <version>2.1.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka_2.11</artifactId>
-      <version>0.11.0.3</version>
+      <version>2.1.1</version>
       <classifier>test</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka-clients</artifactId>
-      <version>0.11.0.3</version>
+      <version>2.1.1</version>
       <classifier>test</classifier>
       <scope>test</scope>
     </dependency>
@@ -195,15 +239,17 @@
   </reporting>
   <distributionManagement>
     <repository>
-      <id>viadeeNexus</id>
-      <name>Internal Releases</name>
-      <url>http://nexus.intern.viadee.de/repository/maven-releases/</url>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
     </repository>
     <snapshotRepository>
-      <id>viadeeNexus</id>
-      <name>Internal Snapshots</name>
-      <url>http://nexus.intern.viadee.de/repository/maven-snapshots/</url>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
+    <site>
+      <id>website</id>
+      <url>file://${basedir}/docs/MavenSite</url>
+    </site>
   </distributionManagement>
   <properties>
     <commons-io.version>2.6</commons-io.version>
@@ -211,7 +257,7 @@
     <univocity-parsers.version>2.7.5</univocity-parsers.version>
     <gson.version>2.8.5</gson.version>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <kafka.version>0.11.0.3</kafka.version>
+    <kafka.version>2.1.1</kafka.version>
     <jcommander.version>1.72</jcommander.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jackson.version>2.6.7.1</jackson.version>
