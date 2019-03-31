@@ -1,13 +1,19 @@
 package de.viadee.ki.sparkimporter.processing.steps.userconfig;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.*;
+import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
+import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import java.util.*;
+
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.apache.spark.sql.functions.*;
+import static org.apache.spark.sql.functions.callUDF;
+import static org.apache.spark.sql.functions.col;
 
 /**
  *  This ProcessingStep returns a DataSet which comprises of all activities and variable updates that took place
@@ -42,6 +48,8 @@ public class DataFilterOnActivityStep implements PreprocessingStepInterface {
 
         // we temporarily store variable updates (rows with a var type set) separately.
         Dataset<Row> variables = dataSet.filter(col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE).isNotNull());
+        //find first occurrence of activity instance
+        final Dataset<Row> dsTmp = dataSet.filter(dataSet.col(SparkImporterVariables.VAR_ACT_ID).equalTo(query)).filter(dataSet.col(SparkImporterVariables.VAR_END_TIME).isNull()); //TODO: ENSURING THAT THIS ISN'T A VARIABLE ROW
 
         // now we look for the first occurrence of the activity id contained in "query". The result comprises of a dataset of corresponding activity instances.
         final Dataset<Row> dsActivityInstances = dataSet.filter(dataSet.col(SparkImporterVariables.VAR_ACT_ID).like(query)).filter(dataSet.col(SparkImporterVariables.VAR_END_TIME).isNull()); //TODO: ENSURING THAT THIS ISN'T A VARIABLE ROW
@@ -68,12 +76,15 @@ public class DataFilterOnActivityStep implements PreprocessingStepInterface {
 
         // However, we lost all variable updates in this approach, so now we add the variables in question to the dataset
         // first, we narrow it down to keep only variables that have a corresponding activity instance
-        // TODO: THE NEXT TWO LINES GONNA BE SUPER EXPENSIVE
-        List<String> actInstIds = activityDataSet.select(SparkImporterVariables.VAR_ACT_INST_ID).toJavaRDD().map(row -> row.getString(0)).collect();
-        variables = variables.filter(col(SparkImporterVariables.VAR_ACT_INST_ID).isin(actInstIds.toArray()));
-        // union variables with activites
+        activityDataSet = activityDataSet.withColumnRenamed(SparkImporterVariables.VAR_ACT_INST_ID, SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT");
+
+        variables = variables.join(activityDataSet.select(SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT").distinct(), variables.col(SparkImporterVariables.VAR_ACT_INST_ID).equalTo(activityDataSet.col(SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT")),"inner");
+
+        activityDataSet = activityDataSet.withColumnRenamed(SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT", SparkImporterVariables.VAR_ACT_INST_ID);
+        variables = variables.drop(SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT");
         dataSet = activityDataSet.union(variables);
         SparkImporterLogger.getInstance().writeInfo("DataFilterOnActivityStep: The filtered DataSet contains "+dataSet.count()+" rows, (before: "+ initialDSCount+" rows)");
+
         if (writeStepResultIntoFile) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataSet, "data_filter_on_activity_step");
         }
