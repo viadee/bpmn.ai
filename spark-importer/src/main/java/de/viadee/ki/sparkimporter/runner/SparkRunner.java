@@ -228,6 +228,9 @@ public abstract class SparkRunner {
 
         writeConfig();
 
+        PreprocessingRunner.minimalPipelineToBeBuild = false;
+        PreprocessingRunner.initialConfigToBeWritten = false;
+
         if(sparkRunnerListener != null) {
             sparkRunnerListener.onFinished(true);
         }
