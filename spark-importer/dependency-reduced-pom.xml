@@ -4,7 +4,7 @@
   <groupId>de.viadee</groupId>
   <artifactId>spark-importer</artifactId>
   <name>bpmn.ai</name>
-  <version>1.2.0-SNAPSHOT</version>
+  <version>1.2.1-SNAPSHOT</version>
   <description>Tooling to feed Camunda logs into a data mining pipeline.</description>
   <url>https://www.viadee.de/bpmnai</url>
   <issueManagement>
