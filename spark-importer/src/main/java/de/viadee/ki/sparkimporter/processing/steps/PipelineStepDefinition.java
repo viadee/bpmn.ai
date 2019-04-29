@@ -7,11 +7,20 @@ public class PipelineStepDefinition {
 
     private String id;
     private String name;
+    private String className;
     private String description;
     private List<ParameterDefinition> parameters = new ArrayList<>();
 
     public String getId() {
         return id;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 
     public void setId(String id) {

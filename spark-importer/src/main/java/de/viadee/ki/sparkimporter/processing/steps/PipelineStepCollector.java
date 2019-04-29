@@ -26,6 +26,7 @@ public class PipelineStepCollector {
 
                 PipelineStepDefinition step = new PipelineStepDefinition();
                 step.setId(routeClassInfo.getSimpleName());
+                step.setClassName(routeClassInfo.getPackageName()+"."+routeClassInfo.getSimpleName());
 
                 for(AnnotationParameterValue parameterValue : paramVals) {
                     if(parameterValue.getName().equals("name")) {
