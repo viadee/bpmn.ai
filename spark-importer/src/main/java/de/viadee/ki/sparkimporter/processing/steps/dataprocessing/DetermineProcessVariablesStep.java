@@ -6,8 +6,8 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfi
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableNameMapping;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -34,25 +34,25 @@ import static org.apache.spark.sql.functions.*;
 public class DetermineProcessVariablesStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // FILTER VARIABLES
-        dataset = doFilterVariables(dataset, writeStepResultIntoFile);
+        dataset = doFilterVariables(dataset, writeStepResultIntoFile, config);
 
         // VARIABLE NAME MAPPING
-        dataset = doVariableNameMapping(dataset, writeStepResultIntoFile);
+        dataset = doVariableNameMapping(dataset, writeStepResultIntoFile, config);
 
         // DETERMINE VARIABLE TYPES
-        dataset = doVariableTypeDetermination(dataset, writeStepResultIntoFile);
+        dataset = doVariableTypeDetermination(dataset, writeStepResultIntoFile, config);
 
         // VARIABLE TYPE ESCALATAION
-        dataset = doVariableTypeEscalation(dataset);
+        dataset = doVariableTypeEscalation(dataset, config);
 
         //return preprocessed data
         return dataset;
     }
 
-    private Dataset<Row> doFilterVariables(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    private Dataset<Row> doFilterVariables(Dataset<Row> dataset, boolean writeStepResultIntoFile, SparkRunnerConfig config) {
         List<String> variablesToFilter = new ArrayList<>();
 
         Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
@@ -101,13 +101,13 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
         });
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "variable_filter");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "variable_filter", config);
         }
 
         return dataset;
     }
 
-    private Dataset<Row> doVariableNameMapping(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    private Dataset<Row> doVariableNameMapping(Dataset<Row> dataset, boolean writeStepResultIntoFile, SparkRunnerConfig config) {
         Map<String, String> variableNameMappings = new HashMap<>();
 
         // getting variable name mappings from configuration
@@ -137,13 +137,13 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
         }
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "variable_name_mapping");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "variable_name_mapping", config);
         }
 
         return dataset;
     }
 
-    private Dataset<Row> doVariableTypeDetermination(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    private Dataset<Row> doVariableTypeDetermination(Dataset<Row> dataset, boolean writeStepResultIntoFile, SparkRunnerConfig config) {
         //Determine the process instances with their variable names and types
         Dataset<Row> variablesTypesDataset = dataset.select(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION)
                 .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE)
@@ -167,13 +167,13 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
 
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(variablesTypesDataset, "variables_types_help");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(variablesTypesDataset, "variables_types_help", config);
         }
 
         return dataset;
     }
 
-    private Dataset<Row> doVariableTypeEscalation(Dataset<Row> dataset) {
+    private Dataset<Row> doVariableTypeEscalation(Dataset<Row> dataset, SparkRunnerConfig config) {
         //get all distinct variable names
         Map<String, String> variables = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_RAW);
 
@@ -211,7 +211,7 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
         }
 
         //if there is no configuration file yet, write variables into the empty one
-        if(PreprocessingRunner.initialConfigToBeWritten) {
+        if(config.isInitialConfigToBeWritten()) {
             Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
             for(String name : variables.keySet()) {
                 String type = variables.get(name);
@@ -239,7 +239,7 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
 
         SparkImporterLogger.getInstance().writeInfo("Found " + helpDataSet.count() + " process variables.");
 
-        SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_escalated");
+        SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_escalated", config);
 
         return dataset;
     }

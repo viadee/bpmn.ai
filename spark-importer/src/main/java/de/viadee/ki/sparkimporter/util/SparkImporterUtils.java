@@ -1,6 +1,6 @@
 package de.viadee.ki.sparkimporter.util;
 
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -59,13 +59,13 @@ public class SparkImporterUtils {
         return DigestUtils.md5Hex(new String(encoded)).toUpperCase();
     }
 
-    public void writeDatasetToParquet(Dataset<Row> dataSet, String subDirectory) {
+    public void writeDatasetToParquet(Dataset<Row> dataSet, String subDirectory, SparkRunnerConfig config) {
 
         String targetFolder = SparkImporterVariables.getTargetFolder()+"/";
         if(subDirectory.equals("result")) {
             targetFolder += "result";
         } else {
-            targetFolder += "intermediate/" + String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory;
+            targetFolder += "intermediate/" + String.format("%02d", config.getAndRaiseStepCounter()) + "_" + subDirectory;
         }
 
         //save dataset into parquet file
@@ -138,11 +138,11 @@ public class SparkImporterUtils {
         }
     }
 
-    public void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory) {
-        writeDatasetToCSV(dataSet, subDirectory, "|");
+    public void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory, SparkRunnerConfig config) {
+        writeDatasetToCSV(dataSet, subDirectory, "|", config);
     }
 
-    private void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory, String delimiter) {
+    private void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory, String delimiter, SparkRunnerConfig config) {
 
         boolean aggreateCSVToOneFile = true;
 
@@ -154,7 +154,7 @@ public class SparkImporterUtils {
         if(subDirectory.equals("result")) {
             path += "result";
         } else {
-            path += "intermediate/" + String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory;
+            path += "intermediate/" + String.format("%02d", config.getAndRaiseStepCounter()) + "_" + subDirectory;
         }
 
         //save dataset into CSV file

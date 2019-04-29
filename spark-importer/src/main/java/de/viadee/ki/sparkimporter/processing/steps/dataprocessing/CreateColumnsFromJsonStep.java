@@ -9,8 +9,8 @@ import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -36,10 +36,10 @@ import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS
 public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameterss) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // CREATE COLUMNS FROM DATASET
-        dataset = doCreateColumnsFromJson(dataset, writeStepResultIntoFile);
+        dataset = doCreateColumnsFromJson(dataset, writeStepResultIntoFile, config);
 
         // FILTER JSON VARIABLES
         dataset = doFilterJsonVariables(dataset);
@@ -48,7 +48,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         return dataset;
     }
 
-    private Dataset<Row> doCreateColumnsFromJson(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    private Dataset<Row> doCreateColumnsFromJson(Dataset<Row> dataset, boolean writeStepResultIntoFile, SparkRunnerConfig config) {
         // get variables
         Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
 
@@ -204,7 +204,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
                 filteredVariablesRows.add(RowFactory.create(name, type));
 
                 // add new variables to configuration
-                if(PreprocessingRunner.initialConfigToBeWritten) {
+                if(config.isInitialConfigToBeWritten()) {
                     Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
                     VariableConfiguration variableConfiguration = new VariableConfiguration();
                     variableConfiguration.setVariableName(name);
@@ -228,10 +228,10 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
             SparkSession sparkSession = SparkSession.builder().getOrCreate();
             Dataset<Row> helpDataSet = sparkSession.createDataFrame(filteredVariablesRows, schemaVars).toDF().orderBy(VAR_PROCESS_INSTANCE_VARIABLE_NAME);
-            SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_after_json_escalated");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_after_json_escalated", config);
 
             if(writeStepResultIntoFile) {
-                SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "create_columns_from_json");
+                SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "create_columns_from_json", config);
             }
         }
 

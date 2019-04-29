@@ -6,6 +6,7 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.ColumnConfiguratio
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.*;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class ReduceColumnsStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // get dataset structure for type determination
         List<StructField> datasetFields = Arrays.asList(dataset.schema().fields());
@@ -49,7 +50,7 @@ public class ReduceColumnsStep implements PreprocessingStepInterface {
         }
 
         //if there is no configuration file yet, write columns into the empty one
-        if(PreprocessingRunner.initialConfigToBeWritten) {
+        if(config.isInitialConfigToBeWritten()) {
             Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
             for(String column : startColumnsString) {
                 if(!columnsToKeep.contains(column)) {
@@ -111,7 +112,7 @@ public class ReduceColumnsStep implements PreprocessingStepInterface {
                 .filter(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID + " <> 'null'");
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "reduced_columns");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "reduced_columns", config);
         }
 
 

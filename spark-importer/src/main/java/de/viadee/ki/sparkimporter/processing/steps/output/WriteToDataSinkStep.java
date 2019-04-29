@@ -2,6 +2,7 @@ package de.viadee.ki.sparkimporter.processing.steps.output;
 
 import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -12,7 +13,7 @@ import java.util.Map;
 @PreprocessingStepDescription(name = "Write to data sink", description = "The resulting dataset is written into a file. It could e.g. also be written to a HDFS filesystem.")
 public class WriteToDataSinkStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         /*
         TODO: Not working yet

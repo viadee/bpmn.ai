@@ -3,6 +3,7 @@ package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Column;
@@ -20,7 +21,7 @@ import java.util.stream.Stream;
 public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
 
 
         // take columns available initially from helper dataset and select the ones to be added back again
@@ -120,7 +121,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         }
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "joined_columns");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "joined_columns", config);
         }
 
         //return preprocessed data

@@ -6,6 +6,7 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.ColumnHashConfigur
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
@@ -21,7 +22,7 @@ import static org.apache.spark.sql.functions.sha1;
 @PreprocessingStepDescription(name = "Hash column", description = "In this step the columns that are configured to be hashed for anonymization are run through a SHA-1 hash operation.")
 public class ColumnHashStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         //check if all variables that should be hashed actually exist, otherwise log a warning
         List<String> existingColumns = new ArrayList<>(Arrays.asList(dataSet.columns()));
@@ -46,7 +47,7 @@ public class ColumnHashStep implements PreprocessingStepInterface {
         }
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataSet, "column_hash_step");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataSet, "column_hash_step", config);
         }
 
         return dataSet;

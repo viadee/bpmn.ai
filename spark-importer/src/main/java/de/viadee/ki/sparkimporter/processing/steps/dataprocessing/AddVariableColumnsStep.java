@@ -2,6 +2,7 @@ package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
 import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -18,18 +19,18 @@ import static org.apache.spark.sql.functions.*;
 public class AddVariableColumnsStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // AGGREGATE VARIABLE UPDATES
-        dataset = doVariableUpdatesAggregation(dataset, writeStepResultIntoFile, dataLevel);
+        dataset = doVariableUpdatesAggregation(dataset, writeStepResultIntoFile, dataLevel, config);
 
         // ADD VARIABLE COLUMNS
-        dataset = doAddVariableColumns(dataset, writeStepResultIntoFile, dataLevel);
+        dataset = doAddVariableColumns(dataset, writeStepResultIntoFile, dataLevel, config);
 
         return dataset;
     }
 
-    private Dataset<Row> doVariableUpdatesAggregation(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
+    private Dataset<Row> doVariableUpdatesAggregation(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, SparkRunnerConfig config) {
         //apply max aggregator to known date columns start_time_ and end_time_ so that no date formatting is done in custom aggregator
         List<String> dateFormatColumns = Arrays.asList(new String[]{SparkImporterVariables.VAR_START_TIME, SparkImporterVariables.VAR_END_TIME});
 
@@ -155,14 +156,14 @@ public class AddVariableColumnsStep implements PreprocessingStepInterface {
         }
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_variable_updates");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_variable_updates", config);
         }
 
         //return preprocessed data
         return dataset;
     }
 
-    private Dataset<Row> doAddVariableColumns(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel) {
+    private Dataset<Row> doAddVariableColumns(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, SparkRunnerConfig config) {
         Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
         Set<String> variables = varMap.keySet();
 
@@ -200,7 +201,7 @@ public class AddVariableColumnsStep implements PreprocessingStepInterface {
         }
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "add_var_columns");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "add_var_columns", config);
         }
 
         //return preprocessed data

@@ -2,6 +2,7 @@ package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
 import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -21,7 +22,7 @@ import static org.apache.spark.sql.functions.when;
 public class FillActivityInstancesHistoryStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // get variables
         Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
@@ -87,7 +88,7 @@ public class FillActivityInstancesHistoryStep implements PreprocessingStepInterf
         }, RowEncoder.apply(dataset.schema()));
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "fill_activity_instances_history");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "fill_activity_instances_history", config);
         }
 
         //return preprocessed data

@@ -33,6 +33,7 @@ public abstract class SparkPredictionServiceRunner {
 
     private PipelineManager pipelineManager = null;
     protected SparkSession sparkSession = null;
+    private SparkRunnerConfig sparkRunnerConfig;
 
     private Dataset<Row> dataset;
     protected String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
@@ -45,7 +46,7 @@ public abstract class SparkPredictionServiceRunner {
     private void checkConfig() {
         //if there is no configuration file yet, write one in the next steps
         if(ConfigurationUtils.getInstance().getConfiguration(true) == null) {
-            PreprocessingRunner.initialConfigToBeWritten = true;
+            this.sparkRunnerConfig.setInitialConfigToBeWritten(true);
             ConfigurationUtils.getInstance().createEmptyConfig();
         } else {
             SparkImporterLogger.getInstance().writeInfo("Configuration file found: " + SparkImporterVariables.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName());
@@ -54,7 +55,7 @@ public abstract class SparkPredictionServiceRunner {
 
     private void writeConfig() {
         //write initial config file
-        if(PreprocessingRunner.initialConfigToBeWritten) {
+        if(this.sparkRunnerConfig.isInitialConfigToBeWritten()) {
             ConfigurationUtils.getInstance().writeConfigurationToFile();
         }
     }
@@ -84,7 +85,9 @@ public abstract class SparkPredictionServiceRunner {
         }, DataTypes.LongType);
     }
 
-    public void setup() throws FaultyConfigurationException {
+    public void setup(SparkRunnerConfig sparkRunnerConfig) throws FaultyConfigurationException {
+        this.sparkRunnerConfig = sparkRunnerConfig;
+
         sparkSession = SparkSession.builder().getOrCreate();
         initialize();
         registerUDFs();
@@ -112,7 +115,7 @@ public abstract class SparkPredictionServiceRunner {
         }
 
         // Run processing runner
-        Dataset<Row> resultDataset = preprocessingRunner.run(dataset, dataLevel);
+        Dataset<Row> resultDataset = preprocessingRunner.run(dataset, dataLevel, this.sparkRunnerConfig);
 
         writeConfig();
 
@@ -125,7 +128,7 @@ public abstract class SparkPredictionServiceRunner {
 
         Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
 
-        if(PreprocessingRunner.initialConfigToBeWritten) {
+        if(this.sparkRunnerConfig.isInitialConfigToBeWritten()) {
             pipelineSteps = buildDefaultPipeline();
 
             ModelPredictionConfiguration modelPredictionConfiguration = configuration.getModelPredictionConfiguration();

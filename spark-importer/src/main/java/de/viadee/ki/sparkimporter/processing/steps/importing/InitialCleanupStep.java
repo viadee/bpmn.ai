@@ -1,6 +1,7 @@
 package de.viadee.ki.sparkimporter.processing.steps.importing;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
@@ -10,7 +11,7 @@ import java.util.Map;
 
 public class InitialCleanupStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // remove duplicated columns created at CSV import step
         dataset = SparkImporterUtils.getInstance().removeDuplicatedColumns(dataset);
@@ -20,7 +21,7 @@ public class InitialCleanupStep implements PreprocessingStepInterface {
 
         // write imported unique column CSV structure to file for debugging
         if (SparkImporterCSVArguments.getInstance().isWriteStepResultsToCSV()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_unique_columns_result");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_unique_columns_result", config);
         }
 
         return dataset;

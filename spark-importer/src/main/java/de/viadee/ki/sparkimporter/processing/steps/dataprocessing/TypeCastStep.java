@@ -7,6 +7,7 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfi
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -28,7 +29,7 @@ import static org.apache.spark.sql.functions.*;
 public class TypeCastStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // get variables
         Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
@@ -121,7 +122,7 @@ public class TypeCastStep implements PreprocessingStepInterface {
         }
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "type_cast_columns");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "type_cast_columns", config);
         }
 
         //return preprocessed data

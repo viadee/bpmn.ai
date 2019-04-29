@@ -3,7 +3,6 @@ package de.viadee.ki.sparkimporter.runner;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
@@ -70,7 +69,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
             }
         }
 
-        PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
+        this.sparkRunnerConfig.setWriteStepResultsIntoFile(ARGS.isWriteStepResultsToCSV());
 
         // Delete destination files, required to avoid exception during runtime
         if(SparkImporterVariables.getSaveMode().equals(SaveMode.Overwrite)) {
@@ -114,11 +113,11 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
 
         // write imported CSV structure to file for debugging
         if (SparkImporterCSVArguments.getInstance().isWriteStepResultsToCSV()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result", this.sparkRunnerConfig);
         }
 
         InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
-        dataset = initialCleanupStep.runPreprocessingStep(dataset, false, SparkImporterVariables.DATA_LEVEL_PROCESS, null);
+        dataset = initialCleanupStep.runPreprocessingStep(dataset, false, SparkImporterVariables.DATA_LEVEL_PROCESS, null, null);
 
         return dataset;
     }

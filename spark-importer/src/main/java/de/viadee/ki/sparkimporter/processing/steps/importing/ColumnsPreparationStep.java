@@ -4,6 +4,7 @@ import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 public class ColumnsPreparationStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
 
 
         List<String> predictionVariables = new ArrayList<>();
@@ -59,7 +60,7 @@ public class ColumnsPreparationStep implements PreprocessingStepInterface {
 
         // write imported CSV structure to file for debugging
         if (SparkImporterCSVArguments.getInstance().isWriteStepResultsToCSV()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result", config);
         }
         
         return dataset;

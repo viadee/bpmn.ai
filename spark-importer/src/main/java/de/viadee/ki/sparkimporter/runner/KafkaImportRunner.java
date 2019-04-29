@@ -2,7 +2,6 @@ package de.viadee.ki.sparkimporter.runner;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.ColumnsPreparationStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
@@ -89,7 +88,7 @@ public class KafkaImportRunner extends SparkRunner {
 
         dataLevel = ARGS.getDataLevel();
 
-        PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
+        this.sparkRunnerConfig.setWriteStepResultsIntoFile(ARGS.isWriteStepResultsToCSV());
 
         // Delete destination files, required to avoid exception during runtime
         FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));

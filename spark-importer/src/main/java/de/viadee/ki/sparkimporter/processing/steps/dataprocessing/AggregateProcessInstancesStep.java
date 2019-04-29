@@ -2,6 +2,7 @@ package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
 import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -21,7 +22,7 @@ import static org.apache.spark.sql.functions.not;
 public class AggregateProcessInstancesStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         //apply first and processState aggregator
         Map<String, String> aggregationMap = new HashMap<>();
@@ -87,7 +88,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         SparkImporterLogger.getInstance().writeInfo("Found " + dataset.count() + " process instances.");
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_process_instances");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_process_instances", config);
         }
 
         //return preprocessed data
