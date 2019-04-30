@@ -1,6 +1,7 @@
 package de.viadee.ki.sparkimporter.processing.steps.userconfig;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
@@ -29,7 +30,7 @@ public class DataFilterOnActivityStep implements PreprocessingStepInterface {
      * @return the filtered DataSet
      */
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
         // any parameters set?
         if (parameters == null || parameters.size() == 0) {
             SparkImporterLogger.getInstance().writeWarn("No parameters found for the DataFilterOnActivityStep");
@@ -86,7 +87,7 @@ public class DataFilterOnActivityStep implements PreprocessingStepInterface {
         SparkImporterLogger.getInstance().writeInfo("DataFilterOnActivityStep: The filtered DataSet contains "+dataSet.count()+" rows, (before: "+ initialDSCount+" rows)");
 
         if (writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataSet, "data_filter_on_activity_step");
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataSet, "data_filter_on_activity_step", config);
         }
 
         return dataSet;

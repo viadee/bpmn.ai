@@ -112,7 +112,7 @@ public class KafkaImportApplicationIntegrationTest {
                 .getOrCreate();
 
         //generate Dataset and create hash to compare
-        Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY_PROCESS+ "/result/parquet");
+        Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY_PROCESS);
 
         //check that dataset contains 43 lines
         assertEquals(43, importedDataset.count());
@@ -141,7 +141,7 @@ public class KafkaImportApplicationIntegrationTest {
                 .getOrCreate();
 
         //generate Dataset and create hash to compare
-        Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY_ACTIVITY + "/result/parquet");
+        Dataset<Row> importedDataset = sparkSession.read().load(IMPORT_TEST_OUTPUT_DIRECTORY_ACTIVITY);
 
         //check that dataset contains 55 lines
         assertEquals(55, importedDataset.count());
