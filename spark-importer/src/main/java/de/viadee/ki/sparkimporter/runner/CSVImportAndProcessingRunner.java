@@ -25,13 +25,12 @@ import java.util.List;
 public class CSVImportAndProcessingRunner extends SparkRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(CSVImportAndProcessingRunner.class);
-    public static SparkImporterCSVArguments ARGS;
 
     @Override
     protected void initialize(String[] arguments) {
         this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);
 
-        ARGS = SparkImporterCSVArguments.getInstance();
+        SparkImporterCSVArguments ARGS = SparkImporterCSVArguments.getInstance();
 
         // instantiate JCommander
         // Use JCommander for flexible usage of Parameters
@@ -47,6 +46,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
         this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);
 
         //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
+        this.sparkRunnerConfig.setSourceFolder(ARGS.getFileSource());
         this.sparkRunnerConfig.setTargetFolder(ARGS.getFileDestination());
         this.sparkRunnerConfig.setDevTypeCastCheckEnabled(ARGS.isDevTypeCastCheckEnabled());
         this.sparkRunnerConfig.setDevProcessStateColumnWorkaroundEnabled(ARGS.isDevProcessStateColumnWorkaroundEnabled());
@@ -110,7 +110,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
                 .option("header", "true")
                 .option("ignoreLeadingWhiteSpace", "false")
                 .option("ignoreTrailingWhiteSpace", "false")
-                .csv(ARGS.getFileSource());
+                .csv(this.sparkRunnerConfig.getSourceFolder());
 
         // write imported CSV structure to file for debugging
         if (SparkImporterCSVArguments.getInstance().isWriteStepResultsToCSV()) {

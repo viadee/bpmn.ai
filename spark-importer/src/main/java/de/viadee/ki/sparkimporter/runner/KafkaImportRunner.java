@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
 public class KafkaImportRunner extends SparkRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaImportRunner.class);
-    public static SparkImporterKafkaImportArguments ARGS;
 
     private final static String TOPIC_PROCESS_INSTANCE = "processInstance";
     private final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
@@ -62,7 +61,7 @@ public class KafkaImportRunner extends SparkRunner {
     protected void initialize(String[] arguments) {
         this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.KAFKA_IMPORT);
 
-        ARGS = SparkImporterKafkaImportArguments.getInstance();
+        SparkImporterKafkaImportArguments ARGS = SparkImporterKafkaImportArguments.getInstance();
 
         // instantiate JCommander
         // Use JCommander for flexible usage of Parameters
@@ -86,6 +85,9 @@ public class KafkaImportRunner extends SparkRunner {
         this.sparkRunnerConfig.setOutputFormat(ARGS.getOutputFormat());
         this.sparkRunnerConfig.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
         this.sparkRunnerConfig.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
+        this.sparkRunnerConfig.setBatchMode(ARGS.isBatchMode());
+        this.sparkRunnerConfig.setKafkaBroker(ARGS.getKafkaBroker());
+        this.sparkRunnerConfig.setDataLevel(ARGS.getDataLevel());
 
         dataLevel = ARGS.getDataLevel();
 
@@ -102,7 +104,7 @@ public class KafkaImportRunner extends SparkRunner {
 
     private synchronized void processMasterRDD(JavaRDD<String> newRDD, String queue) {
         if (newRDD.count() == 0) {
-            if(ARGS.isBatchMode()) {
+            if(this.sparkRunnerConfig.isBatchMode()) {
                 SparkImporterLogger.getInstance().writeInfo("Kafka queue '" + queue + "' returned zero entries.");
 
                 if (!emptyQueues.contains(queue)) {
@@ -164,14 +166,14 @@ public class KafkaImportRunner extends SparkRunner {
 
         // if we are in batch mode we create the countdown latch so we can shutdown the streaming
         // context once the number of queues (EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) are empty.
-        if(ARGS.isBatchMode()) {
+        if(this.sparkRunnerConfig.isBatchMode()) {
             countDownLatch = new CountDownLatch(1);
         }
 
         int duration = 5000;
 
         // list of host:port pairs used for establishing the initial connections to the Kafka cluster
-        kafkaConsumerConfigPI.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, ARGS.getKafkaBroker());
+        kafkaConsumerConfigPI.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, this.sparkRunnerConfig.getKafkaBroker());
         kafkaConsumerConfigPI.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         kafkaConsumerConfigPI.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         // allows a pool of processes to divide the work of consuming and processing records
@@ -180,7 +182,7 @@ public class KafkaImportRunner extends SparkRunner {
         kafkaConsumerConfigPI.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         // list of host:port pairs used for establishing the initial connections to the Kafka cluster
-        kafkaConsumerConfigVU.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, ARGS.getKafkaBroker());
+        kafkaConsumerConfigVU.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, this.sparkRunnerConfig.getKafkaBroker());
         kafkaConsumerConfigVU.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         kafkaConsumerConfigVU.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         // allows a pool of processes to divide the work of consuming and processing records
@@ -221,9 +223,9 @@ public class KafkaImportRunner extends SparkRunner {
                 });
 
 
-        if(ARGS.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(this.sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             // list of host:port pairs used for establishing the initial connections to the Kafka cluster
-            kafkaConsumerConfigAI.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, ARGS.getKafkaBroker());
+            kafkaConsumerConfigAI.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, this.sparkRunnerConfig.getKafkaBroker());
             kafkaConsumerConfigAI.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
             kafkaConsumerConfigAI.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
             // allows a pool of processes to divide the work of consuming and processing records
@@ -248,7 +250,7 @@ public class KafkaImportRunner extends SparkRunner {
         // Start the stream
         jssc.start();
 
-        if(ARGS.isBatchMode()) {
+        if(this.sparkRunnerConfig.isBatchMode()) {
             try {
                 // wait until countdown latch has counted down
                 countDownLatch.await();

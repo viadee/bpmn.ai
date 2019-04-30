@@ -13,12 +13,13 @@ public class SparkRunnerConfig implements Serializable {
     private int stepCounter = 1;
 
     private String workingDirectory = ".";
-    private String sourceFolder = "";
-    private String targetFolder = "";
+    private String sourceFolder = ".";
+    private String targetFolder = ".";
     private boolean devTypeCastCheckEnabled = false;
     private boolean devProcessStateColumnWorkaroundEnabled = false;
     private boolean revCountEnabled = false;
     private SaveMode saveMode = SaveMode.Append;
+    private String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
     private String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
     private String delimiter = "|";
     private String processDefinitionFilter = "";
@@ -38,6 +39,7 @@ public class SparkRunnerConfig implements Serializable {
         FILE_DESTINATION,
         REVISION_COUNT,
         SAVE_MODE,
+        DATA_LEVEL,
         OUTPUT_FORMAT,
         WRITE_STEP_RESULTS,
         DELIMITER,
@@ -64,7 +66,10 @@ public class SparkRunnerConfig implements Serializable {
             setTargetFolder(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.FILE_DESTINATION)));
         }
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.SAVE_MODE)) != null) {
-            setSaveMode(String.valueOf(ENVIRONMENT_VARIABLES.SAVE_MODE) == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
+            setSaveMode(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.SAVE_MODE)) == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.DATA_LEVEL)) != null) {
+            setDataLevel(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.DATA_LEVEL)));
         }
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.OUTPUT_FORMAT)) != null) {
             setOutputFormat(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.OUTPUT_FORMAT)));
@@ -168,6 +173,14 @@ public class SparkRunnerConfig implements Serializable {
 
     public void setSaveMode(SaveMode saveMode) {
         this.saveMode = saveMode;
+    }
+
+    public String getDataLevel() {
+        return dataLevel;
+    }
+
+    public void setDataLevel(String dataLevel) {
+        this.dataLevel = dataLevel;
     }
 
     public String getOutputFormat() {

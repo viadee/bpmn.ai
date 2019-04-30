@@ -23,13 +23,12 @@ import java.util.List;
 public class KafkaProcessingRunner extends SparkRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaProcessingRunner.class);
-    public static SparkImporterKafkaDataProcessingArguments ARGS;
 
     @Override
     protected void initialize(String[] arguments) {
         this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.KAFKA_PROCESSING);
 
-        ARGS = SparkImporterKafkaDataProcessingArguments.getInstance();
+        SparkImporterKafkaDataProcessingArguments ARGS = SparkImporterKafkaDataProcessingArguments.getInstance();
 
         // instantiate JCommander
         // Use JCommander for flexible usage of Parameters
@@ -116,7 +115,7 @@ public class KafkaProcessingRunner extends SparkRunner {
         //Load source parquet file
         Dataset<Row> dataset = sparkSession.read()
                 .option("inferSchema", "true")
-                .load(ARGS.getFileSource());
+                .load(this.sparkRunnerConfig.getSourceFolder());
 
         return dataset;
     }
