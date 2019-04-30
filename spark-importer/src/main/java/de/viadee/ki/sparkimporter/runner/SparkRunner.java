@@ -48,6 +48,12 @@ public abstract class SparkRunner {
 
     protected SparkRunnerConfig sparkRunnerConfig = new SparkRunnerConfig();
 
+    protected SparkRunner() {}
+
+    protected SparkRunner(SparkRunnerConfig config) {
+        this.sparkRunnerConfig = config;
+    }
+
     protected abstract void initialize(String[] arguments);
 
     protected abstract List<PipelineStep> buildDefaultPipeline();

@@ -26,6 +26,12 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(CSVImportAndProcessingRunner.class);
 
+    public CSVImportAndProcessingRunner() {}
+
+    public CSVImportAndProcessingRunner(SparkRunnerConfig config) {
+        super(config);
+    }
+
     @Override
     protected void initialize(String[] arguments) {
         this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);

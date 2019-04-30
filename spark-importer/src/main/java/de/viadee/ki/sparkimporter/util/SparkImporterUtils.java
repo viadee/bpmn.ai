@@ -59,6 +59,15 @@ public class SparkImporterUtils {
         return DigestUtils.md5Hex(new String(encoded)).toUpperCase();
     }
 
+    public void writeDatasetToJson(Dataset<Row> dataset, String targetfolder, SparkRunnerConfig config) {
+        String targetFolder = config.getTargetFolder()+"/result/json/"+targetfolder;
+        dataset
+                .coalesce(1)
+                .write()
+                .mode(config.getSaveMode())
+                .json(targetFolder);
+    }
+
     public void writeDatasetToParquet(Dataset<Row> dataSet, String subDirectory, SparkRunnerConfig config) {
 
         String targetFolder = config.getTargetFolder()+"/";

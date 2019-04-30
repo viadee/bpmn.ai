@@ -8,6 +8,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
 import java.util.Map;
+import java.util.UUID;
 
 @PreprocessingStepDescription(name = "Write to disc", description = "The resulting dataset is written into a file. It could e.g. also be written to a HDFS filesystem.")
 public class WriteToDiscStep implements PreprocessingStepInterface {
@@ -22,7 +23,13 @@ public class WriteToDiscStep implements PreprocessingStepInterface {
             }
         }
 
+        dataset = dataset.cache();
+
         SparkImporterUtils.getInstance().writeDatasetToParquet(dataset, "result", config);
+
+        if(config.isGenerateJsonPreview()) {
+            SparkImporterUtils.getInstance().writeDatasetToJson(dataset.limit(config.getJsonPreviewLineCount()), UUID.randomUUID().toString(), config);
+        }
 
         return dataset;
     }

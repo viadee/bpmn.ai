@@ -57,6 +57,12 @@ public class KafkaImportRunner extends SparkRunner {
     //how many queues are we querying and expecting to be empty in batch mode
     private int EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = 2; // default for process
 
+    public KafkaImportRunner() {}
+
+    public KafkaImportRunner(SparkRunnerConfig config) {
+        super(config);
+    }
+
     @Override
     protected void initialize(String[] arguments) {
         this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.KAFKA_IMPORT);

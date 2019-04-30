@@ -24,6 +24,12 @@ public class KafkaProcessingRunner extends SparkRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaProcessingRunner.class);
 
+    public KafkaProcessingRunner() {}
+
+    public KafkaProcessingRunner(SparkRunnerConfig config) {
+        super(config);
+    }
+
     @Override
     protected void initialize(String[] arguments) {
         this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.KAFKA_PROCESSING);

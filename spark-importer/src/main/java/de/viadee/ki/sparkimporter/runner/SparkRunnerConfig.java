@@ -32,6 +32,9 @@ public class SparkRunnerConfig implements Serializable {
 
     private SparkRunner.RUNNING_MODE runningMode = null;
 
+    private boolean generateJsonPreview = false;
+    private int jsonPreviewLineCount = 1000;
+
     public enum ENVIRONMENT_VARIABLES {
         WORKING_DIRECTORY,
         LOG_DIRECTORY,
@@ -45,7 +48,9 @@ public class SparkRunnerConfig implements Serializable {
         DELIMITER,
         PROCESS_DEFINITION_FILTER,
         BATCH_MODE,
-        KAFKA_BOOTSTRAP_SERVERS
+        KAFKA_BOOTSTRAP_SERVERS,
+        JSON_PREVIEW,
+        JSON_PREVIEW_LINES
     }
 
     public SparkRunnerConfig() {
@@ -88,6 +93,13 @@ public class SparkRunnerConfig implements Serializable {
         }
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.KAFKA_BOOTSTRAP_SERVERS)) != null) {
             setKafkaBroker(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.KAFKA_BOOTSTRAP_SERVERS)));
+        }
+
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.JSON_PREVIEW)) != null) {
+            setGenerateJsonPreview(true);
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.JSON_PREVIEW_LINES)) != null) {
+            setJsonPreviewLineCount(Integer.parseInt(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.JSON_PREVIEW_LINES))));
         }
     }
 
@@ -245,5 +257,21 @@ public class SparkRunnerConfig implements Serializable {
 
     public void setKafkaBroker(String kafkaBroker) {
         this.kafkaBroker = kafkaBroker;
+    }
+
+    public boolean isGenerateJsonPreview() {
+        return generateJsonPreview;
+    }
+
+    public void setGenerateJsonPreview(boolean generateJsonPreview) {
+        this.generateJsonPreview = generateJsonPreview;
+    }
+
+    public int getJsonPreviewLineCount() {
+        return jsonPreviewLineCount;
+    }
+
+    public void setJsonPreviewLineCount(int jsonPreviewLineCount) {
+        this.jsonPreviewLineCount = jsonPreviewLineCount;
     }
 }
