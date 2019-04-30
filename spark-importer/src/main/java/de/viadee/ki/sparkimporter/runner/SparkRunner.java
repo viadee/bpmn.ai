@@ -32,8 +32,8 @@ import org.spark_project.guava.primitives.Longs;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class SparkRunner {
 
