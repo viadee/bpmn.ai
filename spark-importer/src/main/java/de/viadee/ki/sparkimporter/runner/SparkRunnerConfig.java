@@ -1,5 +1,6 @@
 package de.viadee.ki.sparkimporter.runner;
 
+import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.SaveMode;
 
@@ -19,13 +20,71 @@ public class SparkRunnerConfig implements Serializable {
     private boolean revCountEnabled = false;
     private SaveMode saveMode = SaveMode.Append;
     private String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
-
+    private String delimiter = "|";
+    private String processDefinitionFilter = "";
+    private boolean batchMode = true;
+    private String kafkaBroker = "";
 
     private String processFilterDefinitionId = null;
 
     private String pipelineMode = SparkImporterVariables.PIPELINE_MODE_LEARN;
 
     private SparkRunner.RUNNING_MODE runningMode = null;
+
+    public enum ENVIRONMENT_VARIABLES {
+        WORKING_DIRECTORY,
+        LOG_DIRECTORY,
+        FILE_SOURCE,
+        FILE_DESTINATION,
+        REVISION_COUNT,
+        SAVE_MODE,
+        OUTPUT_FORMAT,
+        WRITE_STEP_RESULTS,
+        DELIMITER,
+        PROCESS_DEFINITION_FILTER,
+        BATCH_MODE,
+        KAFKA_BOOTSTRAP_SERVERS
+    }
+
+    public SparkRunnerConfig() {
+        initializeWithEnvironmentVariables();
+    }
+
+    private void initializeWithEnvironmentVariables() {
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.WORKING_DIRECTORY)) != null) {
+            setWorkingDirectory(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.WORKING_DIRECTORY)));
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.LOG_DIRECTORY)) != null) {
+            SparkImporterLogger.getInstance().setLogDirectory(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.LOG_DIRECTORY)));
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.FILE_SOURCE)) != null) {
+            setSourceFolder(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.FILE_SOURCE)));
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.FILE_DESTINATION)) != null) {
+            setTargetFolder(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.FILE_DESTINATION)));
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.SAVE_MODE)) != null) {
+            setSaveMode(String.valueOf(ENVIRONMENT_VARIABLES.SAVE_MODE) == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.OUTPUT_FORMAT)) != null) {
+            setOutputFormat(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.OUTPUT_FORMAT)));
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.WRITE_STEP_RESULTS)) != null) {
+            setWriteStepResultsIntoFile(true);
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.DELIMITER)) != null) {
+            setDelimiter(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.DELIMITER)));
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.PROCESS_DEFINITION_FILTER)) != null) {
+            setProcessFilterDefinitionId(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.PROCESS_DEFINITION_FILTER)));
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.BATCH_MODE)) != null) {
+            setBatchMode(true);
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.KAFKA_BOOTSTRAP_SERVERS)) != null) {
+            setKafkaBroker(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.KAFKA_BOOTSTRAP_SERVERS)));
+        }
+    }
 
     public boolean isInitialConfigToBeWritten() {
         return initialConfigToBeWritten;
@@ -119,6 +178,22 @@ public class SparkRunnerConfig implements Serializable {
         this.outputFormat = outputFormat;
     }
 
+    public String getDelimiter() {
+        return delimiter;
+    }
+
+    public void setDelimiter(String delimiter) {
+        this.delimiter = delimiter;
+    }
+
+    public String getProcessDefinitionFilter() {
+        return processDefinitionFilter;
+    }
+
+    public void setProcessDefinitionFilter(String processDefinitionFilter) {
+        this.processDefinitionFilter = processDefinitionFilter;
+    }
+
     public String getProcessFilterDefinitionId() {
         return processFilterDefinitionId;
     }
@@ -141,5 +216,21 @@ public class SparkRunnerConfig implements Serializable {
 
     public void setRunningMode(SparkRunner.RUNNING_MODE runningMode) {
         this.runningMode = runningMode;
+    }
+
+    public boolean isBatchMode() {
+        return batchMode;
+    }
+
+    public void setBatchMode(boolean batchMode) {
+        this.batchMode = batchMode;
+    }
+
+    public String getKafkaBroker() {
+        return kafkaBroker;
+    }
+
+    public void setKafkaBroker(String kafkaBroker) {
+        this.kafkaBroker = kafkaBroker;
     }
 }

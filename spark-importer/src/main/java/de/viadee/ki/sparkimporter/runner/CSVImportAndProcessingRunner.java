@@ -54,6 +54,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
         this.sparkRunnerConfig.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
         this.sparkRunnerConfig.setOutputFormat(ARGS.getOutputFormat());
         this.sparkRunnerConfig.setWorkingDirectory(ARGS.getWorkingDirectory());
+        this.sparkRunnerConfig.setDelimiter(ARGS.getDelimiter());
         SparkImporterLogger.getInstance().setLogDirectory(ARGS.getLogDirectory());
 
         this.sparkRunnerConfig.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
@@ -105,7 +106,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
         //Load source CSV file
         Dataset<Row> dataset = sparkSession.read()
                 .option("inferSchema", "true")
-                .option("delimiter", ARGS.getDelimiter())
+                .option("delimiter", this.sparkRunnerConfig.getDelimiter())
                 .option("header", "true")
                 .option("ignoreLeadingWhiteSpace", "false")
                 .option("ignoreTrailingWhiteSpace", "false")
