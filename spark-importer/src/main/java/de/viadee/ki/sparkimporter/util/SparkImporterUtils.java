@@ -61,7 +61,7 @@ public class SparkImporterUtils {
 
     public void writeDatasetToParquet(Dataset<Row> dataSet, String subDirectory, SparkRunnerConfig config) {
 
-        String targetFolder = SparkImporterVariables.getTargetFolder()+"/";
+        String targetFolder = config.getTargetFolder()+"/";
         if(subDirectory.equals("result")) {
             targetFolder += "result";
         } else {
@@ -71,10 +71,10 @@ public class SparkImporterUtils {
         //save dataset into parquet file
         dataSet
                 .write()
-                .mode(SparkImporterVariables.getSaveMode())
+                .mode(config.getSaveMode())
                 .save(targetFolder + "/parquet");
 
-        if(SparkImporterVariables.getOutputFormat().equals(SparkImporterVariables.OUTPUT_FORMAT_CSV) && subDirectory.equals("result")) {
+        if(config.getOutputFormat().equals(SparkImporterVariables.OUTPUT_FORMAT_CSV) && subDirectory.equals("result")) {
             SparkSession sparkSession = SparkSession.builder().getOrCreate();
             Dataset<Row> parquetData = sparkSession.read().load(targetFolder + "/parquet");
             parquetData
@@ -85,7 +85,7 @@ public class SparkImporterUtils {
                     .option("timestampFormat", "yyyy-MM-dd'T'HH:mm:ss.SSS")
                     .option("ignoreLeadingWhiteSpace", "false")
                     .option("ignoreTrailingWhiteSpace", "false")
-                    .mode(SparkImporterVariables.getSaveMode())
+                    .mode(config.getSaveMode())
                     .csv(targetFolder + "/csv");
 
             // move resulting csv file
@@ -150,7 +150,7 @@ public class SparkImporterUtils {
             dataSet = dataSet.coalesce(1);
         }
 
-        String path = SparkImporterVariables.getTargetFolder()+"/";
+        String path = config.getTargetFolder()+"/";
         if(subDirectory.equals("result")) {
             path += "result";
         } else {
@@ -164,7 +164,7 @@ public class SparkImporterUtils {
                 .option("delimiter", delimiter)
                 .option("ignoreLeadingWhiteSpace", "false")
                 .option("ignoreTrailingWhiteSpace", "false")
-                .mode(SparkImporterVariables.getSaveMode())
+                .mode(config.getSaveMode())
                 .csv(path);
     }
 

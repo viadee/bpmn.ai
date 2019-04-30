@@ -18,7 +18,7 @@ public class KafkaProcessingPredictionServiceRunner extends SparkPredictionServi
 
     @Override
     public void initialize() {
-        SparkImporterVariables.setPipelineMode(SparkImporterVariables.PIPELINE_MODE_PREDICT);
+        this.sparkRunnerConfig.setPipelineMode(SparkImporterVariables.PIPELINE_MODE_PREDICT);
     }
 
     @Override

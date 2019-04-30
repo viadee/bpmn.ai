@@ -41,7 +41,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_INSTANCE_ID
         });
 
-        if(!SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled()) {
+        if(!config.isDevProcessStateColumnWorkaroundEnabled()) {
             columnsNotBeAddedAgain = Stream.concat(columnsNotBeAddedAgain.stream(), Stream.of(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)).collect(Collectors.toList());
         }
 
@@ -65,7 +65,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         }
 
         Column filter = initialDataset.col(SparkImporterVariables.VAR_STATE).isNotNull();
-        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             filter = initialDataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).isNull();
         }
 
@@ -111,7 +111,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
                     , "left");
         }
 
-        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
         }
 

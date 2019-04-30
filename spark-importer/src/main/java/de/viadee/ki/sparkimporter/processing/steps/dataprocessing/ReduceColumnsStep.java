@@ -51,7 +51,7 @@ public class ReduceColumnsStep implements PreprocessingStepInterface {
 
         //if there is no configuration file yet, write columns into the empty one
         if(config.isInitialConfigToBeWritten()) {
-            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
             for(String column : startColumnsString) {
                 if(!columnsToKeep.contains(column)) {
                     ColumnConfiguration columnConfiguration = new ColumnConfiguration();

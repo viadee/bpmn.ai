@@ -29,7 +29,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
 
     @Override
     protected void initialize(String[] arguments) {
-        SparkImporterVariables.setRunningMode(RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);
+        this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);
 
         ARGS = SparkImporterCSVArguments.getInstance();
 
@@ -44,23 +44,23 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
             System.exit(1);
         }
 
-        SparkImporterVariables.setRunningMode(RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);
+        this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);
 
         //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
-        SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
-        SparkImporterVariables.setDevTypeCastCheckEnabled(ARGS.isDevTypeCastCheckEnabled());
-        SparkImporterVariables.setDevProcessStateColumnWorkaroundEnabled(ARGS.isDevProcessStateColumnWorkaroundEnabled());
-        SparkImporterVariables.setRevCountEnabled(ARGS.isRevisionCount());
-        SparkImporterVariables.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
-        SparkImporterVariables.setOutputFormat(ARGS.getOutputFormat());
-        SparkImporterVariables.setWorkingDirectory(ARGS.getWorkingDirectory());
-        SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
-        
-        SparkImporterVariables.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
+        this.sparkRunnerConfig.setTargetFolder(ARGS.getFileDestination());
+        this.sparkRunnerConfig.setDevTypeCastCheckEnabled(ARGS.isDevTypeCastCheckEnabled());
+        this.sparkRunnerConfig.setDevProcessStateColumnWorkaroundEnabled(ARGS.isDevProcessStateColumnWorkaroundEnabled());
+        this.sparkRunnerConfig.setRevCountEnabled(ARGS.isRevisionCount());
+        this.sparkRunnerConfig.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
+        this.sparkRunnerConfig.setOutputFormat(ARGS.getOutputFormat());
+        this.sparkRunnerConfig.setWorkingDirectory(ARGS.getWorkingDirectory());
+        SparkImporterLogger.getInstance().setLogDirectory(ARGS.getLogDirectory());
+
+        this.sparkRunnerConfig.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
 
         dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
 
-        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(this.sparkRunnerConfig.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             try {
                 throw new FaultyConfigurationException("Process state workaround option cannot be used with activity data level.");
             } catch (FaultyConfigurationException e) {
@@ -72,7 +72,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
         this.sparkRunnerConfig.setWriteStepResultsIntoFile(ARGS.isWriteStepResultsToCSV());
 
         // Delete destination files, required to avoid exception during runtime
-        if(SparkImporterVariables.getSaveMode().equals(SaveMode.Overwrite)) {
+        if(this.sparkRunnerConfig.getSaveMode().equals(SaveMode.Overwrite)) {
             FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
         }
 

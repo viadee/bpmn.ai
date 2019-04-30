@@ -27,7 +27,7 @@ public class ColumnHashStep implements PreprocessingStepInterface {
         //check if all variables that should be hashed actually exist, otherwise log a warning
         List<String> existingColumns = new ArrayList<>(Arrays.asList(dataSet.columns()));
 
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
         if(configuration != null) {
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
             if(preprocessingConfiguration != null) {

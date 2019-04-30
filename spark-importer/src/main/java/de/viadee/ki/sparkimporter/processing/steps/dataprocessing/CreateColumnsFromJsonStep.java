@@ -42,7 +42,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         dataset = doCreateColumnsFromJson(dataset, writeStepResultIntoFile, config);
 
         // FILTER JSON VARIABLES
-        dataset = doFilterJsonVariables(dataset);
+        dataset = doFilterJsonVariables(dataset, config);
 
         //return preprocessed data
         return dataset;
@@ -58,7 +58,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         }
 
         String[] vars = null;
-        if(SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
+        if(config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
             //convert to String array so it is serializable and can be used in map function
             Set<String> variables = varMap.keySet();
             vars = new String[variables.size()];
@@ -78,7 +78,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         Dataset<Row> newColumnsDataset = dataset.flatMap((FlatMapFunction<Row, Row>) row -> {
             List<Row> newColumns = new ArrayList<>();
             for (String c : columns) {
-                if (SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
+                if (config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
                     //it was a variable, so try to parse as json
                     ObjectMapper mapper = new ObjectMapper();
                     JsonFactory factory = mapper.getFactory();
@@ -134,7 +134,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
             for(String c : columns) {
                 String columnValue = null;
-                if (SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
+                if (config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
                     //it was a variable, so try to parse as json
                     ObjectMapper mapper = new ObjectMapper();
                     JsonFactory factory = mapper.getFactory();
@@ -191,7 +191,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         }, RowEncoder.apply(newSchema1));
 
 
-        if (SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
+        if (config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
             //create new Dataset
             //write column names into list
             List<Row> filteredVariablesRows = new ArrayList<>();
@@ -205,7 +205,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
                 // add new variables to configuration
                 if(config.isInitialConfigToBeWritten()) {
-                    Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+                    Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
                     VariableConfiguration variableConfiguration = new VariableConfiguration();
                     variableConfiguration.setVariableName(name);
                     variableConfiguration.setVariableType(type);
@@ -238,11 +238,11 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         return dataset;
     }
 
-    private Dataset<Row> doFilterJsonVariables(Dataset<Row> dataset) {
+    private Dataset<Row> doFilterJsonVariables(Dataset<Row> dataset, SparkRunnerConfig config) {
         //read all variables to filter again. They contain also variables that resulted from Json parsing and are not columns, so they can just be dropped
         List<String> variablesToFilter = new ArrayList<>();
 
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
         if(configuration != null) {
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
             if(preprocessingConfiguration != null) {

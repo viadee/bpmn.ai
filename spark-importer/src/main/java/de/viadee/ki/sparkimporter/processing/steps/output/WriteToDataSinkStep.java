@@ -35,7 +35,7 @@ public class WriteToDataSinkStep implements PreprocessingStepInterface {
                 .repartition(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID))
                 .write()
                 .mode(SaveMode.Append)
-                .save(SparkImporterVariables.getTargetFolder());
+                .save(config.getTargetFolder());
 
         return dataset;
     }

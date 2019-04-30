@@ -21,8 +21,8 @@ public class ColumnsPreparationStep implements PreprocessingStepInterface {
 
 
         List<String> predictionVariables = new ArrayList<>();
-        if(SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT)) {
-            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        if(config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT)) {
+            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
             List<VariableConfiguration> variableConfigurations = configuration.getPreprocessingConfiguration().getVariableConfiguration();
             for(VariableConfiguration vc : variableConfigurations) {
                 predictionVariables.add(vc.getVariableName());
@@ -31,7 +31,7 @@ public class ColumnsPreparationStep implements PreprocessingStepInterface {
 
         //rename columns
         for(String columnName : dataset.columns()) {
-            if(SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)
+            if(config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)
                     || !predictionVariables.contains(columnName)) {
                 dataset = dataset.withColumnRenamed(columnName, columnName.replaceAll("([A-Z])","_$1").concat("_").toLowerCase());
             }

@@ -15,7 +15,7 @@ public class SparkImporterLogger {
 
     private static final String LOG_FILE_NAME = "spark-importer.log";
 
-    private static String logDirectory = ".";
+    private String logDirectory = ".";
 
     private static SparkImporterLogger instance;
 
@@ -23,7 +23,7 @@ public class SparkImporterLogger {
         setupLogger();
     }
 
-    private static void setupLogger() {
+    private void setupLogger() {
         File logDirectory  = new File(getLogDirectory());
         if(!logDirectory.exists()) {
             logDirectory.mkdir();
@@ -63,12 +63,12 @@ public class SparkImporterLogger {
         return instance;
     }
 
-    public static String getLogDirectory() {
+    public String getLogDirectory() {
         return logDirectory;
     }
 
-    public static void setLogDirectory(String logDirectory) {
-        SparkImporterLogger.logDirectory = logDirectory;
+    public void setLogDirectory(String logDirectory) {
+        this.logDirectory = logDirectory;
         setupLogger();
     }
 

@@ -33,7 +33,7 @@ public abstract class SparkPredictionServiceRunner {
 
     private PipelineManager pipelineManager = null;
     protected SparkSession sparkSession = null;
-    private SparkRunnerConfig sparkRunnerConfig;
+    protected SparkRunnerConfig sparkRunnerConfig;
 
     private Dataset<Row> dataset;
     protected String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
@@ -45,18 +45,18 @@ public abstract class SparkPredictionServiceRunner {
 
     private void checkConfig() {
         //if there is no configuration file yet, write one in the next steps
-        if(ConfigurationUtils.getInstance().getConfiguration(true) == null) {
+        if(ConfigurationUtils.getInstance().getConfiguration(true, this.sparkRunnerConfig) == null) {
             this.sparkRunnerConfig.setInitialConfigToBeWritten(true);
-            ConfigurationUtils.getInstance().createEmptyConfig();
+            ConfigurationUtils.getInstance().createEmptyConfig(this.sparkRunnerConfig);
         } else {
-            SparkImporterLogger.getInstance().writeInfo("Configuration file found: " + SparkImporterVariables.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName());
+            SparkImporterLogger.getInstance().writeInfo("Configuration file found: " + this.sparkRunnerConfig.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName(this.sparkRunnerConfig));
         }
     }
 
     private void writeConfig() {
         //write initial config file
         if(this.sparkRunnerConfig.isInitialConfigToBeWritten()) {
-            ConfigurationUtils.getInstance().writeConfigurationToFile();
+            ConfigurationUtils.getInstance().writeConfigurationToFile(this.sparkRunnerConfig);
         }
     }
 
@@ -98,7 +98,7 @@ public abstract class SparkPredictionServiceRunner {
     public Dataset<Row> run(Dataset dataset) {
 
         //only use configured variables for pipeline
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(this.sparkRunnerConfig);
         List<String> predictionVars = configuration.getModelPredictionConfiguration().getPredictionVariables();
         List<Column> usedColumns = new ArrayList<>();
         for(String var : predictionVars) {
@@ -126,7 +126,7 @@ public abstract class SparkPredictionServiceRunner {
 
         List<Step> steps = null;
 
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(this.sparkRunnerConfig);
 
         if(this.sparkRunnerConfig.isInitialConfigToBeWritten()) {
             pipelineSteps = buildDefaultPipeline();

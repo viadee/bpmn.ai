@@ -55,7 +55,7 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
     private Dataset<Row> doFilterVariables(Dataset<Row> dataset, boolean writeStepResultIntoFile, SparkRunnerConfig config) {
         List<String> variablesToFilter = new ArrayList<>();
 
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
         if(configuration != null) {
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
             if(preprocessingConfiguration != null) {
@@ -111,7 +111,7 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
         Map<String, String> variableNameMappings = new HashMap<>();
 
         // getting variable name mappings from configuration
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
         if(configuration != null) {
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
             if(preprocessingConfiguration != null) {
@@ -212,7 +212,7 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
 
         //if there is no configuration file yet, write variables into the empty one
         if(config.isInitialConfigToBeWritten()) {
-            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
             for(String name : variables.keySet()) {
                 String type = variables.get(name);
                 VariableConfiguration variableConfiguration = new VariableConfiguration();

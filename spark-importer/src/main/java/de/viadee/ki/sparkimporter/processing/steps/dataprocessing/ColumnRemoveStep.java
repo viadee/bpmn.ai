@@ -38,7 +38,7 @@ public class ColumnRemoveStep implements PreprocessingStepInterface {
 
         List<String> columnsToRemove = new ArrayList<>();
 
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
         if(configuration != null) {
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
             if(preprocessingConfiguration != null) {

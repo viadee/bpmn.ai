@@ -39,7 +39,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         }
 
         Column filter = not(isnull(dataset.col(SparkImporterVariables.VAR_STATE)));
-        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             filter = isnull(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME));
         }
 
@@ -62,7 +62,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         }
 
         filter = isnull(dataset.col(SparkImporterVariables.VAR_STATE));
-        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             filter = not(isnull(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)));
         }
 

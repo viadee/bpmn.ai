@@ -79,22 +79,22 @@ public abstract class SparkRunner {
 
     private void checkConfig() {
         //if there is no configuration file yet or an completely empty one, write one in the next steps
-        if(ConfigurationUtils.getInstance().getConfiguration(true) == null
-                || ConfigurationUtils.getInstance().getConfiguration(true).isEmpty()) {
-            if(!SparkImporterVariables.getRunningMode().equals(RUNNING_MODE.KAFKA_IMPORT)) {
+        if(ConfigurationUtils.getInstance().getConfiguration(true, this.sparkRunnerConfig) == null
+                || ConfigurationUtils.getInstance().getConfiguration(true, this.sparkRunnerConfig).isEmpty()) {
+            if(!this.sparkRunnerConfig.getRunningMode().equals(RUNNING_MODE.KAFKA_IMPORT)) {
                 this.sparkRunnerConfig.setMinimalPipelineToBeBuild(true);
             }
             this.sparkRunnerConfig.setInitialConfigToBeWritten(true);
-            ConfigurationUtils.getInstance().createEmptyConfig();
+            ConfigurationUtils.getInstance().createEmptyConfig(this.sparkRunnerConfig);
         } else {
-            SparkImporterLogger.getInstance().writeInfo("Configuration file found: " + SparkImporterVariables.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName());
+            SparkImporterLogger.getInstance().writeInfo("Configuration file found: " + this.sparkRunnerConfig.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName(this.sparkRunnerConfig));
         }
     }
 
     private void writeConfig() {
         //write initial config file
         if(this.sparkRunnerConfig.isInitialConfigToBeWritten()) {
-            ConfigurationUtils.getInstance().writeConfigurationToFile();
+            ConfigurationUtils.getInstance().writeConfigurationToFile(this.sparkRunnerConfig);
         }
     }
 
@@ -181,8 +181,8 @@ public abstract class SparkRunner {
         dataset = loadInitialDataset();
         
         // filter dataset if only a specific processDefinitionId should be preprocessed (-pf)
-        if(SparkImporterVariables.getProcessFilterDefinitionId() != null) {
-        	dataset = dataset.filter(dataset.col(SparkImporterVariables.VAR_PROCESS_DEF_ID).equalTo(SparkImporterVariables.getProcessFilterDefinitionId()));
+        if(this.sparkRunnerConfig.getProcessFilterDefinitionId() != null) {
+        	dataset = dataset.filter(dataset.col(SparkImporterVariables.VAR_PROCESS_DEF_ID).equalTo(this.sparkRunnerConfig.getProcessFilterDefinitionId()));
         }
         
         // TODO 
@@ -236,7 +236,7 @@ public abstract class SparkRunner {
     }
 
     public void overwritePipelineSteps() {
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(this.sparkRunnerConfig);
 
         if (this.sparkRunnerConfig.isInitialConfigToBeWritten()) {
             pipelineSteps = buildDefaultPipeline();
@@ -264,10 +264,10 @@ public abstract class SparkRunner {
 
         List<Step> steps = null;
 
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(this.sparkRunnerConfig);
 
         if(this.sparkRunnerConfig.isInitialConfigToBeWritten()) {
-            if(!SparkImporterVariables.getRunningMode().equals(RUNNING_MODE.KAFKA_IMPORT)) {
+            if(!this.sparkRunnerConfig.getRunningMode().equals(RUNNING_MODE.KAFKA_IMPORT)) {
                 pipelineSteps = buildMinimalPipeline();
             } else {
                 pipelineSteps = buildDefaultPipeline();
