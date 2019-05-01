@@ -186,24 +186,26 @@ public abstract class SparkRunner {
         AtomicInteger tasksTotal = new AtomicInteger();
         AtomicInteger tasksDone = new AtomicInteger();
 
+        SparkListener sparkListener = new SparkListener() {
+            @Override
+            public void onStageSubmitted(SparkListenerStageSubmitted stageSubmitted) {
+                super.onStageSubmitted(stageSubmitted);
+
+                tasksTotal.getAndAdd(stageSubmitted.stageInfo().numTasks());
+                sparkRunnerListener.onProgressUpdate(null, tasksDone.get(), tasksTotal.get());
+            }
+
+            @Override
+            public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
+                super.onStageCompleted(stageCompleted);
+
+                sparkRunnerListener.onProgressUpdate(null, tasksDone.get(), tasksTotal.get());
+                tasksDone.getAndAdd(stageCompleted.stageInfo().numTasks());
+            }
+        };
+
         if(sparkRunnerListener != null) {
-            sparkSession.sparkContext().addSparkListener(new SparkListener() {
-                @Override
-                public void onStageSubmitted(SparkListenerStageSubmitted stageSubmitted) {
-                    super.onStageSubmitted(stageSubmitted);
-
-                    tasksTotal.getAndAdd(stageSubmitted.stageInfo().numTasks());
-                    sparkRunnerListener.onProgressUpdate(null, tasksDone.get(), tasksTotal.get());
-                }
-
-                @Override
-                public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
-                    super.onStageCompleted(stageCompleted);
-
-                    sparkRunnerListener.onProgressUpdate(null, tasksDone.get(), tasksTotal.get());
-                    tasksDone.getAndAdd(stageCompleted.stageInfo().numTasks());
-                }
-            });
+            sparkSession.sparkContext().addSparkListener(sparkListener);
         }
 
         registerUDFs();
@@ -264,6 +266,7 @@ public abstract class SparkRunner {
 
         if(sparkRunnerListener != null) {
             sparkRunnerListener.onFinished(true);
+            sparkSession.sparkContext().removeSparkListener(sparkListener);
         }
     }
 
