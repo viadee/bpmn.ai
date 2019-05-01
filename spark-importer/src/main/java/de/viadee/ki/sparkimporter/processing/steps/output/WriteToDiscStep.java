@@ -6,6 +6,7 @@ import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SaveMode;
 
 import java.util.Map;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class WriteToDiscStep implements PreprocessingStepInterface {
         SparkImporterUtils.getInstance().writeDatasetToParquet(dataset, "result", config);
 
         if(config.isGenerateJsonPreview()) {
+            dataset.write().mode(SaveMode.Overwrite).saveAsTable("result");
             SparkImporterUtils.getInstance().writeDatasetToJson(dataset.limit(config.getJsonPreviewLineCount()), UUID.randomUUID().toString(), config);
         }
 
