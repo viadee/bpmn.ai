@@ -35,6 +35,8 @@ public class SparkRunnerConfig implements Serializable {
     private boolean generateJsonPreview = false;
     private int jsonPreviewLineCount = 1000;
 
+    private boolean closeSparkSessionAfterRun = true;
+
     public enum ENVIRONMENT_VARIABLES {
         WORKING_DIRECTORY,
         LOG_DIRECTORY,
@@ -273,5 +275,13 @@ public class SparkRunnerConfig implements Serializable {
 
     public void setJsonPreviewLineCount(int jsonPreviewLineCount) {
         this.jsonPreviewLineCount = jsonPreviewLineCount;
+    }
+
+    public boolean isCloseSparkSessionAfterRun() {
+        return closeSparkSessionAfterRun;
+    }
+
+    public void setCloseSparkSessionAfterRun(boolean closeSparkSessionAfterRun) {
+        this.closeSparkSessionAfterRun = closeSparkSessionAfterRun;
     }
 }

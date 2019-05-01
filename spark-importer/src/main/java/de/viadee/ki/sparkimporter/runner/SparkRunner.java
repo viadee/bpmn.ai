@@ -260,7 +260,9 @@ public abstract class SparkRunner {
         }
 
         // Cleanup
-        sparkSession.close();
+        if(this.sparkRunnerConfig.isCloseSparkSessionAfterRun()) {
+            sparkSession.close();
+        }
 
         writeConfig();
 
