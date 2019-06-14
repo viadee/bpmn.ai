@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "perform maven build"
+
+docker run -v $(pwd):/src -w /src maven:3.6-jdk-8-alpine mvn clean package
