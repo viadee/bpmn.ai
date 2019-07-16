@@ -104,22 +104,6 @@
 				</plugins>
 			</build>
 		</profile>
-		<profile>
-			<id>viadee-internal</id>
-			<distributionManagement>
-				<repository>
-					<id>viadeeNexus</id>
-					<name>Internal Releases</name>
-					<url>http://nexus.intern.viadee.de/repository/maven-releases/</url>
-				</repository>
-				<snapshotRepository>
-					<id>viadeeNexus</id>
-					<name>Internal Snapshots</name>
-					<url>http://nexus.intern.viadee.de/repository/maven-snapshots/</url>
-				</snapshotRepository>
-			</distributionManagement>
-
-		</profile>
 	</profiles>
 
 	<distributionManagement>
