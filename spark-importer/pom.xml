@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>de.viadee</groupId>
@@ -105,10 +104,26 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>viadee-internal</id>
+			<distributionManagement>
+				<repository>
+					<id>viadeeNexus</id>
+					<name>Internal Releases</name>
+					<url>http://nexus.intern.viadee.de/repository/maven-releases/</url>
+				</repository>
+				<snapshotRepository>
+					<id>viadeeNexus</id>
+					<name>Internal Snapshots</name>
+					<url>http://nexus.intern.viadee.de/repository/maven-snapshots/</url>
+				</snapshotRepository>
+			</distributionManagement>
+
+		</profile>
 	</profiles>
 
 	<distributionManagement>
-		<site>
+ 		<site>
 			<id>website</id>
 			<url>file://${basedir}/docs/MavenSite</url>
 		</site>
@@ -228,9 +243,7 @@
 			<artifactId>classgraph</artifactId>
 			<version>4.8.11</version>
 		</dependency>
-
 	</dependencies>
-
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -279,7 +292,7 @@
 		<excludeDefaults>true</excludeDefaults>
 		<outputDirectory>${project.build.directory}/site</outputDirectory>
 		<plugins>
-			<plugin> <!-- Call via mvn project-info-reports:dependencies -->
+			<plugin>				<!-- Call via mvn project-info-reports:dependencies -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
 				<version>3.0.0</version>
