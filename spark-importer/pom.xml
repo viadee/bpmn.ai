@@ -1,325 +1,329 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>de.viadee</groupId>
-	<artifactId>spark-importer</artifactId>
-	<version>1.1.1</version>
-	<packaging>jar</packaging>
+    <groupId>de.viadee</groupId>
+    <artifactId>spark-importer</artifactId>
+    <version>1.1.1</version>
+    <packaging>jar</packaging>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<spark-scala.version>2.11</spark-scala.version>
-		<spark.version>2.3.1</spark.version>
-		<jcommander.version>1.72</jcommander.version>
-		<univocity-parsers.version>2.7.5</univocity-parsers.version>
-		<commons-io.version>2.6</commons-io.version>
-		<gson.version>2.8.5</gson.version>
-		<kafka.version>2.1.1</kafka.version>
-		<junit.version>4.12</junit.version>
-		<jackson.version>2.6.7.1</jackson.version>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <spark-scala.version>2.11</spark-scala.version>
+        <spark.version>2.3.1</spark.version>
+        <jcommander.version>1.72</jcommander.version>
+        <univocity-parsers.version>2.7.5</univocity-parsers.version>
+        <commons-io.version>2.6</commons-io.version>
+        <gson.version>2.8.5</gson.version>
+        <kafka.version>2.1.1</kafka.version>
+        <junit.version>4.12</junit.version>
+        <jackson.version>2.6.7.1</jackson.version>
+    </properties>
 
-	<url>https://www.viadee.de/bpmnai</url>
-	<organization>
-		<name>viadee Unternehmensberatung AG</name>
-		<url>www.viadee.de</url>
-	</organization>
+    <url>https://www.viadee.de/bpmnai</url>
+    <organization>
+        <name>viadee Unternehmensberatung AG</name>
+        <url>www.viadee.de</url>
+    </organization>
 
-	<ciManagement>
-		<url>https://travis-ci.org/viadee/bpmn.ai</url>
-		<system>Travis</system>
-	</ciManagement>
+    <ciManagement>
+        <url>https://travis-ci.org/viadee/bpmn.ai</url>
+        <system>Travis</system>
+    </ciManagement>
 
-	<issueManagement>
-		<url>https://github.com/viadee/bpmn.ai/issues</url>
-		<system>GitHub</system>
-	</issueManagement>
+    <issueManagement>
+        <url>https://github.com/viadee/bpmn.ai/issues</url>
+        <system>GitHub</system>
+    </issueManagement>
 
-	<scm>
-		<connection>https://github.com/viadee/bpmn.ai</connection>
-		<url>GitHub</url>
-	</scm>
+    <scm>
+        <connection>https://github.com/viadee/bpmn.ai</connection>
+        <url>GitHub</url>
+    </scm>
 
-	<name>bpmn.ai</name>
-	<description>Tooling to feed Camunda logs into a data mining pipeline.</description>
-	<inceptionYear>2018</inceptionYear>
+    <name>bpmn.ai</name>
+    <description>Tooling to feed Camunda logs into a data mining pipeline.</description>
+    <inceptionYear>2018</inceptionYear>
 
-	<developers>
-		<developer>
-			<name>Mario Micudaj</name>
-			<email>Mario.Micudaj@viadee.de</email>
-			<organization>viadee Unternehmensberatung AG</organization>
-			<organizationUrl>http://www.viadee.de</organizationUrl>
-		</developer>
-		<developer>
-			<name>Caroline Methner</name>
-			<email>Caroline.Methner@viadee.de</email>
-			<organization>viadee Unternehmensberatung AG</organization>
-			<organizationUrl>http://www.viadee.de</organizationUrl>
-		</developer>
-		<developer>
-			<name>Frank Koehne</name>
-			<email>Frank.Koehne@viadee.de</email>
-			<organization>viadee Unternehmensberatung AG</organization>
-			<organizationUrl>http://www.viadee.de</organizationUrl>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <name>Mario Micudaj</name>
+            <email>Mario.Micudaj@viadee.de</email>
+            <organization>viadee Unternehmensberatung AG</organization>
+            <organizationUrl>http://www.viadee.de</organizationUrl>
+        </developer>
+        <developer>
+            <name>Caroline Methner</name>
+            <email>Caroline.Methner@viadee.de</email>
+            <organization>viadee Unternehmensberatung AG</organization>
+            <organizationUrl>http://www.viadee.de</organizationUrl>
+        </developer>
+        <developer>
+            <name>Frank Koehne</name>
+            <email>Frank.Koehne@viadee.de</email>
+            <organization>viadee Unternehmensberatung AG</organization>
+            <organizationUrl>http://www.viadee.de</organizationUrl>
+        </developer>
+    </developers>
 
-	<licenses>
-		<license>
-			<name>BSD-3 Clause</name>
-			<url>https://opensource.org/licenses/BSD-3-Clause</url>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>BSD-3 Clause</name>
+            <url>https://opensource.org/licenses/BSD-3-Clause</url>
+        </license>
+    </licenses>
 
-	<profiles>
-		<profile>
-			<id>release-sign-artifacts</id>
-			<activation>
-				<property>
-					<name>performRelease</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>standaloneJar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.1.1</version>
+                        <configuration>
+                            <encoding>UTF-8</encoding>
+                            <!-- get all project dependencies -->
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <!-- bind to the packaging phase -->
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <!-- unpack spring boot fat jar to allow using its components in docker build -->
+                                <id>unpack</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>${project.artifactId}</artifactId>
+                                            <version>${project.version}</version>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>false</overWriteSnapshots>
+                                    <overWriteIfNewer>true</overWriteIfNewer>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
 
-	<distributionManagement>
-		<site>
-			<id>website</id>
-			<url>file://${basedir}/docs/MavenSite</url>
-		</site>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-	</distributionManagement>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-core_${spark-scala.version}</artifactId>
-			<version>${spark.version}</version>
-		</dependency>
+    <distributionManagement>
+        <site>
+            <id>website</id>
+            <url>file://${basedir}/docs/MavenSite</url>
+        </site>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+    </distributionManagement>
 
-		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
-		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-sql_${spark-scala.version}</artifactId>
-			<version>${spark.version}</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_${spark-scala.version}</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-streaming-kafka-0-10_${spark-scala.version}</artifactId>
-			<version>${spark.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming -->
-		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-streaming_${spark-scala.version}</artifactId>
-			<version>${spark.version}</version>
-			<scope>compile</scope>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_${spark-scala.version}</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-streaming-kafka-0-10_${spark-scala.version}</artifactId>
-			<version>${spark.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming-kafka-0-10_${spark-scala.version}</artifactId>
+            <version>${spark.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming -->
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_${spark-scala.version}</artifactId>
+            <version>${spark.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
-		<dependency>
-			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka-clients</artifactId>
-			<version>${kafka.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming-kafka-0-10_${spark-scala.version}</artifactId>
+            <version>${spark.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-			<version>1.1</version>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>${kafka.version}</version>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.beust/jcommander -->
-		<dependency>
-			<groupId>com.beust</groupId>
-			<artifactId>jcommander</artifactId>
-			<version>${jcommander.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>${gson.version}</version>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/com.beust/jcommander -->
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>${jcommander.version}</version>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/junit/junit -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka_${spark-scala.version}</artifactId>
-			<version>${kafka.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka_${spark-scala.version}</artifactId>
-			<version>${kafka.version}</version>
-			<classifier>test</classifier>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka-clients</artifactId>
-			<version>${kafka.version}</version>
-			<classifier>test</classifier>
-			<scope>test</scope>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_${spark-scala.version}</artifactId>
+            <version>${kafka.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_${spark-scala.version}</artifactId>
+            <version>${kafka.version}</version>
+            <classifier>test</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>${kafka.version}</version>
+            <classifier>test</classifier>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>io.github.classgraph</groupId>
-			<artifactId>classgraph</artifactId>
-			<version>4.8.11</version>
-		</dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
 
-	</dependencies>
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>4.8.11</version>
+        </dependency>
+
+    </dependencies>
 
 
-	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
-		<testSourceDirectory>src/test/java</testSourceDirectory>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.1.1</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-					<!-- get all project dependencies -->
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<!-- bind to the packaging phase -->
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
+    </build>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<!-- unpack spring boot fat jar to allow using its components in docker build -->
-						<id>unpack</id>
-						<phase>package</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>${project.groupId}</groupId>
-									<artifactId>${project.artifactId}</artifactId>
-									<version>${project.version}</version>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<overWriteReleases>false</overWriteReleases>
-							<overWriteSnapshots>false</overWriteSnapshots>
-							<overWriteIfNewer>true</overWriteIfNewer>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-		</plugins>
-	</build>
-
-	<reporting>
-		<excludeDefaults>true</excludeDefaults>
-		<outputDirectory>${project.build.directory}/site</outputDirectory>
-		<plugins>
-			<plugin> <!-- Call via mvn project-info-reports:dependencies -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>3.0.0</version>
-				<configuration>
-					<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-				</configuration>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>dependencies</report>
-							<report>scm</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin>
-		</plugins>
-	</reporting>
+    <reporting>
+        <excludeDefaults>true</excludeDefaults>
+        <outputDirectory>${project.build.directory}/site</outputDirectory>
+        <plugins>
+            <plugin> <!-- Call via mvn project-info-reports:dependencies -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>dependencies</report>
+                            <report>scm</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>
