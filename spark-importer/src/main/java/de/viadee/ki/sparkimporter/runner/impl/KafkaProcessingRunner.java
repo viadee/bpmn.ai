@@ -8,7 +8,7 @@ import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep;
 import de.viadee.ki.sparkimporter.runner.SparkRunner;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
-import de.viadee.ki.sparkimporter.util.arguments.SparkImporterKafkaDataProcessingArguments;
+import de.viadee.ki.sparkimporter.util.arguments.KafkaProcessingArguments;
 import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.commons.io.FileUtils;
@@ -36,11 +36,11 @@ public class KafkaProcessingRunner extends SparkRunner {
     protected void initialize(String[] arguments) {
         this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.KAFKA_PROCESSING);
 
-        SparkImporterKafkaDataProcessingArguments ARGS = SparkImporterKafkaDataProcessingArguments.getInstance();
+        KafkaProcessingArguments ARGS = KafkaProcessingArguments.getInstance();
 
         // instantiate JCommander
         // Use JCommander for flexible usage of Parameters
-        final JCommander jCommander = JCommander.newBuilder().addObject(SparkImporterKafkaDataProcessingArguments.getInstance()).build();
+        final JCommander jCommander = JCommander.newBuilder().addObject(KafkaProcessingArguments.getInstance()).build();
         try {
             jCommander.parse(arguments);
         } catch (final ParameterException e) {

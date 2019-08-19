@@ -6,9 +6,9 @@ import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 /**
  * Configures command line parameters of the KAfka import application.
  */
-public class SparkImporterKafkaImportArguments {
+public class KafkaImportArguments {
 
-	private static SparkImporterKafkaImportArguments sparkImporterArguments = null;
+	private static KafkaImportArguments sparkImporterArguments = null;
 
 	@Parameter(names = { "--kafka-broker",
 			"-kb" }, required = true, description = "Server and port of Kafka broker to consume from")
@@ -54,7 +54,7 @@ private String saveMode = SparkImporterVariables.SAVE_MODE_APPEND;
 	/**
 	 * Singleton.
 	 */
-	private SparkImporterKafkaImportArguments() {
+	private KafkaImportArguments() {
 	}
 
 
@@ -105,16 +105,17 @@ private String saveMode = SparkImporterVariables.SAVE_MODE_APPEND;
 	/**
 	 * @return SparkImporterKafkaImportArguments instance
 	 */
-	public static SparkImporterKafkaImportArguments getInstance() {
+	public static KafkaImportArguments getInstance() {
 		if (sparkImporterArguments == null) {
-			sparkImporterArguments = new SparkImporterKafkaImportArguments();
+			sparkImporterArguments = new KafkaImportArguments();
 		}
 		return sparkImporterArguments;
 	}
 
 	@Override
 	public String toString() {
-		return "SparkImporterKafkaImportArguments{" + "kafkaBroker='" + kafkaBroker + '\'' + ", fileDestination='" + fileDestination
+		return "KafkaImportArguments{" + "kafkaBroker='" + kafkaBroker
+				+ '\'' + ", fileDestination='" + fileDestination
 				+ '\'' + ", writeStepResultsToCSV=" + writeStepResultsToCSV + '}'
 				+ '\'' + ", batchMode=" + batchMode
 				+ '\'' + ", workingDirectory=" + workingDirectory

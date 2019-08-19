@@ -9,7 +9,7 @@ import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep;
 import de.viadee.ki.sparkimporter.runner.SparkRunner;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
-import de.viadee.ki.sparkimporter.util.arguments.SparkImporterCSVArguments;
+import de.viadee.ki.sparkimporter.util.arguments.CSVImportAndProcessingArguments;
 import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -38,11 +38,11 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
     protected void initialize(String[] arguments) {
         this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);
 
-        SparkImporterCSVArguments ARGS = SparkImporterCSVArguments.getInstance();
+        CSVImportAndProcessingArguments ARGS = CSVImportAndProcessingArguments.getInstance();
 
         // instantiate JCommander
         // Use JCommander for flexible usage of Parameters
-        final JCommander jCommander = JCommander.newBuilder().addObject(SparkImporterCSVArguments.getInstance()).build();
+        final JCommander jCommander = JCommander.newBuilder().addObject(CSVImportAndProcessingArguments.getInstance()).build();
         try {
             jCommander.parse(arguments);
         } catch (final ParameterException e) {
@@ -121,7 +121,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
                 .csv(this.sparkRunnerConfig.getSourceFolder());
 
         // write imported CSV structure to file for debugging
-        if (SparkImporterCSVArguments.getInstance().isWriteStepResultsToCSV()) {
+        if (CSVImportAndProcessingArguments.getInstance().isWriteStepResultsToCSV()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result", this.sparkRunnerConfig);
         }
 

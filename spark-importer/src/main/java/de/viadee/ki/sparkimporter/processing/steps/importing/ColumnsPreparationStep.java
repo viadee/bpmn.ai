@@ -5,7 +5,7 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfigurat
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
-import de.viadee.ki.sparkimporter.util.arguments.SparkImporterCSVArguments;
+import de.viadee.ki.sparkimporter.util.arguments.CSVImportAndProcessingArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
@@ -59,7 +59,7 @@ public class ColumnsPreparationStep implements PreprocessingStepInterface {
         }
 
         // write imported CSV structure to file for debugging
-        if (SparkImporterCSVArguments.getInstance().isWriteStepResultsToCSV()) {
+        if (CSVImportAndProcessingArguments.getInstance().isWriteStepResultsToCSV()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result", config);
         }
         

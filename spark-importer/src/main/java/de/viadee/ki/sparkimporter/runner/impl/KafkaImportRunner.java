@@ -8,7 +8,7 @@ import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep;
 import de.viadee.ki.sparkimporter.runner.SparkRunner;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
-import de.viadee.ki.sparkimporter.util.arguments.SparkImporterKafkaImportArguments;
+import de.viadee.ki.sparkimporter.util.arguments.KafkaImportArguments;
 import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.commons.io.FileUtils;
@@ -69,11 +69,11 @@ public class KafkaImportRunner extends SparkRunner {
     protected void initialize(String[] arguments) {
         this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.KAFKA_IMPORT);
 
-        SparkImporterKafkaImportArguments ARGS = SparkImporterKafkaImportArguments.getInstance();
+        KafkaImportArguments ARGS = KafkaImportArguments.getInstance();
 
         // instantiate JCommander
         // Use JCommander for flexible usage of Parameters
-        final JCommander jCommander = JCommander.newBuilder().addObject(SparkImporterKafkaImportArguments.getInstance()).build();
+        final JCommander jCommander = JCommander.newBuilder().addObject(KafkaImportArguments.getInstance()).build();
         try {
             jCommander.parse(arguments);
         } catch (final ParameterException e) {

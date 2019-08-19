@@ -2,7 +2,7 @@ package de.viadee.ki.sparkimporter.processing.steps.importing;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
-import de.viadee.ki.sparkimporter.util.arguments.SparkImporterCSVArguments;
+import de.viadee.ki.sparkimporter.util.arguments.CSVImportAndProcessingArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -20,7 +20,7 @@ public class InitialCleanupStep implements PreprocessingStepInterface {
         dataset = SparkImporterUtils.getInstance().removeEmptyLinesAfterImport(dataset);
 
         // write imported unique column CSV structure to file for debugging
-        if (SparkImporterCSVArguments.getInstance().isWriteStepResultsToCSV()) {
+        if (CSVImportAndProcessingArguments.getInstance().isWriteStepResultsToCSV()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_unique_columns_result", config);
         }
 
