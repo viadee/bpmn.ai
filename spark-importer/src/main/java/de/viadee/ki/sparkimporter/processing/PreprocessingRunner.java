@@ -1,7 +1,7 @@
 package de.viadee.ki.sparkimporter.processing;
 
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
-import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 

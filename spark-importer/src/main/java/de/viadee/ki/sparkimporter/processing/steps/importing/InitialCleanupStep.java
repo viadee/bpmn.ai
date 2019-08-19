@@ -1,8 +1,8 @@
 package de.viadee.ki.sparkimporter.processing.steps.importing;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
-import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.util.arguments.SparkImporterCSVArguments;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;

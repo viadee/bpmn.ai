@@ -1,4 +1,4 @@
-package de.viadee.ki.sparkimporter.util;
+package de.viadee.ki.sparkimporter.util.logging;
 
 import java.io.File;
 import java.io.IOException;

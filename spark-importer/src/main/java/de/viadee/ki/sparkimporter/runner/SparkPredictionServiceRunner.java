@@ -11,7 +11,8 @@ import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggreg
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Column;

@@ -6,8 +6,8 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.ColumnConfiguratio
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;

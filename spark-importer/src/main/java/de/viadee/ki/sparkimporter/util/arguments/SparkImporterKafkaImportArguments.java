@@ -1,6 +1,7 @@
-package de.viadee.ki.sparkimporter.util;
+package de.viadee.ki.sparkimporter.util.arguments;
 
 import com.beust.jcommander.Parameter;
+import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 
 /**
  * Configures command line parameters of the KAfka import application.

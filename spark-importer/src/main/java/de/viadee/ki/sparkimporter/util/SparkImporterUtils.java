@@ -1,6 +1,7 @@
 package de.viadee.ki.sparkimporter.util;
 
-import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;

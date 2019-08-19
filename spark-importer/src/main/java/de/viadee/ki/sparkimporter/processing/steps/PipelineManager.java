@@ -1,7 +1,7 @@
 package de.viadee.ki.sparkimporter.processing.steps;
 
 import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 
 import java.util.HashMap;
 import java.util.LinkedList;

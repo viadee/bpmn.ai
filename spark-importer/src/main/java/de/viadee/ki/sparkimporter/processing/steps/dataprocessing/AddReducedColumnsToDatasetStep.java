@@ -3,7 +3,7 @@ package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Column;

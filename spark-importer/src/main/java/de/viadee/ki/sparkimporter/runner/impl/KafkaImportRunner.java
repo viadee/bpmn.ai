@@ -1,4 +1,4 @@
-package de.viadee.ki.sparkimporter.runner;
+package de.viadee.ki.sparkimporter.runner.impl;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -6,8 +6,10 @@ import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.ColumnsPreparationStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep;
-import de.viadee.ki.sparkimporter.util.SparkImporterKafkaImportArguments;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.runner.SparkRunner;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.util.arguments.SparkImporterKafkaImportArguments;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.commons.io.FileUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

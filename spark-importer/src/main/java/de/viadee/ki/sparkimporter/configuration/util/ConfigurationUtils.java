@@ -8,8 +8,8 @@ import de.viadee.ki.sparkimporter.configuration.modellearning.ModelLearningConfi
 import de.viadee.ki.sparkimporter.configuration.modelprediction.ModelPredictionConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.runner.SparkRunner;
-import de.viadee.ki.sparkimporter.runner.SparkRunnerConfig;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 
 import java.io.*;
 
