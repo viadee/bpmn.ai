@@ -63,8 +63,8 @@ public class KafkaProcessingArguments {
 	private String processDefinitionId = null;
 
 	@Parameter(names = { "--output-delimiter",
-			"-od" }, required = true, description = "Character or string that separates fields such as [ ;,  | or ||| ] for the written csv file. Please make sure that these are not contained in your data.")
-	private String outputDelimiter;
+			"-od" }, required = false, description = "Character or string that separates fields such as [ ;,  | or ||| ] for the written csv file. Please make sure that these are not contained in your data.")
+	private String outputDelimiter = "|";
 
 	/**
 	 * Singleton.

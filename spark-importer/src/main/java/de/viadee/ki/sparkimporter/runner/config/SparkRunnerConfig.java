@@ -23,6 +23,7 @@ public class SparkRunnerConfig implements Serializable {
     private String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
     private String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
     private String delimiter = "|";
+    private String outputDelimiter = "|";
     private String processDefinitionFilter = "";
     private boolean batchMode = true;
     private String kafkaBroker = "";
@@ -49,6 +50,7 @@ public class SparkRunnerConfig implements Serializable {
         OUTPUT_FORMAT,
         WRITE_STEP_RESULTS,
         DELIMITER,
+        OUTPUT_DELIMITER,
         PROCESS_DEFINITION_FILTER,
         BATCH_MODE,
         KAFKA_BOOTSTRAP_SERVERS,
@@ -87,6 +89,9 @@ public class SparkRunnerConfig implements Serializable {
         }
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.DELIMITER)) != null) {
             setDelimiter(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.DELIMITER)));
+        }
+        if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.OUTPUT_DELIMITER)) != null) {
+            setOutputDelimiter(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.OUTPUT_DELIMITER)));
         }
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.PROCESS_DEFINITION_FILTER)) != null) {
             setProcessFilterDefinitionId(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.PROCESS_DEFINITION_FILTER)));
@@ -212,6 +217,14 @@ public class SparkRunnerConfig implements Serializable {
 
     public void setDelimiter(String delimiter) {
         this.delimiter = delimiter;
+    }
+
+    public String getOutputDelimiter() {
+        return outputDelimiter;
+    }
+
+    public void setOutputDelimiter(String outputDelimiter) {
+        this.outputDelimiter = outputDelimiter;
     }
 
     public String getProcessDefinitionFilter() {

@@ -92,7 +92,7 @@ public class SparkImporterUtils {
                     .coalesce(1)
                     .write()
                     .option("header", "true")
-                    .option("delimiter", "|")
+                    .option("delimiter", config.getOutputDelimiter())
                     .option("timestampFormat", "yyyy-MM-dd'T'HH:mm:ss.SSS")
                     .option("ignoreLeadingWhiteSpace", "false")
                     .option("ignoreTrailingWhiteSpace", "false")
@@ -150,10 +150,6 @@ public class SparkImporterUtils {
     }
 
     public void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory, SparkRunnerConfig config) {
-        writeDatasetToCSV(dataSet, subDirectory, "|", config);
-    }
-
-    private void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory, String delimiter, SparkRunnerConfig config) {
 
         boolean aggreateCSVToOneFile = true;
 
@@ -172,7 +168,7 @@ public class SparkImporterUtils {
         dataSet
                 .write()
                 .option("header", "true")
-                .option("delimiter", delimiter)
+                .option("delimiter", config.getOutputDelimiter())
                 .option("ignoreLeadingWhiteSpace", "false")
                 .option("ignoreTrailingWhiteSpace", "false")
                 .mode(config.getSaveMode())
