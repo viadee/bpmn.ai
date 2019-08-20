@@ -2,7 +2,6 @@ package de.viadee.ki.sparkimporter.runner.impl;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep;

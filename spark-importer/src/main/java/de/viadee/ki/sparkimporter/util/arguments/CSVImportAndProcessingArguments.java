@@ -1,10 +1,10 @@
 package de.viadee.ki.sparkimporter.util.arguments;
 
 import com.beust.jcommander.Parameter;
+import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
 import de.viadee.ki.sparkimporter.runner.SparkRunner;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
-import org.apache.spark.sql.SaveMode;
 
 /**
  * Configures command line parameters of the import application.
@@ -19,41 +19,13 @@ public class CSVImportAndProcessingArguments extends AbstractArguments {
 					+ "AND a.proc_def_key_ = 'XYZ' \r\n" + "")
 	private String fileSource;
 
-	@Parameter(names = { "--data-level",
-			"-dl" }, required = false, description = "Which level should the resulting data have. It can be process or activity.")
-	private String dataLavel = SparkImporterVariables.DATA_LEVEL_PROCESS;
-
 	@Parameter(names = { "--delimiter",
 			"-d" }, required = true, description = "Character or string that separates fields such as [ ;,  | or ||| ]. Please make sure that these are not contained in your data.")
 	private String delimiter;
 
-	@Parameter(names = { "--file-destination",
-			"-fd" }, required = true, description = "The name of the target folder, where the resulting csv files are being stored, i.e. the data mining table.")
-	private String fileDestination;
-
 	@Parameter(names = { "--revision-count", "-rc" }, description = "Boolean toggle to enable the counting of changes "
 			+ "to a variable. It results in a number of columns named <VARIABLE_NAME>_rev.", arity = 1)
 	private boolean revisionCount = true;
-
-	@Parameter(names = { "--step-results",
-			"-sr" }, description = "Should intermediate results be written into CSV files?", arity = 1)
-	private boolean writeStepResultsToCSV = false;
-
-	@Parameter(names = { "--working-directory",
-			"-wd" }, required = false, description = "Folder where the configuration files are stored or should be stored.")
-	private String workingDirectory = "./";
-
-	@Parameter(names = { "--log-directory",
-			"-ld" }, required = false, description = "Folder where the log files should be stored.")
-	private String logDirectory = "./";
-
-	@Parameter(names = { "--save-mode",
-			"-sm" }, required = false, description = "Should the result be appended to the destination or should it be overwritten?")
-	private String saveMode = SparkImporterVariables.SAVE_MODE_APPEND;
-
-	@Parameter(names = { "--output-format",
-			"-of" }, required = false, description = "In which format should the result be written (parquet or csv)?")
-	private String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
 
 	@Parameter(names = { "--dev-type-cast-check",
 			"-devtcc" }, required = false, description = "Development feature: Check for type casting errors of columns.", arity = 1)
@@ -77,62 +49,6 @@ public class CSVImportAndProcessingArguments extends AbstractArguments {
 	private CSVImportAndProcessingArguments() {
 	}
 
-	private boolean isRevisionCount() {
-		return revisionCount;
-	}
-
-	private String getFileSource() {
-		return fileSource;
-	}
-
-	private String getDelimiter() {
-		return delimiter;
-	}
-
-	private String getFileDestination() {
-		return fileDestination;
-	}
-
-	private boolean isWriteStepResultsToCSV() {
-		return writeStepResultsToCSV;
-	}
-
-	private String getWorkingDirectory() {
-		return workingDirectory;
-	}
-
-	private String getLogDirectory() {
-		return logDirectory;
-	}
-
-	private String getSaveMode() {
-		return saveMode;
-	}
-
-	private String getOutputFormat() {
-		return outputFormat;
-	}
-
-	private boolean isDevTypeCastCheckEnabled() {
-		return devTypeCastCheckEnabled;
-	}
-
-	private boolean isDevProcessStateColumnWorkaroundEnabled() {
-		return devProcessStateColumnWorkaroundEnabled;
-	}
-
-	private String getProcessDefinitionFilterId() {
-		return processDefinitionId;
-	}
-
-	private String getOutputDelimiter() {
-		return outputDelimiter;
-	}
-
-	public void setOutputDelimiter(String outputDelimiter) {
-		this.outputDelimiter = outputDelimiter;
-	}
-
 	/**
 	 * @return DataExtractorArguments-Instanz as Singleton
 	 */
@@ -143,29 +59,34 @@ public class CSVImportAndProcessingArguments extends AbstractArguments {
 		return CSVImportAndProcessingArguments;
 	}
 
-	public SparkRunnerConfig createOrUpdateSparkRunnerConfig(SparkRunnerConfig config) {
-		if(config == null) {
-			config = new SparkRunnerConfig();
-		}
+	@Override
+	public void createOrUpdateSparkRunnerConfig(SparkRunnerConfig config) {
+		super.createOrUpdateSparkRunnerConfig(config);
 
 		config.setRunningMode(SparkRunner.RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);
-		config.setSourceFolder(this.getFileSource());
-		config.setTargetFolder(this.getFileDestination());
-		config.setWorkingDirectory(this.getWorkingDirectory());
-		config.setLogDirectory(this.getLogDirectory());
-		config.setDevTypeCastCheckEnabled(this.isDevTypeCastCheckEnabled());
-		config.setDevProcessStateColumnWorkaroundEnabled(this.isDevProcessStateColumnWorkaroundEnabled());
-		config.setRevCountEnabled(this.isRevisionCount());
-		config.setOutputFormat(this.getOutputFormat());
-		config.setSaveMode(this.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
-		config.setProcessFilterDefinitionId(this.getProcessDefinitionFilterId());
-		config.setDelimiter(this.getDelimiter());
-		config.setWriteStepResultsIntoFile(this.isWriteStepResultsToCSV());
-		config.setOutputDelimiter(this.getOutputDelimiter());
+		config.setSourceFolder(this.fileSource);
+		config.setDevTypeCastCheckEnabled(this.devTypeCastCheckEnabled);
+		config.setDevProcessStateColumnWorkaroundEnabled(this.devProcessStateColumnWorkaroundEnabled);
+		config.setRevCountEnabled(this.revisionCount);
+		config.setProcessFilterDefinitionId(this.processDefinitionId);
+		config.setDelimiter(this.delimiter);
+		config.setOutputDelimiter(this.outputDelimiter);
 
 		this.validateConfig(config);
+	}
 
-		return config;
+	@Override
+	protected void validateConfig(SparkRunnerConfig config) {
+		super.validateConfig(config);
+
+		if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+			try {
+				throw new FaultyConfigurationException("Date level activity is not supported for CSVImportAndProcessingApplication.");
+			} catch (FaultyConfigurationException e) {
+				e.printStackTrace();
+				System.exit(-1);
+			}
+		}
 	}
 
 	@Override
