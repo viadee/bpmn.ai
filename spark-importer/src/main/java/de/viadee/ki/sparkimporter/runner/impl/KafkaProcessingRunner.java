@@ -25,7 +25,7 @@ public class KafkaProcessingRunner extends SparkRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaProcessingRunner.class);
 
-    public KafkaProcessingRunner() {}
+    public KafkaProcessingRunner() { super(); }
 
     public KafkaProcessingRunner(SparkRunnerConfig config) {
         super(config);
@@ -49,19 +49,10 @@ public class KafkaProcessingRunner extends SparkRunner {
         //parse arguments to create SparkRunnerConfig
         kafkaProcessingArguments.createOrUpdateSparkRunnerConfig(this.sparkRunnerConfig);
 
-        if(this.sparkRunnerConfig.isDevProcessStateColumnWorkaroundEnabled() && sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
-            try {
-                throw new FaultyConfigurationException("Process state workaround option cannot be used with activity data level.");
-            } catch (FaultyConfigurationException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
-
         // Delete destination files, required to avoid exception during runtime
-        FileUtils.deleteQuietly(new File(kafkaProcessingArguments.getFileDestination()));
+        FileUtils.deleteQuietly(new File(this.sparkRunnerConfig.getTargetFolder()));
 
-        SparkImporterLogger.getInstance().writeInfo("Starting data processing with data from: " + kafkaProcessingArguments.getFileSource());
+        SparkImporterLogger.getInstance().writeInfo("Starting data processing with data from: " + this.sparkRunnerConfig.getSourceFolder());
     }
 
     @Override

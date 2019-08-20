@@ -59,7 +59,7 @@ public class ColumnsPreparationStep implements PreprocessingStepInterface {
         }
 
         // write imported CSV structure to file for debugging
-        if (CSVImportAndProcessingArguments.getInstance().isWriteStepResultsToCSV()) {
+        if (config.isWriteStepResultsIntoFile()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result", config);
         }
         

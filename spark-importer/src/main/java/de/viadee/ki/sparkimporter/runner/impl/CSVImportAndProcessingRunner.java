@@ -28,7 +28,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(CSVImportAndProcessingRunner.class);
 
-    public CSVImportAndProcessingRunner() {}
+    public CSVImportAndProcessingRunner() { super(); }
 
     public CSVImportAndProcessingRunner(SparkRunnerConfig config) {
         super(config);
@@ -63,11 +63,11 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
 
         // Delete destination files, required to avoid exception during runtime
         if(this.sparkRunnerConfig.getSaveMode().equals(SaveMode.Overwrite)) {
-            FileUtils.deleteQuietly(new File(csvImportAndProcessingArguments.getFileDestination()));
+            FileUtils.deleteQuietly(new File(this.sparkRunnerConfig.getTargetFolder()));
         }
 
         SparkImporterLogger.getInstance().writeInfo("Starting CSV import and processing");
-        SparkImporterLogger.getInstance().writeInfo("Importing CSV file: " + csvImportAndProcessingArguments.getFileSource());
+        SparkImporterLogger.getInstance().writeInfo("Importing CSV file: " + this.sparkRunnerConfig.getSourceFolder());
     }
 
     @Override
@@ -102,12 +102,12 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
                 .csv(this.sparkRunnerConfig.getSourceFolder());
 
         // write imported CSV structure to file for debugging
-        if (CSVImportAndProcessingArguments.getInstance().isWriteStepResultsToCSV()) {
+        if (this.sparkRunnerConfig.isWriteStepResultsIntoFile()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result", this.sparkRunnerConfig);
         }
 
         InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
-        dataset = initialCleanupStep.runPreprocessingStep(dataset, null, null);
+        dataset = initialCleanupStep.runPreprocessingStep(dataset, null, this.sparkRunnerConfig);
 
         return dataset;
     }

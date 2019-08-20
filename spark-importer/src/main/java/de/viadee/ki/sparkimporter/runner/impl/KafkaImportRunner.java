@@ -59,7 +59,7 @@ public class KafkaImportRunner extends SparkRunner {
     //how many queues are we querying and expecting to be empty in batch mode
     private int EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = 2; // default for process
 
-    public KafkaImportRunner() {}
+    public KafkaImportRunner() { super(); }
 
     public KafkaImportRunner(SparkRunnerConfig config) {
         super(config);
@@ -83,14 +83,14 @@ public class KafkaImportRunner extends SparkRunner {
         //parse arguments to create SparkRunnerConfig
         kafkaImportArguments.createOrUpdateSparkRunnerConfig(this.sparkRunnerConfig);
 
-        EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (kafkaImportArguments.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? 2 : 3);
+        EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (this.sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? 2 : 3);
 
         // Delete destination files, required to avoid exception during runtime
         if(this.sparkRunnerConfig.getSaveMode().equals(SaveMode.Overwrite)) {
-        	FileUtils.deleteQuietly(new File(kafkaImportArguments.getFileDestination()));
+        	FileUtils.deleteQuietly(new File(this.sparkRunnerConfig.getTargetFolder()));
         }
 
-        SparkImporterLogger.getInstance().writeInfo("Starting Kafka import "+ (kafkaImportArguments.isBatchMode() ? "in batch mode " : "") +"from: " + kafkaImportArguments.getKafkaBroker());
+        SparkImporterLogger.getInstance().writeInfo("Starting Kafka import "+ (this.sparkRunnerConfig.isBatchMode() ? "in batch mode " : "") +"from: " + this.sparkRunnerConfig.getKafkaBroker());
     }
 
     private synchronized void processMasterRDD(JavaRDD<String> newRDD, String queue) {

@@ -20,7 +20,7 @@ public class InitialCleanupStep implements PreprocessingStepInterface {
         dataset = SparkImporterUtils.getInstance().removeEmptyLinesAfterImport(dataset);
 
         // write imported unique column CSV structure to file for debugging
-        if (CSVImportAndProcessingArguments.getInstance().isWriteStepResultsToCSV()) {
+        if (config.isWriteStepResultsIntoFile()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_unique_columns_result", config);
         }
 

@@ -9,7 +9,7 @@ import org.apache.spark.sql.SaveMode;
 /**
  * Configures command line parameters of the import application.
  */
-public class CSVImportAndProcessingArguments {
+public class CSVImportAndProcessingArguments extends AbstractArguments {
 
 	private static CSVImportAndProcessingArguments CSVImportAndProcessingArguments = null;
 
@@ -77,55 +77,55 @@ public class CSVImportAndProcessingArguments {
 	private CSVImportAndProcessingArguments() {
 	}
 
-	public boolean isRevisionCount() {
+	private boolean isRevisionCount() {
 		return revisionCount;
 	}
 
-	public String getFileSource() {
+	private String getFileSource() {
 		return fileSource;
 	}
 
-	public String getDelimiter() {
+	private String getDelimiter() {
 		return delimiter;
 	}
 
-	public String getFileDestination() {
+	private String getFileDestination() {
 		return fileDestination;
 	}
 
-	public boolean isWriteStepResultsToCSV() {
+	private boolean isWriteStepResultsToCSV() {
 		return writeStepResultsToCSV;
 	}
 
-	public String getWorkingDirectory() {
+	private String getWorkingDirectory() {
 		return workingDirectory;
 	}
 
-	public String getLogDirectory() {
+	private String getLogDirectory() {
 		return logDirectory;
 	}
 
-	public String getSaveMode() {
+	private String getSaveMode() {
 		return saveMode;
 	}
 
-	public String getOutputFormat() {
+	private String getOutputFormat() {
 		return outputFormat;
 	}
 
-	public boolean isDevTypeCastCheckEnabled() {
+	private boolean isDevTypeCastCheckEnabled() {
 		return devTypeCastCheckEnabled;
 	}
 
-	public boolean isDevProcessStateColumnWorkaroundEnabled() {
+	private boolean isDevProcessStateColumnWorkaroundEnabled() {
 		return devProcessStateColumnWorkaroundEnabled;
 	}
 
-	public String getProcessDefinitionFilterId() {
+	private String getProcessDefinitionFilterId() {
 		return processDefinitionId;
 	}
 
-	public String getOutputDelimiter() {
+	private String getOutputDelimiter() {
 		return outputDelimiter;
 	}
 
@@ -161,8 +161,11 @@ public class CSVImportAndProcessingArguments {
 		config.setProcessFilterDefinitionId(this.getProcessDefinitionFilterId());
 		config.setDelimiter(this.getDelimiter());
 		config.setWriteStepResultsIntoFile(this.isWriteStepResultsToCSV());
+		config.setOutputDelimiter(this.getOutputDelimiter());
 
-		return  config;
+		this.validateConfig(config);
+
+		return config;
 	}
 
 	@Override

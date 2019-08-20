@@ -1,6 +1,7 @@
 package de.viadee.ki.sparkimporter.util.arguments;
 
 import com.beust.jcommander.Parameter;
+import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
 import de.viadee.ki.sparkimporter.runner.SparkRunner;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
@@ -9,7 +10,7 @@ import org.apache.spark.sql.SaveMode;
 /**
  * Configures command line parameters of the KAfka import application.
  */
-public class KafkaProcessingArguments {
+public class KafkaProcessingArguments extends AbstractArguments {
 
 	private static KafkaProcessingArguments sparkImporterArguments = null;
 
@@ -75,63 +76,63 @@ public class KafkaProcessingArguments {
 	private KafkaProcessingArguments() {
 	}
 
-	public boolean isRevisionCount() {
+	private boolean isRevisionCount() {
 		return revisionCount;
 	}
 
-	public String getFileSource() {
+	private String getFileSource() {
 		return fileSource;
 	}
 
-	public String getDelimiter() {
+	private String getDelimiter() {
 		return delimiter;
 	}
 
-	public String getFileDestination() {
+	private String getFileDestination() {
 		return fileDestination;
 	}
 
-	public boolean isWriteStepResultsToCSV() {
+	private boolean isWriteStepResultsToCSV() {
 		return writeStepResultsToCSV;
 	}
 
-	public String getWorkingDirectory() {
+	private String getWorkingDirectory() {
 		return workingDirectory;
 	}
 
-	public String getLogDirectory() {
+	private String getLogDirectory() {
 		return logDirectory;
 	}
 
-	public String getSaveMode() {
+	private String getSaveMode() {
 		return saveMode;
 	}
 
-	public String getOutputFormat() {
+	private String getOutputFormat() {
 		return outputFormat;
 	}
 
-	public boolean isDevTypeCastCheckEnabled() {
+	private boolean isDevTypeCastCheckEnabled() {
 		return devTypeCastCheckEnabled;
 	}
 
-	public boolean isDevProcessStateColumnWorkaroundEnabled() {
+	private boolean isDevProcessStateColumnWorkaroundEnabled() {
 		return devProcessStateColumnWorkaroundEnabled;
 	}
 
-	public String getDataLevel() {
+	private String getDataLevel() {
 		return dataLevel;
 	}
-	
-	public String getProcessDefinitionFilterId() {
+
+	private String getProcessDefinitionFilterId() {
 		return processDefinitionId;
 	}
 
-	public String getOutputDelimiter() {
+	private String getOutputDelimiter() {
 		return outputDelimiter;
 	}
 
-	public void setOutputDelimiter(String outputDelimiter) {
+	private void setOutputDelimiter(String outputDelimiter) {
 		this.outputDelimiter = outputDelimiter;
 	}
 
@@ -163,8 +164,11 @@ public class KafkaProcessingArguments {
 		config.setProcessFilterDefinitionId(this.getProcessDefinitionFilterId());
 		config.setDataLevel(this.getDataLevel());
 		config.setWriteStepResultsIntoFile(this.isWriteStepResultsToCSV());
+		config.setOutputDelimiter(this.getOutputDelimiter());
 
-		return  config;
+		validateConfig(config);
+
+		return config;
 	}
 
 	@Override

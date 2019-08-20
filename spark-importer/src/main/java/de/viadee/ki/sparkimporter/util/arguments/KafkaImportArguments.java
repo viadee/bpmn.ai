@@ -9,7 +9,7 @@ import org.apache.spark.sql.SaveMode;
 /**
  * Configures command line parameters of the KAfka import application.
  */
-public class KafkaImportArguments {
+public class KafkaImportArguments extends AbstractArguments {
 
 	private static KafkaImportArguments sparkImporterArguments = null;
 
@@ -61,47 +61,47 @@ public class KafkaImportArguments {
 	}
 
 
-	public String getKafkaBroker() {
+	private String getKafkaBroker() {
 		return kafkaBroker;
 	}
 
-	public String getFileDestination() {
+	private String getFileDestination() {
 		return fileDestination;
 	}
 
-	public boolean isWriteStepResultsToCSV() {
+	private boolean isWriteStepResultsToCSV() {
 		return writeStepResultsToCSV;
 	}
 
-	public boolean isBatchMode() {
+	private boolean isBatchMode() {
 		return batchMode;
 	}
 
-	public void setBatchMode(boolean batchMode) {
+	private void setBatchMode(boolean batchMode) {
 		this.batchMode = batchMode;
 	}
 
-	public String getWorkingDirectory() {
+	private String getWorkingDirectory() {
 		return workingDirectory;
 	}
 
-	public String getLogDirectory() {
+	private String getLogDirectory() {
 		return logDirectory;
 	}
 
-	public String getDataLevel() {
+	private String getDataLevel() {
 		return dataLevel;
 	}
-	
-	public String getProcessDefinitionFilterId() {
+
+	private String getProcessDefinitionFilterId() {
 		return processDefinitionId;
 	}
-	
-	public String getOutputFormat() {
+
+	private String getOutputFormat() {
 		return outputFormat;
 	}
-	
-	public String getSaveMode() {
+
+	private String getSaveMode() {
 		return saveMode;
 	}
 
@@ -131,6 +131,8 @@ public class KafkaImportArguments {
 		config.setKafkaBroker(this.getKafkaBroker());
 		config.setDataLevel(this.getDataLevel());
 		config.setWriteStepResultsIntoFile(this.isWriteStepResultsToCSV());
+
+		validateConfig(config);
 
 		return  config;
 	}
