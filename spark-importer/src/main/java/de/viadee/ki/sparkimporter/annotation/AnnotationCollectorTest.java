@@ -21,10 +21,6 @@ public class AnnotationCollectorTest {
             if(PreprocessingStepInterface.class.isAssignableFrom(c)) {
                 System.out.println(c.getSimpleName());
             }
-//            if (c.isAnnotationPresent(PreprocessingStepDescription.class))
-//            {
-//                System.out.println(c.getSimpleName());
-//            }
         }
 
         PipelineStepCollector.collectAllAvailablePipelineSteps();

@@ -1,8 +1,8 @@
 package de.viadee.ki.sparkimporter;
 
 import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
-import de.viadee.ki.sparkimporter.runner.impl.KafkaImportRunner;
 import de.viadee.ki.sparkimporter.runner.SparkRunner;
+import de.viadee.ki.sparkimporter.runner.impl.KafkaImportRunner;
 
 public class KafkaImportApplication {
 

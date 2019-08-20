@@ -16,9 +16,9 @@ import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariableCol
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineProcessVariablesStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsStep;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import de.viadee.ki.sparkimporter.util.helper.SparkBroadcastHelper;
 import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
-import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.scheduler.*;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;

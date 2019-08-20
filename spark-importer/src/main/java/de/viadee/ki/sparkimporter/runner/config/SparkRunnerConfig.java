@@ -1,8 +1,8 @@
 package de.viadee.ki.sparkimporter.runner.config;
 
 import de.viadee.ki.sparkimporter.runner.SparkRunner;
-import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import org.apache.spark.sql.SaveMode;
 
 import java.io.Serializable;
