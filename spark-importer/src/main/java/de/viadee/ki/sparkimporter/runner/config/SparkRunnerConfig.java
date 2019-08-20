@@ -14,6 +14,7 @@ public class SparkRunnerConfig implements Serializable {
     private int stepCounter = 1;
 
     private String workingDirectory = ".";
+    private String logDirectory = ".";
     private String sourceFolder = ".";
     private String targetFolder = ".";
     private boolean devTypeCastCheckEnabled = false;
@@ -67,6 +68,7 @@ public class SparkRunnerConfig implements Serializable {
             setWorkingDirectory(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.WORKING_DIRECTORY)));
         }
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.LOG_DIRECTORY)) != null) {
+            setLogDirectory(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.LOG_DIRECTORY)));
             SparkImporterLogger.getInstance().setLogDirectory(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.LOG_DIRECTORY)));
         }
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.FILE_SOURCE)) != null) {
@@ -145,6 +147,14 @@ public class SparkRunnerConfig implements Serializable {
 
     public void setWorkingDirectory(String workingDirectory) {
         this.workingDirectory = workingDirectory;
+    }
+
+    public String getLogDirectory() {
+        return logDirectory;
+    }
+
+    public void setLogDirectory(String logDirectory) {
+        this.logDirectory = logDirectory;
     }
 
     public String getSourceFolder() {

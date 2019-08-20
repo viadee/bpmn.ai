@@ -1,7 +1,11 @@
 package de.viadee.ki.sparkimporter.util.arguments;
 
 import com.beust.jcommander.Parameter;
+import de.viadee.ki.sparkimporter.runner.SparkRunner;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
+import org.apache.spark.sql.SaveMode;
 
 /**
  * Configures command line parameters of the KAfka import application.
@@ -140,6 +144,28 @@ public class KafkaProcessingArguments {
 			sparkImporterArguments = new KafkaProcessingArguments();
 		}
 		return sparkImporterArguments;
+	}
+
+	public SparkRunnerConfig createOrUpdateSparkRunnerConfig(SparkRunnerConfig config) {
+		if(config == null) {
+			config = new SparkRunnerConfig();
+		}
+
+		config.setRunningMode(SparkRunner.RUNNING_MODE.KAFKA_PROCESSING);
+		config.setSourceFolder(this.getFileSource());
+		config.setTargetFolder(this.getFileDestination());
+		config.setWorkingDirectory(this.getWorkingDirectory());
+		config.setLogDirectory(this.getLogDirectory());
+		config.setOutputFormat(this.getOutputFormat());
+		config.setDevTypeCastCheckEnabled(this.isDevTypeCastCheckEnabled());
+		config.setDevProcessStateColumnWorkaroundEnabled(this.isDevProcessStateColumnWorkaroundEnabled());
+		config.setRevCountEnabled(this.isRevisionCount());
+		config.setSaveMode(this.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
+		config.setProcessFilterDefinitionId(this.getProcessDefinitionFilterId());
+		config.setDataLevel(this.getDataLevel());
+		config.setWriteStepResultsIntoFile(this.isWriteStepResultsToCSV());
+
+		return  config;
 	}
 
 	@Override

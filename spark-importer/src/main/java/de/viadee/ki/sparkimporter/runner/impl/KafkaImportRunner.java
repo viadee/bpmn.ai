@@ -67,9 +67,7 @@ public class KafkaImportRunner extends SparkRunner {
 
     @Override
     protected void initialize(String[] arguments) {
-        this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.KAFKA_IMPORT);
-
-        KafkaImportArguments ARGS = KafkaImportArguments.getInstance();
+        KafkaImportArguments kafkaImportArguments = KafkaImportArguments.getInstance();
 
         // instantiate JCommander
         // Use JCommander for flexible usage of Parameters
@@ -82,32 +80,17 @@ public class KafkaImportRunner extends SparkRunner {
             System.exit(1);
         }
 
-        EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (ARGS.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? 2 : 3);
+        //parse arguments to create SparkRunnerConfig
+        kafkaImportArguments.createOrUpdateSparkRunnerConfig(this.sparkRunnerConfig);
 
-        this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.KAFKA_IMPORT);
-
-        //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
-        this.sparkRunnerConfig.setTargetFolder(ARGS.getFileDestination());
-        this.sparkRunnerConfig.setWorkingDirectory(ARGS.getWorkingDirectory());
-        SparkImporterLogger.getInstance().setLogDirectory(ARGS.getLogDirectory());
-        this.sparkRunnerConfig.setOutputFormat(ARGS.getOutputFormat());
-        this.sparkRunnerConfig.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
-        this.sparkRunnerConfig.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
-        this.sparkRunnerConfig.setBatchMode(ARGS.isBatchMode());
-        this.sparkRunnerConfig.setKafkaBroker(ARGS.getKafkaBroker());
-        this.sparkRunnerConfig.setDataLevel(ARGS.getDataLevel());
-
-        this.sparkRunnerConfig.setDataLevel(ARGS.getDataLevel());
-
-        this.sparkRunnerConfig.setWriteStepResultsIntoFile(ARGS.isWriteStepResultsToCSV());
+        EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (kafkaImportArguments.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? 2 : 3);
 
         // Delete destination files, required to avoid exception during runtime
         if(this.sparkRunnerConfig.getSaveMode().equals(SaveMode.Overwrite)) {
-        	FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
+        	FileUtils.deleteQuietly(new File(kafkaImportArguments.getFileDestination()));
         }
 
-
-        SparkImporterLogger.getInstance().writeInfo("Starting Kafka import "+ (ARGS.isBatchMode() ? "in batch mode " : "") +"from: " + ARGS.getKafkaBroker());
+        SparkImporterLogger.getInstance().writeInfo("Starting Kafka import "+ (kafkaImportArguments.isBatchMode() ? "in batch mode " : "") +"from: " + kafkaImportArguments.getKafkaBroker());
     }
 
     private synchronized void processMasterRDD(JavaRDD<String> newRDD, String queue) {

@@ -34,9 +34,7 @@ public class KafkaProcessingRunner extends SparkRunner {
 
     @Override
     protected void initialize(String[] arguments) {
-        this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.KAFKA_PROCESSING);
-
-        KafkaProcessingArguments ARGS = KafkaProcessingArguments.getInstance();
+        KafkaProcessingArguments kafkaProcessingArguments = KafkaProcessingArguments.getInstance();
 
         // instantiate JCommander
         // Use JCommander for flexible usage of Parameters
@@ -49,22 +47,8 @@ public class KafkaProcessingRunner extends SparkRunner {
             System.exit(1);
         }
 
-        this.sparkRunnerConfig.setRunningMode(RUNNING_MODE.KAFKA_PROCESSING);
-
-        //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
-        this.sparkRunnerConfig.setSourceFolder(ARGS.getFileSource());
-        this.sparkRunnerConfig.setTargetFolder(ARGS.getFileDestination());
-        this.sparkRunnerConfig.setDevTypeCastCheckEnabled(ARGS.isDevTypeCastCheckEnabled());
-        this.sparkRunnerConfig.setDevProcessStateColumnWorkaroundEnabled(ARGS.isDevProcessStateColumnWorkaroundEnabled());
-        this.sparkRunnerConfig.setRevCountEnabled(ARGS.isRevisionCount());
-        this.sparkRunnerConfig.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
-        this.sparkRunnerConfig.setOutputFormat(ARGS.getOutputFormat());
-        this.sparkRunnerConfig.setWorkingDirectory(ARGS.getWorkingDirectory());
-        SparkImporterLogger.getInstance().setLogDirectory(ARGS.getLogDirectory());
-
-        this.sparkRunnerConfig.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
-
-        this.sparkRunnerConfig.setDataLevel(ARGS.getDataLevel());
+        //parse arguments to create SparkRunnerConfig
+        kafkaProcessingArguments.createOrUpdateSparkRunnerConfig(this.sparkRunnerConfig);
 
         if(this.sparkRunnerConfig.isDevProcessStateColumnWorkaroundEnabled() && sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             try {
@@ -75,12 +59,10 @@ public class KafkaProcessingRunner extends SparkRunner {
             }
         }
 
-        this.sparkRunnerConfig.setWriteStepResultsIntoFile(ARGS.isWriteStepResultsToCSV());
-
         // Delete destination files, required to avoid exception during runtime
-        FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
+        FileUtils.deleteQuietly(new File(kafkaProcessingArguments.getFileDestination()));
 
-        SparkImporterLogger.getInstance().writeInfo("Starting data processing with data from: " + ARGS.getFileSource());
+        SparkImporterLogger.getInstance().writeInfo("Starting data processing with data from: " + kafkaProcessingArguments.getFileSource());
     }
 
     @Override
