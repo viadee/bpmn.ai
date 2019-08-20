@@ -22,7 +22,7 @@ import static org.apache.spark.sql.functions.not;
 public class AggregateProcessInstancesStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         //apply first and processState aggregator
         Map<String, String> aggregationMap = new HashMap<>();
@@ -39,7 +39,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         }
 
         Column filter = not(isnull(dataset.col(SparkImporterVariables.VAR_STATE)));
-        if(config.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             filter = isnull(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME));
         }
 
@@ -62,7 +62,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         }
 
         filter = isnull(dataset.col(SparkImporterVariables.VAR_STATE));
-        if(config.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             filter = not(isnull(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)));
         }
 
@@ -87,7 +87,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
 
         SparkImporterLogger.getInstance().writeInfo("Found " + dataset.count() + " process instances.");
 
-        if(writeStepResultIntoFile) {
+        if(config.isWriteStepResultsIntoFile()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_process_instances", config);
         }
 

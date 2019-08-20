@@ -44,7 +44,6 @@ public abstract class SparkRunner {
     protected SparkSession sparkSession = null;
 
     private Dataset<Row> dataset;
-    protected String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
     private List<PipelineStep> pipelineSteps = new ArrayList<>();
 
     protected SparkRunnerConfig sparkRunnerConfig = new SparkRunnerConfig();
@@ -239,7 +238,7 @@ public abstract class SparkRunner {
         final long startMillis = System.currentTimeMillis();
 
         // Run processing runner
-        preprocessingRunner.run(dataset, dataLevel, this.sparkRunnerConfig);
+        preprocessingRunner.run(dataset, this.sparkRunnerConfig);
 
         final long endMillis = System.currentTimeMillis();
 

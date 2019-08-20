@@ -22,7 +22,7 @@ import static org.apache.spark.sql.functions.sha1;
 @PreprocessingStepDescription(name = "Hash column", description = "In this step the columns that are configured to be hashed for anonymization are run through a SHA-1 hash operation.")
 public class ColumnHashStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         //check if all variables that should be hashed actually exist, otherwise log a warning
         List<String> existingColumns = new ArrayList<>(Arrays.asList(dataSet.columns()));
@@ -46,7 +46,7 @@ public class ColumnHashStep implements PreprocessingStepInterface {
             }
         }
 
-        if(writeStepResultIntoFile) {
+        if(config.isWriteStepResultsIntoFile()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataSet, "column_hash_step", config);
         }
 

@@ -97,7 +97,7 @@ public class KafkaImportRunner extends SparkRunner {
         this.sparkRunnerConfig.setKafkaBroker(ARGS.getKafkaBroker());
         this.sparkRunnerConfig.setDataLevel(ARGS.getDataLevel());
 
-        dataLevel = ARGS.getDataLevel();
+        this.sparkRunnerConfig.setDataLevel(ARGS.getDataLevel());
 
         this.sparkRunnerConfig.setWriteStepResultsIntoFile(ARGS.isWriteStepResultsToCSV());
 

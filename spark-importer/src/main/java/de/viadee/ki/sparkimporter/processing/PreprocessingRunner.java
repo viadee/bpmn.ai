@@ -20,13 +20,13 @@ public class PreprocessingRunner {
 
     public PreprocessingRunner(){}
 
-    public Dataset<Row> run(Dataset<Row> dataset, String dataLevel, SparkRunnerConfig config) {
+    public Dataset<Row> run(Dataset<Row> dataset, SparkRunnerConfig config) {
         helper_datasets.clear();
-        helper_datasets.put(DATASET_INITIAL + "_" + dataLevel, dataset);
+        helper_datasets.put(DATASET_INITIAL + "_" + config.getDataLevel(), dataset);
 
         for(PipelineStep ps : this.pipelineSteps) {
             if(ps.getPreprocessingStep() != null)
-            dataset = ps.getPreprocessingStep().runPreprocessingStep(dataset, config.isWriteStepResultsIntoFile(), dataLevel, ps.getStepParameters(), config);
+            dataset = ps.getPreprocessingStep().runPreprocessingStep(dataset, ps.getStepParameters(), config);
         }
         return dataset;
     }

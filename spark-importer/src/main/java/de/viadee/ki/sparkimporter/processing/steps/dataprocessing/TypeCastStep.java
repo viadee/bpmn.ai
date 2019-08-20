@@ -29,7 +29,7 @@ import static org.apache.spark.sql.functions.*;
 public class TypeCastStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // get variables
         Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
@@ -116,12 +116,12 @@ public class TypeCastStep implements PreprocessingStepInterface {
             }
 
             // cast revision columns for former variables, revisions columns only exist on process level
-            if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) && config.isRevCountEnabled() && isVariableColumn) {
+            if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) && config.isRevCountEnabled() && isVariableColumn) {
                 dataset = dataset.withColumn(column+"_rev", dataset.col(column+"_rev").cast("integer"));
             }
         }
 
-        if(writeStepResultIntoFile) {
+        if(config.isWriteStepResultsIntoFile()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "type_cast_columns", config);
         }
 

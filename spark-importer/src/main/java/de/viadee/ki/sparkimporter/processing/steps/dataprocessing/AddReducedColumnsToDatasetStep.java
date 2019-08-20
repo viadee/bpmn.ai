@@ -21,12 +21,12 @@ import java.util.stream.Stream;
 public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
 
         // take columns available initially from helper dataset and select the ones to be added back again
         List<String> existingColumns = Arrays.asList(dataset.columns());
-        Dataset<Row> startColumns = PreprocessingRunner.helper_datasets.get("startColumns" + "_" + dataLevel);
+        Dataset<Row> startColumns = PreprocessingRunner.helper_datasets.get("startColumns" + "_" + config.getDataLevel());
         List<String> columnNamesString = new ArrayList<>();
         List<Column> columnNames = new ArrayList<>();
         List<String> columnsNotBeAddedAgain = Arrays.asList(new String[]{
@@ -58,18 +58,18 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         Seq<Column> selectionColumns = SparkImporterUtils.getInstance().asSeq(columnNames);
 
         //get relevant data from initial dataset to be added back again
-        Dataset<Row> initialDataset = PreprocessingRunner.helper_datasets.get(PreprocessingRunner.DATASET_INITIAL + "_" + dataLevel);
+        Dataset<Row> initialDataset = PreprocessingRunner.helper_datasets.get(PreprocessingRunner.DATASET_INITIAL + "_" + config.getDataLevel());
         Map<String, String> aggregationMap = new HashMap<>();
         for(String column : columnNamesString) {
             aggregationMap.put(column, "first");
         }
 
         Column filter = initialDataset.col(SparkImporterVariables.VAR_STATE).isNotNull();
-        if(config.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             filter = initialDataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).isNull();
         }
 
-        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             initialDataset = initialDataset
                     .select(selectionColumns)
                     .filter(filter)
@@ -100,7 +100,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         }
 
         // rejoin removed columns to dataset
-        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             dataset = dataset.join(initialDataset,
                     dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).equalTo(initialDataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right")
                     ), "left");
@@ -111,16 +111,16 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
                     , "left");
         }
 
-        if(config.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
         }
 
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
-        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             dataset = dataset.drop(SparkImporterVariables.VAR_ACT_INST_ID+"_right");
         }
 
-        if(writeStepResultIntoFile) {
+        if(config.isWriteStepResultsIntoFile()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "joined_columns", config);
         }
 

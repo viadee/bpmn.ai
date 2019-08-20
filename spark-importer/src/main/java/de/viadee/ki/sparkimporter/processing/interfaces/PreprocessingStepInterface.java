@@ -15,5 +15,5 @@ public interface PreprocessingStepInterface {
      * @param config the SparkRunnerConfig for this run
      * @return the resulting dataset of the processing step
      */
-    Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config);
+    Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, Map<String, Object> parameters, SparkRunnerConfig config);
 }

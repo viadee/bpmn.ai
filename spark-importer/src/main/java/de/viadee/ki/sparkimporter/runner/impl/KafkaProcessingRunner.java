@@ -64,9 +64,9 @@ public class KafkaProcessingRunner extends SparkRunner {
 
         this.sparkRunnerConfig.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
 
-        dataLevel = ARGS.getDataLevel();
+        this.sparkRunnerConfig.setDataLevel(ARGS.getDataLevel());
 
-        if(this.sparkRunnerConfig.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(this.sparkRunnerConfig.isDevProcessStateColumnWorkaroundEnabled() && sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             try {
                 throw new FaultyConfigurationException("Process state workaround option cannot be used with activity data level.");
             } catch (FaultyConfigurationException e) {
@@ -93,7 +93,7 @@ public class KafkaProcessingRunner extends SparkRunner {
         pipelineSteps.add(new PipelineStep(new DetermineProcessVariablesStep(), "ReduceColumnsStep"));
         pipelineSteps.add(new PipelineStep(new AddVariableColumnsStep(), "DetermineProcessVariablesStep"));
 
-        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             // process level
             pipelineSteps.add(new PipelineStep(new AggregateProcessInstancesStep(), "AddVariableColumnsStep"));
         } else {
@@ -103,14 +103,14 @@ public class KafkaProcessingRunner extends SparkRunner {
 
        // pipelineSteps.add(new PipelineStep(new DataFilterOnActivityStep(), "AddVariablesColumnsStep"));
 
-        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "AggregateProcessInstancesStep" : "AggregateActivityInstancesStep"));
+        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "AggregateProcessInstancesStep" : "AggregateActivityInstancesStep"));
 
-        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             // activity level
             pipelineSteps.add(new PipelineStep(new FillActivityInstancesHistoryStep(), "CreateColumnsFromJsonStep"));
         }
 
-        pipelineSteps.add(new PipelineStep(new AddReducedColumnsToDatasetStep(), dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "CreateColumnsFromJsonStep" : "FillActivityInstancesHistoryStep"));
+        pipelineSteps.add(new PipelineStep(new AddReducedColumnsToDatasetStep(), sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "CreateColumnsFromJsonStep" : "FillActivityInstancesHistoryStep"));
         pipelineSteps.add(new PipelineStep(new ColumnHashStep(), "AddReducedColumnsToDatasetStep"));
         pipelineSteps.add(new PipelineStep(new TypeCastStep(), "ColumnHashStep"));
         pipelineSteps.add(new PipelineStep(new WriteToDiscStep(), "TypeCastStep"));

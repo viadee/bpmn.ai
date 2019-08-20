@@ -34,16 +34,16 @@ import static org.apache.spark.sql.functions.*;
 public class DetermineProcessVariablesStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // FILTER VARIABLES
-        dataset = doFilterVariables(dataset, writeStepResultIntoFile, config);
+        dataset = doFilterVariables(dataset, config.isWriteStepResultsIntoFile(), config);
 
         // VARIABLE NAME MAPPING
-        dataset = doVariableNameMapping(dataset, writeStepResultIntoFile, config);
+        dataset = doVariableNameMapping(dataset, config.isWriteStepResultsIntoFile(), config);
 
         // DETERMINE VARIABLE TYPES
-        dataset = doVariableTypeDetermination(dataset, writeStepResultIntoFile, config);
+        dataset = doVariableTypeDetermination(dataset, config.isWriteStepResultsIntoFile(), config);
 
         // VARIABLE TYPE ESCALATAION
         dataset = doVariableTypeEscalation(dataset, config);

@@ -36,8 +36,6 @@ public abstract class SparkPredictionServiceRunner {
     protected SparkSession sparkSession = null;
     protected SparkRunnerConfig sparkRunnerConfig;
 
-    private Dataset<Row> dataset;
-    protected String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
     private List<PipelineStep> pipelineSteps = new ArrayList<>();
 
     protected abstract void initialize();
@@ -116,7 +114,7 @@ public abstract class SparkPredictionServiceRunner {
         }
 
         // Run processing runner
-        Dataset<Row> resultDataset = preprocessingRunner.run(dataset, dataLevel, this.sparkRunnerConfig);
+        Dataset<Row> resultDataset = preprocessingRunner.run(dataset, this.sparkRunnerConfig);
 
         writeConfig();
 

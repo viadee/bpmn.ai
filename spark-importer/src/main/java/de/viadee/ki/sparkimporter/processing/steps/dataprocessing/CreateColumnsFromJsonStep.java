@@ -36,10 +36,10 @@ import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS
 public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // CREATE COLUMNS FROM DATASET
-        dataset = doCreateColumnsFromJson(dataset, writeStepResultIntoFile, config);
+        dataset = doCreateColumnsFromJson(dataset, config.isWriteStepResultsIntoFile(), config);
 
         // FILTER JSON VARIABLES
         dataset = doFilterJsonVariables(dataset, config);

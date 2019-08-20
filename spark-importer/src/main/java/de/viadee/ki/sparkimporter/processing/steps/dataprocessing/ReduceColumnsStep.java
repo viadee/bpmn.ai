@@ -22,7 +22,7 @@ import java.util.Map;
 public class ReduceColumnsStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // get dataset structure for type determination
         List<StructField> datasetFields = Arrays.asList(dataset.schema().fields());
@@ -42,7 +42,7 @@ public class ReduceColumnsStep implements PreprocessingStepInterface {
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT);
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT2);
 
-        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             columnsToKeep.add(SparkImporterVariables.VAR_ACT_INST_ID);
             columnsToKeep.add(SparkImporterVariables.VAR_START_TIME);
             columnsToKeep.add(SparkImporterVariables.VAR_END_TIME);
@@ -80,7 +80,7 @@ public class ReduceColumnsStep implements PreprocessingStepInterface {
         Dataset<Row> startColumnsDataset = sparkSession.createDataFrame(startColumns, schema).toDF();
 
         // add helper dataset to PreprocessingRunner so we can access it later when adding the columns back
-        PreprocessingRunner.helper_datasets.put("startColumns" + "_" + dataLevel, startColumnsDataset);
+        PreprocessingRunner.helper_datasets.put("startColumns" + "_" + config.getDataLevel(), startColumnsDataset);
 
         // select only relevant columns to continue
         List<Column> columns = new ArrayList<>();
@@ -94,7 +94,7 @@ public class ReduceColumnsStep implements PreprocessingStepInterface {
         columns.add(new Column(SparkImporterVariables.VAR_TEXT));
         columns.add(new Column(SparkImporterVariables.VAR_TEXT2));
 
-        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             columns.add(new Column(SparkImporterVariables.VAR_ACT_INST_ID));
             columns.add(new Column(SparkImporterVariables.VAR_START_TIME));
             columns.add(new Column(SparkImporterVariables.VAR_END_TIME));
@@ -111,11 +111,9 @@ public class ReduceColumnsStep implements PreprocessingStepInterface {
                 .select(selectionColumns)
                 .filter(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID + " <> 'null'");
 
-        if(writeStepResultIntoFile) {
+        if(config.isWriteStepResultsIntoFile()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "reduced_columns", config);
         }
-
-
 
         //return preprocessed data
         return dataset;

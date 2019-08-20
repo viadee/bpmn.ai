@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 @PreprocessingStepDescription(name = "Remove column", description = "In this step input columns are removed accoording to the configuration before the processing to the data is done.")
 public class ColumnRemoveStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         //these columns have to stay in in order to do the processing
         List<String> columnsToKeep = new ArrayList<>();

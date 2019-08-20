@@ -21,7 +21,7 @@ import static org.apache.spark.sql.functions.not;
 public class AggregateActivityInstancesStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         //apply first and processState aggregator
         Map<String, String> aggregationMap = new HashMap<>();
@@ -83,7 +83,7 @@ public class AggregateActivityInstancesStep implements PreprocessingStepInterfac
 
         SparkImporterLogger.getInstance().writeInfo("Found " + dataset.count() + " activity instances.");
 
-        if(writeStepResultIntoFile) {
+        if(config.isWriteStepResultsIntoFile()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_activity_instances", config);
         }
 

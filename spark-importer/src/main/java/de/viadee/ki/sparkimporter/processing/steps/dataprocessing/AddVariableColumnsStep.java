@@ -19,13 +19,13 @@ import static org.apache.spark.sql.functions.*;
 public class AddVariableColumnsStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // AGGREGATE VARIABLE UPDATES
-        dataset = doVariableUpdatesAggregation(dataset, writeStepResultIntoFile, dataLevel, config);
+        dataset = doVariableUpdatesAggregation(dataset, config.isWriteStepResultsIntoFile(), config.getDataLevel(), config);
 
         // ADD VARIABLE COLUMNS
-        dataset = doAddVariableColumns(dataset, writeStepResultIntoFile, dataLevel, config);
+        dataset = doAddVariableColumns(dataset, config.isWriteStepResultsIntoFile(), config.getDataLevel(), config);
 
         return dataset;
     }

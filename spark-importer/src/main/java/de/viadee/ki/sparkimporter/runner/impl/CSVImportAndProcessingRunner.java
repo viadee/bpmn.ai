@@ -67,9 +67,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
 
         this.sparkRunnerConfig.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
 
-        dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
-
-        if(this.sparkRunnerConfig.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(this.sparkRunnerConfig.isDevProcessStateColumnWorkaroundEnabled() && sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             try {
                 throw new FaultyConfigurationException("Process state workaround option cannot be used with activity data level.");
             } catch (FaultyConfigurationException e) {
@@ -126,7 +124,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
         }
 
         InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
-        dataset = initialCleanupStep.runPreprocessingStep(dataset, false, SparkImporterVariables.DATA_LEVEL_PROCESS, null, null);
+        dataset = initialCleanupStep.runPreprocessingStep(dataset, null, null);
 
         return dataset;
     }

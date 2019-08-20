@@ -24,13 +24,11 @@ import static org.apache.spark.sql.functions.col;
 public class DataFilterOnActivityStep implements PreprocessingStepInterface {
     /**
      * @param dataSet the incoming dataset for this processing step
-     * @param writeStepResultIntoFile
-     * @param dataLevel
      * @param parameters
      * @return the filtered DataSet
      */
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters, SparkRunnerConfig config) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, Map<String, Object> parameters, SparkRunnerConfig config) {
         // any parameters set?
         if (parameters == null || parameters.size() == 0) {
             SparkImporterLogger.getInstance().writeWarn("No parameters found for the DataFilterOnActivityStep");
@@ -86,7 +84,7 @@ public class DataFilterOnActivityStep implements PreprocessingStepInterface {
         dataSet = activityDataSet.union(variables);
         SparkImporterLogger.getInstance().writeInfo("DataFilterOnActivityStep: The filtered DataSet contains "+dataSet.count()+" rows, (before: "+ initialDSCount+" rows)");
 
-        if (writeStepResultIntoFile) {
+        if (config.isWriteStepResultsIntoFile()) {
             SparkImporterUtils.getInstance().writeDatasetToCSV(dataSet, "data_filter_on_activity_step", config);
         }
 
