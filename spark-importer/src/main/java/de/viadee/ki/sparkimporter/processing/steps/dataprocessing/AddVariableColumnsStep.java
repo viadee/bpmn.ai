@@ -50,7 +50,7 @@ public class AddVariableColumnsStep implements PreprocessingStepInterface {
         //take only variableUpdate rows
 
         Dataset<Row> datasetVUAgg = dataset;
-        datasetVUAgg = datasetVUAgg.filter(dataset.col(SparkImporterVariables.VAR_DATA_SOURCE).like(KafkaImportRunner.TOPIC_VARIABLE_UPDATE));
+        datasetVUAgg = datasetVUAgg.filter(dataset.col(SparkImporterVariables.VAR_DATA_SOURCE).equalTo(KafkaImportRunner.TOPIC_VARIABLE_UPDATE));
 
         if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             if (Arrays.asList(dataset.columns()).contains(SparkImporterVariables.VAR_TIMESTAMP)) {
@@ -102,7 +102,7 @@ public class AddVariableColumnsStep implements PreprocessingStepInterface {
                             SparkImporterVariables.VAR_TEXT2,
                             SparkImporterVariables.VAR_DATA_SOURCE
                     )
-                    .filter(dataset.col(SparkImporterVariables.VAR_DATA_SOURCE).like(KafkaImportRunner.TOPIC_PROCESS_INSTANCE))
+                    .filter(dataset.col(SparkImporterVariables.VAR_DATA_SOURCE).equalTo(KafkaImportRunner.TOPIC_PROCESS_INSTANCE))
                     .union(datasetVUAgg
                             .select(
                                     SparkImporterVariables.VAR_PROCESS_INSTANCE_ID,
