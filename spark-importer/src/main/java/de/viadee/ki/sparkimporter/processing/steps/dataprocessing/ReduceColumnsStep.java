@@ -41,6 +41,7 @@ public class ReduceColumnsStep implements PreprocessingStepInterface {
         columnsToKeep.add(SparkImporterVariables.VAR_DOUBLE);
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT);
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT2);
+        columnsToKeep.add(SparkImporterVariables.VAR_DATA_SOURCE);
 
         if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             columnsToKeep.add(SparkImporterVariables.VAR_ACT_INST_ID);
@@ -93,6 +94,7 @@ public class ReduceColumnsStep implements PreprocessingStepInterface {
         columns.add(new Column(SparkImporterVariables.VAR_DOUBLE));
         columns.add(new Column(SparkImporterVariables.VAR_TEXT));
         columns.add(new Column(SparkImporterVariables.VAR_TEXT2));
+        columns.add(new Column(SparkImporterVariables.VAR_DATA_SOURCE));
 
         if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             columns.add(new Column(SparkImporterVariables.VAR_ACT_INST_ID));

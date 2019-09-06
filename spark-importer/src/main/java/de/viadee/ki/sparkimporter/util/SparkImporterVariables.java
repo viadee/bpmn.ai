@@ -39,6 +39,7 @@ public final class SparkImporterVariables {
     public static final String VAR_PROCESS_INSTANCE_VARIABLE_REVISION = "rev_";
     public static final String VAR_TIMESTAMP = "timestamp_";
     public static final String VAR_SEQUENCE_COUNTER = "sequence_counter_";
+    public static final String VAR_DATA_SOURCE = "source_";
 
     public static final String PROCESS_STATE_ACTIVE = "ACTIVE";
     public static final String PROCESS_STATE_COMPLETED = "COMPLETED";

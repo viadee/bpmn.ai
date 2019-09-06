@@ -35,6 +35,7 @@ public class ColumnRemoveStep implements PreprocessingStepInterface {
         columnsToKeep.add(SparkImporterVariables.VAR_DOUBLE);
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT);
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT2);
+        columnsToKeep.add(SparkImporterVariables.VAR_DATA_SOURCE);
 
         List<String> columnsToRemove = new ArrayList<>();
 

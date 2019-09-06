@@ -8,6 +8,7 @@ import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep;
 import de.viadee.ki.sparkimporter.runner.SparkRunner;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import de.viadee.ki.sparkimporter.util.arguments.KafkaImportArguments;
 import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
@@ -18,10 +19,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.VoidFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.*;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -40,9 +38,9 @@ public class KafkaImportRunner extends SparkRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaImportRunner.class);
 
-    private final static String TOPIC_PROCESS_INSTANCE = "processInstance";
-    private final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
-    private final static String TOPIC_ACTIVITY_INSTANCE = "activityInstance";
+    public final static String TOPIC_PROCESS_INSTANCE = "processInstance";
+    public final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
+    public final static String TOPIC_ACTIVITY_INSTANCE = "activityInstance";
 
     private final Map<String, Object> kafkaConsumerConfigPI  = new HashMap<>();
     private final Map<String, Object> kafkaConsumerConfigVU  = new HashMap<>();
@@ -102,6 +100,8 @@ public class KafkaImportRunner extends SparkRunner {
                     emptyQueues.add(queue);
                 }
                 if(emptyQueues.size() == EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) {
+                    masterDataset.show(100);
+
                     SparkImporterLogger.getInstance().writeInfo("All Kafka queues ("
                             + emptyQueues.stream().collect(Collectors.joining(","))
                             + ") returned zero entries once. Stopping as running in batch mode");
@@ -116,24 +116,16 @@ public class KafkaImportRunner extends SparkRunner {
             receivedQueues.add(queue);
         }
 
-        if (masterDataset == null) {
-            if(receivedQueues.size() == EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) {
-                masterRdd = masterRdd.union(newRDD);
-                Dataset<String> jsonDataset = sparkSession.createDataset(masterRdd.rdd(), Encoders.STRING());
-                masterDataset = sparkSession.read().json(jsonDataset);
-            } else {
-                if(masterRdd == null) {
-                    masterRdd = newRDD;
-                } else {
-                    masterRdd = masterRdd.union(newRDD);
-                }
+        // add source column
+        Dataset<String> jd = sparkSession.createDataset(newRDD.rdd(), Encoders.STRING());
+        Dataset<Row> newDataset = sparkSession.read().json(jd);
+        newDataset = newDataset.withColumn("source", functions.lit(queue));
+        //newDataset.show(100);
 
-            }
+        if (masterDataset == null) {
+            masterDataset = newDataset;
         } else {
-            Dataset<String> jsonDataset = sparkSession.createDataset(newRDD.rdd(), Encoders.STRING());
-            Dataset<Row> rowDataset = sparkSession.read().json(jsonDataset);
-            Dataset<Row> unionPrepDataset = sparkSession.createDataFrame(rowDataset.rdd(), masterDataset.schema());
-            masterDataset = unionPrepDataset;
+            masterDataset = SparkImporterUtils.getInstance().unionDatasets(masterDataset, newDataset);
         }
     }
 

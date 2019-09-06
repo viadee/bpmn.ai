@@ -3,6 +3,7 @@ package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.runner.impl.KafkaImportRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import de.viadee.ki.sparkimporter.util.helper.SparkBroadcastHelper;
@@ -50,24 +51,21 @@ public class AddVariableColumnsStep implements PreprocessingStepInterface {
 
         Dataset<Row> datasetVUAgg = null;
 
-
         if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+            datasetVUAgg = dataset;
             if (Arrays.asList(dataset.columns()).contains(SparkImporterVariables.VAR_TIMESTAMP)) {
-                datasetVUAgg = dataset
-                        .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
-                        .orderBy(desc(SparkImporterVariables.VAR_TIMESTAMP))
-                        .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
-                        .agg(aggregationMap);
-            } else {
-                datasetVUAgg = dataset
-                        .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
-                        .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
-                        .agg(aggregationMap);
+                datasetVUAgg = datasetVUAgg
+                        .orderBy(desc(SparkImporterVariables.VAR_TIMESTAMP));
             }
+
+            datasetVUAgg = datasetVUAgg
+                    .filter(dataset.col(SparkImporterVariables.VAR_DATA_SOURCE).like(KafkaImportRunner.TOPIC_VARIABLE_UPDATE))
+                    .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
+                    .agg(aggregationMap);
 
         } else {
             datasetVUAgg = dataset
-                    .filter(isnull(dataset.col(SparkImporterVariables.VAR_STATE)))
+                    .filter(dataset.col(SparkImporterVariables.VAR_DATA_SOURCE).like(KafkaImportRunner.TOPIC_VARIABLE_UPDATE))
                     .groupBy(SparkImporterVariables.VAR_ACT_INST_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
                     .agg(aggregationMap);
         }
@@ -102,9 +100,10 @@ public class AddVariableColumnsStep implements PreprocessingStepInterface {
                             SparkImporterVariables.VAR_LONG,
                             SparkImporterVariables.VAR_DOUBLE,
                             SparkImporterVariables.VAR_TEXT,
-                            SparkImporterVariables.VAR_TEXT2
+                            SparkImporterVariables.VAR_TEXT2,
+                            SparkImporterVariables.VAR_DATA_SOURCE
                     )
-                    .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_STATE))))
+                    .filter(dataset.col(SparkImporterVariables.VAR_DATA_SOURCE).like(KafkaImportRunner.TOPIC_PROCESS_INSTANCE))
                     .union(datasetVUAgg
                             .select(
                                     SparkImporterVariables.VAR_PROCESS_INSTANCE_ID,
@@ -115,7 +114,8 @@ public class AddVariableColumnsStep implements PreprocessingStepInterface {
                                     SparkImporterVariables.VAR_LONG,
                                     SparkImporterVariables.VAR_DOUBLE,
                                     SparkImporterVariables.VAR_TEXT,
-                                    SparkImporterVariables.VAR_TEXT2
+                                    SparkImporterVariables.VAR_TEXT2,
+                                    SparkImporterVariables.VAR_DATA_SOURCE
                             ));
         } else {
             //union again with processInstance rows. we aggregate them as well to have the same columns
@@ -133,9 +133,10 @@ public class AddVariableColumnsStep implements PreprocessingStepInterface {
                             SparkImporterVariables.VAR_LONG,
                             SparkImporterVariables.VAR_DOUBLE,
                             SparkImporterVariables.VAR_TEXT,
-                            SparkImporterVariables.VAR_TEXT2
+                            SparkImporterVariables.VAR_TEXT2,
+                            SparkImporterVariables.VAR_DATA_SOURCE
                     )
-                    .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_STATE))))
+                    .filter(not(isnull(dataset.col(SparkImporterVariables.VAR_START_TIME))))
                     .union(datasetVUAgg
                             .select(
                                     SparkImporterVariables.VAR_PROCESS_INSTANCE_ID,
@@ -150,7 +151,8 @@ public class AddVariableColumnsStep implements PreprocessingStepInterface {
                                     SparkImporterVariables.VAR_LONG,
                                     SparkImporterVariables.VAR_DOUBLE,
                                     SparkImporterVariables.VAR_TEXT,
-                                    SparkImporterVariables.VAR_TEXT2
+                                    SparkImporterVariables.VAR_TEXT2,
+                                    SparkImporterVariables.VAR_DATA_SOURCE
                             ))
                     .orderBy(SparkImporterVariables.VAR_ACT_INST_ID, SparkImporterVariables.VAR_START_TIME);
         }

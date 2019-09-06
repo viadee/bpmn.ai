@@ -7,10 +7,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
-import org.apache.spark.sql.Column;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import scala.collection.JavaConversions;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -22,11 +19,10 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class SparkImporterUtils {
 
@@ -233,5 +229,27 @@ public class SparkImporterUtils {
      */
     public <T> Seq<T> asSeq(List<T> values) {
         return JavaConversions.asScalaBuffer(values);
+    }
+
+    public Dataset<Row> unionDatasets(Dataset<Row> ds1, Dataset<Row> ds2) {
+        Set<String> allUniqueColumns = new HashSet<>();
+        allUniqueColumns.addAll(Arrays.asList(ds1.columns()));
+        allUniqueColumns.addAll(Arrays.asList(ds2.columns()));
+
+        for(String column : allUniqueColumns) {
+            if(!Arrays.stream(ds1.columns()).anyMatch(column::equals)) {
+                ds1 = ds1.withColumn(column, functions.lit(null));
+            }
+        }
+
+        for(String column : allUniqueColumns) {
+            if(!Arrays.stream(ds2.columns()).anyMatch(column::equals)) {
+                ds2 = ds2.withColumn(column, functions.lit(null));
+            }
+        }
+
+        return ds1
+                .select(SparkImporterUtils.getInstance().asSeq(allUniqueColumns.stream().map(Column::new).collect(Collectors.toList())))
+                .union(ds2.select(SparkImporterUtils.getInstance().asSeq(allUniqueColumns.stream().map(Column::new).collect(Collectors.toList()))));
     }
 }
