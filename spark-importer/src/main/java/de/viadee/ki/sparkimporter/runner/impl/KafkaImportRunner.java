@@ -100,8 +100,6 @@ public class KafkaImportRunner extends SparkRunner {
                     emptyQueues.add(queue);
                 }
                 if(emptyQueues.size() == EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) {
-                    masterDataset.show(100);
-
                     SparkImporterLogger.getInstance().writeInfo("All Kafka queues ("
                             + emptyQueues.stream().collect(Collectors.joining(","))
                             + ") returned zero entries once. Stopping as running in batch mode");
@@ -120,7 +118,6 @@ public class KafkaImportRunner extends SparkRunner {
         Dataset<String> jd = sparkSession.createDataset(newRDD.rdd(), Encoders.STRING());
         Dataset<Row> newDataset = sparkSession.read().json(jd);
         newDataset = newDataset.withColumn("source", functions.lit(queue));
-        //newDataset.show(100);
 
         if (masterDataset == null) {
             masterDataset = newDataset;
