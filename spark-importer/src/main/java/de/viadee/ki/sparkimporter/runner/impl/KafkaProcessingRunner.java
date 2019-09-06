@@ -7,6 +7,7 @@ import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep;
 import de.viadee.ki.sparkimporter.runner.SparkRunner;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import de.viadee.ki.sparkimporter.util.arguments.KafkaProcessingArguments;
 import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
@@ -95,6 +96,10 @@ public class KafkaProcessingRunner extends SparkRunner {
         Dataset<Row> dataset = sparkSession.read()
                 .option("inferSchema", "true")
                 .load(this.sparkRunnerConfig.getSourceFolder());
+
+        if(sparkRunnerConfig.isWriteStepResultsIntoFile()) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "initial_dataset", sparkRunnerConfig);
+        }
 
         return dataset;
     }
