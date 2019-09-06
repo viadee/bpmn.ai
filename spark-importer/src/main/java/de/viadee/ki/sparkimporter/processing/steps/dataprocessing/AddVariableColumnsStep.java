@@ -49,26 +49,25 @@ public class AddVariableColumnsStep implements PreprocessingStepInterface {
         //first aggregation
         //take only variableUpdate rows
 
-        Dataset<Row> datasetVUAgg = null;
+        Dataset<Row> datasetVUAgg = dataset;
+        datasetVUAgg = datasetVUAgg.filter(dataset.col(SparkImporterVariables.VAR_DATA_SOURCE).like(KafkaImportRunner.TOPIC_VARIABLE_UPDATE));
 
         if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
-            datasetVUAgg = dataset;
             if (Arrays.asList(dataset.columns()).contains(SparkImporterVariables.VAR_TIMESTAMP)) {
                 datasetVUAgg = datasetVUAgg
                         .orderBy(desc(SparkImporterVariables.VAR_TIMESTAMP));
             }
 
             datasetVUAgg = datasetVUAgg
-                    .filter(dataset.col(SparkImporterVariables.VAR_DATA_SOURCE).like(KafkaImportRunner.TOPIC_VARIABLE_UPDATE))
                     .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
                     .agg(aggregationMap);
 
         } else {
-            datasetVUAgg = dataset
-                    .filter(dataset.col(SparkImporterVariables.VAR_DATA_SOURCE).like(KafkaImportRunner.TOPIC_VARIABLE_UPDATE))
+            datasetVUAgg = datasetVUAgg
                     .groupBy(SparkImporterVariables.VAR_ACT_INST_ID, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)
                     .agg(aggregationMap);
         }
+
         //cleanup, so renaming columns and dropping not used ones
         datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
         datasetVUAgg = datasetVUAgg.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);

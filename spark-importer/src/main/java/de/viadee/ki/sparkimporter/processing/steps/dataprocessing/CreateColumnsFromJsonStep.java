@@ -39,7 +39,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // CREATE COLUMNS FROM DATASET
-        dataset = doCreateColumnsFromJson(dataset, config.isWriteStepResultsIntoFile(), config);
+        dataset = doCreateColumnsFromJson(dataset, config);
 
         // FILTER JSON VARIABLES
         dataset = doFilterJsonVariables(dataset, config);
@@ -48,7 +48,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         return dataset;
     }
 
-    private Dataset<Row> doCreateColumnsFromJson(Dataset<Row> dataset, boolean writeStepResultIntoFile, SparkRunnerConfig config) {
+    private Dataset<Row> doCreateColumnsFromJson(Dataset<Row> dataset, SparkRunnerConfig config) {
         // get variables
         Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
 
@@ -228,9 +228,9 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
             SparkSession sparkSession = SparkSession.builder().getOrCreate();
             Dataset<Row> helpDataSet = sparkSession.createDataFrame(filteredVariablesRows, schemaVars).toDF().orderBy(VAR_PROCESS_INSTANCE_VARIABLE_NAME);
-            SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_after_json_escalated", config);
 
-            if(writeStepResultIntoFile) {
+            if(config.isWriteStepResultsIntoFile()) {
+                SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_after_json_escalated", config);
                 SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "create_columns_from_json", config);
             }
         }

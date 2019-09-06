@@ -239,7 +239,9 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
 
         SparkImporterLogger.getInstance().writeInfo("Found " + helpDataSet.count() + " process variables.");
 
-        SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_escalated", config);
+        if(config.isWriteStepResultsIntoFile()) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_escalated", config);
+        }
 
         return dataset;
     }
