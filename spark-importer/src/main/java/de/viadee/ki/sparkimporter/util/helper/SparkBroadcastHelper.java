@@ -1,4 +1,4 @@
-package de.viadee.ki.sparkimporter.util;
+package de.viadee.ki.sparkimporter.util.helper;
 
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;

@@ -1,12 +1,13 @@
 package de.viadee.ki.sparkimporter;
 
 import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
-import de.viadee.ki.sparkimporter.runner.CSVImportAndProcessingRunner;
+import de.viadee.ki.sparkimporter.runner.SparkRunner;
+import de.viadee.ki.sparkimporter.runner.impl.CSVImportAndProcessingRunner;
 
 public class CSVImportAndProcessingApplication {
 
 	public static void main(String[] arguments) {
-		CSVImportAndProcessingRunner csvImportAndProcessingRunner = new CSVImportAndProcessingRunner();
+		SparkRunner csvImportAndProcessingRunner = new CSVImportAndProcessingRunner();
 		try {
 			csvImportAndProcessingRunner.run(arguments);
 		} catch (FaultyConfigurationException e) {

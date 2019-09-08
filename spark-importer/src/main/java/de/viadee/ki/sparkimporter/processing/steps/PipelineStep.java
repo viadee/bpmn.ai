@@ -2,7 +2,7 @@ package de.viadee.ki.sparkimporter.processing.steps;
 
 import de.viadee.ki.sparkimporter.configuration.preprocessing.Step;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 
 import java.util.Map;
 import java.util.Objects;

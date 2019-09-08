@@ -1,15 +1,17 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.ColumnConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import de.viadee.ki.sparkimporter.util.helper.SparkBroadcastHelper;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.DataType;
@@ -23,10 +25,11 @@ import java.util.Map;
 
 import static org.apache.spark.sql.functions.*;
 
+@PreprocessingStepDescription(name = "Type cast", description = "In this step the columns are casted into the data type they have been defined in the configuration. If the cast could not be done by Spark the value is null afterwards.")
 public class TypeCastStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // get variables
         Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
@@ -36,7 +39,7 @@ public class TypeCastStep implements PreprocessingStepInterface {
         List<ColumnConfiguration> columnConfigurations = null;
         List<VariableConfiguration> variableConfigurations = null;
 
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
         if(configuration != null) {
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
             columnConfigurations = preprocessingConfiguration.getColumnConfiguration();
@@ -74,7 +77,7 @@ public class TypeCastStep implements PreprocessingStepInterface {
                 // was initially a variable
                 configurationDataType = variableTypeConfigMap.get(column).getVariableType();
                 configurationParseFormat = variableTypeConfigMap.get(column).getParseFormat();
-                if (SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
+                if (config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
                     isVariableColumn = varMap.keySet().contains(column);
                 } else {
                     isVariableColumn = true;
@@ -88,7 +91,7 @@ public class TypeCastStep implements PreprocessingStepInterface {
             newDataType = mapDataType(datasetFields, column, configurationDataType);
 
             // only check for cast errors if dev feature is enabled and if a change in the datatype has been done
-            if(SparkImporterVariables.isDevTypeCastCheckEnabled() && !newDataType.equals(getCurrentDataType(datasetFields, column))) {
+            if(config.isDevTypeCastCheckEnabled() && !newDataType.equals(getCurrentDataType(datasetFields, column))) {
                 // add a column with casted value to be able to check the cast results
                 dataset = castColumn(dataset, column, column+"_casted", newDataType, configurationParseFormat);
 
@@ -113,13 +116,13 @@ public class TypeCastStep implements PreprocessingStepInterface {
             }
 
             // cast revision columns for former variables, revisions columns only exist on process level
-            if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS) && SparkImporterVariables.isRevCountEnabled() && isVariableColumn) {
+            if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) && config.isRevCountEnabled() && isVariableColumn) {
                 dataset = dataset.withColumn(column+"_rev", dataset.col(column+"_rev").cast("integer"));
             }
         }
 
-        if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "type_cast_columns");
+        if(config.isWriteStepResultsIntoFile()) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "type_cast_columns", config);
         }
 
         //return preprocessed data

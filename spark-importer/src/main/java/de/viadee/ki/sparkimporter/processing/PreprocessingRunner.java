@@ -1,6 +1,7 @@
 package de.viadee.ki.sparkimporter.processing;
 
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -13,40 +14,24 @@ public class PreprocessingRunner {
 
     private final List<PipelineStep> pipelineSteps = new ArrayList<>();
 
-    private static int stepCounter = 0;
-
     public final static String DATASET_INITIAL = "initial";
 
-    public static final Map<String, Dataset<Row>> helper_datasets = new HashMap<>();
-
-    public static boolean writeStepResultsIntoFile = false;
-
-    public static boolean initialConfigToBeWritten = false;
-
-    public static boolean minimalPipelineToBeBuild = false;
+    public final static Map<String, Dataset<Row>> helper_datasets = new HashMap<>();
 
     public PreprocessingRunner(){}
 
-    public Dataset<Row> run(Dataset<Row> dataset, String dataLevel) {
+    public Dataset<Row> run(Dataset<Row> dataset, SparkRunnerConfig config) {
         helper_datasets.clear();
-        helper_datasets.put(DATASET_INITIAL + "_" + dataLevel, dataset);
+        helper_datasets.put(DATASET_INITIAL + "_" + config.getDataLevel(), dataset);
 
         for(PipelineStep ps : this.pipelineSteps) {
             if(ps.getPreprocessingStep() != null)
-            dataset = ps.getPreprocessingStep().runPreprocessingStep(dataset, writeStepResultsIntoFile, dataLevel, ps.getStepParameters());
+            dataset = ps.getPreprocessingStep().runPreprocessingStep(dataset, ps.getStepParameters(), config);
         }
         return dataset;
     }
 
     public void addPreprocessorStep(PipelineStep step) {
         this.pipelineSteps.add(step);
-    }
-
-    public static synchronized int getNextCounter() {
-        return ++stepCounter;
-    }
-
-    public static synchronized int getCounter() {
-        return stepCounter;
     }
 }

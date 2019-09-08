@@ -6,22 +6,20 @@ import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfi
 import de.viadee.ki.sparkimporter.configuration.preprocessing.Step;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
+import de.viadee.ki.sparkimporter.listener.SparkRunnerListener;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.aggregation.AllButEmptyStringAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.aggregation.ProcessStatesAggregationFunction;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineManager;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariableColumnsStep;
-import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineProcessVariablesStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsStep;
-import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
-import org.apache.spark.scheduler.SparkListener;
-import org.apache.spark.scheduler.SparkListenerApplicationEnd;
-import org.apache.spark.scheduler.SparkListenerJobEnd;
-import org.apache.spark.scheduler.SparkListenerJobStart;
+import de.viadee.ki.sparkimporter.util.helper.SparkBroadcastHelper;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
+import org.apache.spark.scheduler.*;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -36,6 +34,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class SparkRunner {
 
@@ -45,8 +44,15 @@ public abstract class SparkRunner {
     protected SparkSession sparkSession = null;
 
     private Dataset<Row> dataset;
-    protected String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
     private List<PipelineStep> pipelineSteps = new ArrayList<>();
+
+    protected SparkRunnerConfig sparkRunnerConfig = new SparkRunnerConfig();
+
+    protected SparkRunner() {}
+
+    protected SparkRunner(SparkRunnerConfig config) {
+        this.sparkRunnerConfig = config;
+    }
 
     protected abstract void initialize(String[] arguments);
 
@@ -58,7 +64,7 @@ public abstract class SparkRunner {
         pipelineSteps.add(new PipelineStep(new ReduceColumnsStep(), ""));
         pipelineSteps.add(new PipelineStep(new DetermineProcessVariablesStep(), "ReduceColumnsStep"));
         pipelineSteps.add(new PipelineStep(new AddVariableColumnsStep(), "DetermineProcessVariablesStep"));
-        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "AddVariableColumnsStep"));
+        //pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), "AddVariableColumnsStep"));
 
         return pipelineSteps;
     }
@@ -83,22 +89,22 @@ public abstract class SparkRunner {
 
     private void checkConfig() {
         //if there is no configuration file yet or an completely empty one, write one in the next steps
-        if(ConfigurationUtils.getInstance().getConfiguration(true) == null
-                || ConfigurationUtils.getInstance().getConfiguration(true).isEmpty()) {
-            if(!SparkImporterVariables.getRunningMode().equals(RUNNING_MODE.KAFKA_IMPORT)) {
-                PreprocessingRunner.minimalPipelineToBeBuild = true;
+        if(ConfigurationUtils.getInstance().getConfiguration(true, this.sparkRunnerConfig) == null
+                || ConfigurationUtils.getInstance().getConfiguration(true, this.sparkRunnerConfig).isEmpty()) {
+            if(!this.sparkRunnerConfig.getRunningMode().equals(RUNNING_MODE.KAFKA_IMPORT)) {
+                this.sparkRunnerConfig.setMinimalPipelineToBeBuild(true);
             }
-            PreprocessingRunner.initialConfigToBeWritten = true;
-            ConfigurationUtils.getInstance().createEmptyConfig();
+            this.sparkRunnerConfig.setInitialConfigToBeWritten(true);
+            ConfigurationUtils.getInstance().createEmptyConfig(this.sparkRunnerConfig);
         } else {
-            SparkImporterLogger.getInstance().writeInfo("Configuration file found: " + SparkImporterVariables.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName());
+            SparkImporterLogger.getInstance().writeInfo("Configuration file found: " + this.sparkRunnerConfig.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName(this.sparkRunnerConfig));
         }
     }
 
     private void writeConfig() {
         //write initial config file
-        if(PreprocessingRunner.initialConfigToBeWritten) {
-            ConfigurationUtils.getInstance().writeConfigurationToFile();
+        if(this.sparkRunnerConfig.isInitialConfigToBeWritten()) {
+            ConfigurationUtils.getInstance().writeConfigurationToFile(this.sparkRunnerConfig);
         }
     }
 
@@ -144,6 +150,10 @@ public abstract class SparkRunner {
     }
 
     public void run(String[] arguments) throws FaultyConfigurationException {
+        run(arguments, null);
+    }
+
+    public void run(String[] arguments, SparkRunnerListener sparkRunnerListener) throws FaultyConfigurationException {
         // spark configuration is being loaded from Environment (e.g. when using spark-submit)
         sparkSession = SparkSession.builder().getOrCreate();
 
@@ -173,6 +183,31 @@ public abstract class SparkRunner {
             }
         });
 
+        AtomicInteger tasksTotal = new AtomicInteger();
+        AtomicInteger tasksDone = new AtomicInteger();
+
+        SparkListener sparkListener = new SparkListener() {
+            @Override
+            public void onStageSubmitted(SparkListenerStageSubmitted stageSubmitted) {
+                super.onStageSubmitted(stageSubmitted);
+
+                tasksTotal.getAndAdd(stageSubmitted.stageInfo().numTasks());
+                sparkRunnerListener.onProgressUpdate(null, tasksDone.get(), tasksTotal.get());
+            }
+
+            @Override
+            public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
+                super.onStageCompleted(stageCompleted);
+
+                sparkRunnerListener.onProgressUpdate(null, tasksDone.get(), tasksTotal.get());
+                tasksDone.getAndAdd(stageCompleted.stageInfo().numTasks());
+            }
+        };
+
+        if(sparkRunnerListener != null) {
+            sparkSession.sparkContext().addSparkListener(sparkListener);
+        }
+
         registerUDFs();
         initialize(arguments);
         checkConfig();
@@ -180,8 +215,8 @@ public abstract class SparkRunner {
         dataset = loadInitialDataset();
         
         // filter dataset if only a specific processDefinitionId should be preprocessed (-pf)
-        if(SparkImporterVariables.getProcessFilterDefinitionId() != null) {
-        	dataset = dataset.filter(dataset.col(SparkImporterVariables.VAR_PROCESS_DEF_ID).equalTo(SparkImporterVariables.getProcessFilterDefinitionId()));
+        if(this.sparkRunnerConfig.getProcessFilterDefinitionId() != null) {
+        	dataset = dataset.filter(dataset.col(SparkImporterVariables.VAR_PROCESS_DEF_ID).equalTo(this.sparkRunnerConfig.getProcessFilterDefinitionId()));
         }
         
         // TODO 
@@ -203,7 +238,7 @@ public abstract class SparkRunner {
         final long startMillis = System.currentTimeMillis();
 
         // Run processing runner
-        preprocessingRunner.run(dataset, dataLevel);
+        preprocessingRunner.run(dataset, this.sparkRunnerConfig);
 
         final long endMillis = System.currentTimeMillis();
 
@@ -214,7 +249,7 @@ public abstract class SparkRunner {
         /**
          * if the created configuration file is a minimal one, overwrite the steps with the default pipeline
          */
-        if (PreprocessingRunner.minimalPipelineToBeBuild){
+        if (this.sparkRunnerConfig.isMinimalPipelineToBeBuild()){
             logMessage = "Filling the minimal configuration pipeline with the applications default pipeline...";
             LOG.info(logMessage);
             SparkImporterLogger.getInstance().writeInfo(logMessage);
@@ -225,15 +260,22 @@ public abstract class SparkRunner {
         }
 
         // Cleanup
-        sparkSession.close();
+        if(this.sparkRunnerConfig.isCloseSparkSessionAfterRun()) {
+            sparkSession.close();
+        }
 
         writeConfig();
+
+        if(sparkRunnerListener != null) {
+            sparkRunnerListener.onFinished(true);
+            sparkSession.sparkContext().removeSparkListener(sparkListener);
+        }
     }
 
     public void overwritePipelineSteps() {
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(this.sparkRunnerConfig);
 
-        if (PreprocessingRunner.initialConfigToBeWritten) {
+        if (this.sparkRunnerConfig.isInitialConfigToBeWritten()) {
             pipelineSteps = buildDefaultPipeline();
 
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
@@ -259,10 +301,10 @@ public abstract class SparkRunner {
 
         List<Step> steps = null;
 
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(this.sparkRunnerConfig);
 
-        if(PreprocessingRunner.initialConfigToBeWritten) {
-            if(!SparkImporterVariables.getRunningMode().equals(RUNNING_MODE.KAFKA_IMPORT)) {
+        if(this.sparkRunnerConfig.isInitialConfigToBeWritten()) {
+            if(!this.sparkRunnerConfig.getRunningMode().equals(RUNNING_MODE.KAFKA_IMPORT)) {
                 pipelineSteps = buildMinimalPipeline();
             } else {
                 pipelineSteps = buildDefaultPipeline();

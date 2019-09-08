@@ -1,15 +1,13 @@
 package de.viadee.ki.sparkimporter.util;
 
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
-import org.apache.spark.sql.Column;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import scala.collection.JavaConversions;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -21,11 +19,10 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class SparkImporterUtils {
 
@@ -59,34 +56,43 @@ public class SparkImporterUtils {
         return DigestUtils.md5Hex(new String(encoded)).toUpperCase();
     }
 
-    public void writeDatasetToParquet(Dataset<Row> dataSet, String subDirectory) {
+    public void writeDatasetToJson(Dataset<Row> dataset, String targetfolder, SparkRunnerConfig config) {
+        String targetFolder = config.getTargetFolder()+"/result/json/"+targetfolder;
+        dataset
+                .coalesce(1)
+                .write()
+                .mode(config.getSaveMode())
+                .json(targetFolder);
+    }
 
-        String targetFolder = SparkImporterVariables.getTargetFolder()+"/";
+    public void writeDatasetToParquet(Dataset<Row> dataSet, String subDirectory, SparkRunnerConfig config) {
+
+        String targetFolder = config.getTargetFolder()+"/";
         if(subDirectory.equals("result")) {
             targetFolder += "result";
         } else {
-            targetFolder += "intermediate/" + String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory;
+            targetFolder += "intermediate/" + String.format("%02d", config.getAndRaiseStepCounter()) + "_" + subDirectory;
         }
 
         //save dataset into parquet file
         dataSet
         		.repartition(dataSet.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID))
                 .write()
-                .mode(SparkImporterVariables.getSaveMode())
+                .mode(config.getSaveMode())
                 .save(targetFolder + "/parquet");
 
-        if(SparkImporterVariables.getOutputFormat().equals(SparkImporterVariables.OUTPUT_FORMAT_CSV) && subDirectory.equals("result")) {
+        if(config.getOutputFormat().equals(SparkImporterVariables.OUTPUT_FORMAT_CSV) && subDirectory.equals("result")) {
             SparkSession sparkSession = SparkSession.builder().getOrCreate();
             Dataset<Row> parquetData = sparkSession.read().load(targetFolder + "/parquet");
             parquetData
                     .coalesce(1)
                     .write()
                     .option("header", "true")
-                    .option("delimiter", "|")
+                    .option("delimiter", config.getOutputDelimiter())
                     .option("timestampFormat", "yyyy-MM-dd'T'HH:mm:ss.SSS")
                     .option("ignoreLeadingWhiteSpace", "false")
                     .option("ignoreTrailingWhiteSpace", "false")
-                    .mode(SparkImporterVariables.getSaveMode())
+                    .mode(config.getSaveMode())
                     .csv(targetFolder + "/csv");
 
             // move resulting csv file
@@ -139,11 +145,7 @@ public class SparkImporterUtils {
         }
     }
 
-    public void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory) {
-        writeDatasetToCSV(dataSet, subDirectory, "|");
-    }
-
-    private void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory, String delimiter) {
+    public void writeDatasetToCSV(Dataset<Row> dataSet, String subDirectory, SparkRunnerConfig config) {
 
         boolean aggreateCSVToOneFile = true;
 
@@ -151,21 +153,21 @@ public class SparkImporterUtils {
             dataSet = dataSet.coalesce(1);
         }
 
-        String path = SparkImporterVariables.getTargetFolder()+"/";
+        String path = config.getTargetFolder()+"/";
         if(subDirectory.equals("result")) {
             path += "result";
         } else {
-            path += "intermediate/" + String.format("%02d", PreprocessingRunner.getNextCounter()) + "_" + subDirectory;
+            path += "intermediate/" + String.format("%02d", config.getAndRaiseStepCounter()) + "_" + subDirectory;
         }
 
         //save dataset into CSV file
         dataSet
                 .write()
                 .option("header", "true")
-                .option("delimiter", delimiter)
+                .option("delimiter", config.getOutputDelimiter())
                 .option("ignoreLeadingWhiteSpace", "false")
                 .option("ignoreTrailingWhiteSpace", "false")
-                .mode(SparkImporterVariables.getSaveMode())
+                .mode(config.getSaveMode())
                 .csv(path);
     }
 
@@ -227,5 +229,27 @@ public class SparkImporterUtils {
      */
     public <T> Seq<T> asSeq(List<T> values) {
         return JavaConversions.asScalaBuffer(values);
+    }
+
+    public Dataset<Row> unionDatasets(Dataset<Row> ds1, Dataset<Row> ds2) {
+        Set<String> allUniqueColumns = new HashSet<>();
+        allUniqueColumns.addAll(Arrays.asList(ds1.columns()));
+        allUniqueColumns.addAll(Arrays.asList(ds2.columns()));
+
+        for(String column : allUniqueColumns) {
+            if(!Arrays.stream(ds1.columns()).anyMatch(column::equals)) {
+                ds1 = ds1.withColumn(column, functions.lit(null));
+            }
+        }
+
+        for(String column : allUniqueColumns) {
+            if(!Arrays.stream(ds2.columns()).anyMatch(column::equals)) {
+                ds2 = ds2.withColumn(column, functions.lit(null));
+            }
+        }
+
+        return ds1
+                .select(SparkImporterUtils.getInstance().asSeq(allUniqueColumns.stream().map(Column::new).collect(Collectors.toList())))
+                .union(ds2.select(SparkImporterUtils.getInstance().asSeq(allUniqueColumns.stream().map(Column::new).collect(Collectors.toList()))));
     }
 }

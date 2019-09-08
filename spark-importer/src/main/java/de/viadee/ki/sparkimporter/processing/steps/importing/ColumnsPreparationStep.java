@@ -4,7 +4,7 @@ import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
@@ -16,12 +16,12 @@ import java.util.Map;
 
 public class ColumnsPreparationStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
 
         List<String> predictionVariables = new ArrayList<>();
-        if(SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT)) {
-            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        if(config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT)) {
+            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
             List<VariableConfiguration> variableConfigurations = configuration.getPreprocessingConfiguration().getVariableConfiguration();
             for(VariableConfiguration vc : variableConfigurations) {
                 predictionVariables.add(vc.getVariableName());
@@ -30,7 +30,7 @@ public class ColumnsPreparationStep implements PreprocessingStepInterface {
 
         //rename columns
         for(String columnName : dataset.columns()) {
-            if(SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)
+            if(config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)
                     || !predictionVariables.contains(columnName)) {
                 dataset = dataset.withColumnRenamed(columnName, columnName.replaceAll("([A-Z])","_$1").concat("_").toLowerCase());
             }
@@ -58,8 +58,8 @@ public class ColumnsPreparationStep implements PreprocessingStepInterface {
         }
 
         // write imported CSV structure to file for debugging
-        if (SparkImporterCSVArguments.getInstance().isWriteStepResultsToCSV()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
+        if (config.isWriteStepResultsIntoFile()) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result", config);
         }
         
         return dataset;

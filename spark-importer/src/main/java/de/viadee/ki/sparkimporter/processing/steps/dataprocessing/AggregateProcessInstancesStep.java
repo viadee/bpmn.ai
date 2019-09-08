@@ -1,9 +1,11 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -16,10 +18,11 @@ import java.util.regex.Pattern;
 import static org.apache.spark.sql.functions.isnull;
 import static org.apache.spark.sql.functions.not;
 
+@PreprocessingStepDescription(name = "Aggregate process instances", description = "In this step the data is aggregated in a way so that there is only one line per process instance in the dataset. In this step the process state for each process instance is also aggregated to the last state the process instance had in the underlying dataset.")
 public class AggregateProcessInstancesStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         //apply first and processState aggregator
         Map<String, String> aggregationMap = new HashMap<>();
@@ -36,7 +39,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         }
 
         Column filter = not(isnull(dataset.col(SparkImporterVariables.VAR_STATE)));
-        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             filter = isnull(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME));
         }
 
@@ -59,7 +62,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         }
 
         filter = isnull(dataset.col(SparkImporterVariables.VAR_STATE));
-        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             filter = not(isnull(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)));
         }
 
@@ -84,8 +87,8 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
 
         SparkImporterLogger.getInstance().writeInfo("Found " + dataset.count() + " process instances.");
 
-        if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_process_instances");
+        if(config.isWriteStepResultsIntoFile()) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_process_instances", config);
         }
 
         //return preprocessed data

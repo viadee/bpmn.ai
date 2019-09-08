@@ -1,7 +1,9 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Column;
@@ -15,15 +17,16 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@PreprocessingStepDescription(name = "Add reduced columns", description = "In the beginning the non relevant columns where removed to speed up the processing. These columns are now added back to the dataset by using the processInstanceId as a reference.")
 public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
 
         // take columns available initially from helper dataset and select the ones to be added back again
         List<String> existingColumns = Arrays.asList(dataset.columns());
-        Dataset<Row> startColumns = PreprocessingRunner.helper_datasets.get("startColumns" + "_" + dataLevel);
+        Dataset<Row> startColumns = PreprocessingRunner.helper_datasets.get("startColumns" + "_" + config.getDataLevel());
         List<String> columnNamesString = new ArrayList<>();
         List<Column> columnNames = new ArrayList<>();
         List<String> columnsNotBeAddedAgain = Arrays.asList(new String[]{
@@ -38,7 +41,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
                 SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_INSTANCE_ID
         });
 
-        if(!SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled()) {
+        if(!config.isDevProcessStateColumnWorkaroundEnabled()) {
             columnsNotBeAddedAgain = Stream.concat(columnsNotBeAddedAgain.stream(), Stream.of(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)).collect(Collectors.toList());
         }
 
@@ -55,18 +58,18 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         Seq<Column> selectionColumns = SparkImporterUtils.getInstance().asSeq(columnNames);
 
         //get relevant data from initial dataset to be added back again
-        Dataset<Row> initialDataset = PreprocessingRunner.helper_datasets.get(PreprocessingRunner.DATASET_INITIAL + "_" + dataLevel);
+        Dataset<Row> initialDataset = PreprocessingRunner.helper_datasets.get(PreprocessingRunner.DATASET_INITIAL + "_" + config.getDataLevel());
         Map<String, String> aggregationMap = new HashMap<>();
         for(String column : columnNamesString) {
             aggregationMap.put(column, "first");
         }
 
         Column filter = initialDataset.col(SparkImporterVariables.VAR_STATE).isNotNull();
-        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             filter = initialDataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).isNull();
         }
 
-        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             initialDataset = initialDataset
                     .select(selectionColumns)
                     .filter(filter)
@@ -97,7 +100,7 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
         }
 
         // rejoin removed columns to dataset
-        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             dataset = dataset.join(initialDataset,
                     dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID).equalTo(initialDataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right")
                     ), "left");
@@ -108,17 +111,17 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
                     , "left");
         }
 
-        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
             dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
         }
 
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID+"_right");
-        if(dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             dataset = dataset.drop(SparkImporterVariables.VAR_ACT_INST_ID+"_right");
         }
 
-        if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "joined_columns");
+        if(config.isWriteStepResultsIntoFile()) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "joined_columns", config);
         }
 
         //return preprocessed data

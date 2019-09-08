@@ -1,10 +1,11 @@
 package de.viadee.ki.sparkimporter.processing.steps.userconfig;
 
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import de.viadee.ki.sparkimporter.util.helper.SparkBroadcastHelper;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -23,13 +24,11 @@ import static org.apache.spark.sql.functions.col;
 public class DataFilterOnActivityStep implements PreprocessingStepInterface {
     /**
      * @param dataSet the incoming dataset for this processing step
-     * @param writeStepResultIntoFile
-     * @param dataLevel
      * @param parameters
      * @return the filtered DataSet
      */
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, Map<String, Object> parameters, SparkRunnerConfig config) {
         // any parameters set?
         if (parameters == null || parameters.size() == 0) {
             SparkImporterLogger.getInstance().writeWarn("No parameters found for the DataFilterOnActivityStep");
@@ -85,8 +84,8 @@ public class DataFilterOnActivityStep implements PreprocessingStepInterface {
         dataSet = activityDataSet.union(variables);
         SparkImporterLogger.getInstance().writeInfo("DataFilterOnActivityStep: The filtered DataSet contains "+dataSet.count()+" rows, (before: "+ initialDSCount+" rows)");
 
-        if (writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataSet, "data_filter_on_activity_step");
+        if (config.isWriteStepResultsIntoFile()) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataSet, "data_filter_on_activity_step", config);
         }
 
         return dataSet;

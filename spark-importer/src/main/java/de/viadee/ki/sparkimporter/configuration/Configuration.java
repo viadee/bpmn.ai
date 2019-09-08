@@ -1,11 +1,14 @@
 package de.viadee.ki.sparkimporter.configuration;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.annotations.SerializedName;
 import de.viadee.ki.sparkimporter.configuration.dataextraction.DataExtractionConfiguration;
 import de.viadee.ki.sparkimporter.configuration.modellearning.ModelLearningConfiguration;
 import de.viadee.ki.sparkimporter.configuration.modelprediction.ModelPredictionConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Configuration {
 
     @SerializedName("data_extraction")
@@ -52,6 +55,7 @@ public class Configuration {
         this.modelPredictionConfiguration = modelPredictionConfiguration;
     }
 
+    @JsonIgnore
     public boolean isEmpty() {
         boolean result = false;
 

@@ -1,13 +1,15 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.ColumnConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -17,9 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+@PreprocessingStepDescription(name = "Remove column", description = "In this step input columns are removed accoording to the configuration before the processing to the data is done.")
 public class ColumnRemoveStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         //these columns have to stay in in order to do the processing
         List<String> columnsToKeep = new ArrayList<>();
@@ -32,10 +35,11 @@ public class ColumnRemoveStep implements PreprocessingStepInterface {
         columnsToKeep.add(SparkImporterVariables.VAR_DOUBLE);
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT);
         columnsToKeep.add(SparkImporterVariables.VAR_TEXT2);
+        columnsToKeep.add(SparkImporterVariables.VAR_DATA_SOURCE);
 
         List<String> columnsToRemove = new ArrayList<>();
 
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
         if(configuration != null) {
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
             if(preprocessingConfiguration != null) {

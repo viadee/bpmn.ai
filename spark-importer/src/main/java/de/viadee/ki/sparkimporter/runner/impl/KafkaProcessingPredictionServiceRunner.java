@@ -1,10 +1,11 @@
-package de.viadee.ki.sparkimporter.runner;
+package de.viadee.ki.sparkimporter.runner.impl;
 
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ColumnHashStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.TypeCastStep;
 import de.viadee.ki.sparkimporter.processing.steps.importing.ColumnsPreparationStep;
+import de.viadee.ki.sparkimporter.runner.SparkPredictionServiceRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ public class KafkaProcessingPredictionServiceRunner extends SparkPredictionServi
 
     @Override
     public void initialize() {
-        SparkImporterVariables.setPipelineMode(SparkImporterVariables.PIPELINE_MODE_PREDICT);
+        this.sparkRunnerConfig.setPipelineMode(SparkImporterVariables.PIPELINE_MODE_PREDICT);
     }
 
     @Override

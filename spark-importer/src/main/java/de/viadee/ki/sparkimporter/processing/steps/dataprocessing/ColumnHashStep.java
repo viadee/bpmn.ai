@@ -1,12 +1,14 @@
 package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.ColumnHashConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -17,14 +19,15 @@ import java.util.Map;
 
 import static org.apache.spark.sql.functions.sha1;
 
+@PreprocessingStepDescription(name = "Hash column", description = "In this step the columns that are configured to be hashed for anonymization are run through a SHA-1 hash operation.")
 public class ColumnHashStep implements PreprocessingStepInterface {
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameters) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataSet, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         //check if all variables that should be hashed actually exist, otherwise log a warning
         List<String> existingColumns = new ArrayList<>(Arrays.asList(dataSet.columns()));
 
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
         if(configuration != null) {
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
             if(preprocessingConfiguration != null) {
@@ -43,8 +46,8 @@ public class ColumnHashStep implements PreprocessingStepInterface {
             }
         }
 
-        if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataSet, "column_hash_step");
+        if(config.isWriteStepResultsIntoFile()) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataSet, "column_hash_step", config);
         }
 
         return dataSet;

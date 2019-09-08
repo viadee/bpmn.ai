@@ -4,16 +4,17 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.configuration.Configuration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.ki.sparkimporter.configuration.preprocessing.VariableConfiguration;
 import de.viadee.ki.sparkimporter.configuration.util.ConfigurationUtils;
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.ki.sparkimporter.util.SparkBroadcastHelper;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import de.viadee.ki.sparkimporter.util.helper.SparkBroadcastHelper;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -31,22 +32,23 @@ import java.util.*;
 import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME;
 import static de.viadee.ki.sparkimporter.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE;
 
+@PreprocessingStepDescription(name = "Create columns from Json", description = "In this step each variable column is checked if it contains a json and if so, the first level of attributes is transformed into separate columns. No object or array parameters are converted.")
 public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
     @Override
-    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, boolean writeStepResultIntoFile, String dataLevel, Map<String, Object> parameterss) {
+    public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
         // CREATE COLUMNS FROM DATASET
-        dataset = doCreateColumnsFromJson(dataset, writeStepResultIntoFile);
+        dataset = doCreateColumnsFromJson(dataset, config);
 
         // FILTER JSON VARIABLES
-        dataset = doFilterJsonVariables(dataset);
+        dataset = doFilterJsonVariables(dataset, config);
 
         //return preprocessed data
         return dataset;
     }
 
-    private Dataset<Row> doCreateColumnsFromJson(Dataset<Row> dataset, boolean writeStepResultIntoFile) {
+    private Dataset<Row> doCreateColumnsFromJson(Dataset<Row> dataset, SparkRunnerConfig config) {
         // get variables
         Map<String, String> varMap = (Map<String, String>) SparkBroadcastHelper.getInstance().getBroadcastVariable(SparkBroadcastHelper.BROADCAST_VARIABLE.PROCESS_VARIABLES_ESCALATED);
 
@@ -56,7 +58,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         }
 
         String[] vars = null;
-        if(SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
+        if(config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
             //convert to String array so it is serializable and can be used in map function
             Set<String> variables = varMap.keySet();
             vars = new String[variables.size()];
@@ -76,7 +78,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         Dataset<Row> newColumnsDataset = dataset.flatMap((FlatMapFunction<Row, Row>) row -> {
             List<Row> newColumns = new ArrayList<>();
             for (String c : columns) {
-                if (SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
+                if (config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
                     //it was a variable, so try to parse as json
                     ObjectMapper mapper = new ObjectMapper();
                     JsonFactory factory = mapper.getFactory();
@@ -132,15 +134,17 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
             for(String c : columns) {
                 String columnValue = null;
-                if (SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
+                if (config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
                     //it was a variable, so try to parse as json
                     ObjectMapper mapper = new ObjectMapper();
                     JsonFactory factory = mapper.getFactory();
                     JsonParser parser = null;
                     JsonNode jsonParsed = null;
                     try {
-                        parser = factory.createParser((String)row.getAs(c));
-                        jsonParsed = mapper.readTree(parser);
+                        if(row.getAs(c) != null) {
+                            parser = factory.createParser((String)row.getAs(c));
+                            jsonParsed = mapper.readTree(parser);
+                        }
                     } catch (IOException e) {
                         //do nothing
                     }
@@ -187,7 +191,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         }, RowEncoder.apply(newSchema1));
 
 
-        if (SparkImporterVariables.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
+        if (config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
             //create new Dataset
             //write column names into list
             List<Row> filteredVariablesRows = new ArrayList<>();
@@ -200,8 +204,8 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
                 filteredVariablesRows.add(RowFactory.create(name, type));
 
                 // add new variables to configuration
-                if(PreprocessingRunner.initialConfigToBeWritten) {
-                    Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+                if(config.isInitialConfigToBeWritten()) {
+                    Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
                     VariableConfiguration variableConfiguration = new VariableConfiguration();
                     variableConfiguration.setVariableName(name);
                     variableConfiguration.setVariableType(type);
@@ -224,21 +228,21 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
             SparkSession sparkSession = SparkSession.builder().getOrCreate();
             Dataset<Row> helpDataSet = sparkSession.createDataFrame(filteredVariablesRows, schemaVars).toDF().orderBy(VAR_PROCESS_INSTANCE_VARIABLE_NAME);
-            SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_after_json_escalated");
 
-            if(writeStepResultIntoFile) {
-                SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "create_columns_from_json");
+            if(config.isWriteStepResultsIntoFile()) {
+                SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_after_json_escalated", config);
+                SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "create_columns_from_json", config);
             }
         }
 
         return dataset;
     }
 
-    private Dataset<Row> doFilterJsonVariables(Dataset<Row> dataset) {
+    private Dataset<Row> doFilterJsonVariables(Dataset<Row> dataset, SparkRunnerConfig config) {
         //read all variables to filter again. They contain also variables that resulted from Json parsing and are not columns, so they can just be dropped
         List<String> variablesToFilter = new ArrayList<>();
 
-        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration();
+        Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
         if(configuration != null) {
             PreprocessingConfiguration preprocessingConfiguration = configuration.getPreprocessingConfiguration();
             if(preprocessingConfiguration != null) {

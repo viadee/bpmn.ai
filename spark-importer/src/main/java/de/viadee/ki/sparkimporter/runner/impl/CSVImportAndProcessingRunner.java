@@ -1,17 +1,18 @@
-package de.viadee.ki.sparkimporter.runner;
+package de.viadee.ki.sparkimporter.runner.impl;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import de.viadee.ki.sparkimporter.exceptions.FaultyConfigurationException;
-import de.viadee.ki.sparkimporter.processing.PreprocessingRunner;
 import de.viadee.ki.sparkimporter.processing.steps.PipelineStep;
 import de.viadee.ki.sparkimporter.processing.steps.dataprocessing.*;
 import de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep;
 import de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep;
-import de.viadee.ki.sparkimporter.util.SparkImporterCSVArguments;
-import de.viadee.ki.sparkimporter.util.SparkImporterLogger;
+import de.viadee.ki.sparkimporter.runner.SparkRunner;
+import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
+import de.viadee.ki.sparkimporter.util.arguments.CSVImportAndProcessingArguments;
+import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -26,17 +27,20 @@ import java.util.List;
 public class CSVImportAndProcessingRunner extends SparkRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(CSVImportAndProcessingRunner.class);
-    public static SparkImporterCSVArguments ARGS;
+
+    public CSVImportAndProcessingRunner() { super(); }
+
+    public CSVImportAndProcessingRunner(SparkRunnerConfig config) {
+        super(config);
+    }
 
     @Override
     protected void initialize(String[] arguments) {
-        SparkImporterVariables.setRunningMode(RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);
-
-        ARGS = SparkImporterCSVArguments.getInstance();
+        CSVImportAndProcessingArguments csvImportAndProcessingArguments = CSVImportAndProcessingArguments.getInstance();
 
         // instantiate JCommander
         // Use JCommander for flexible usage of Parameters
-        final JCommander jCommander = JCommander.newBuilder().addObject(SparkImporterCSVArguments.getInstance()).build();
+        final JCommander jCommander = JCommander.newBuilder().addObject(CSVImportAndProcessingArguments.getInstance()).build();
         try {
             jCommander.parse(arguments);
         } catch (final ParameterException e) {
@@ -45,23 +49,10 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
             System.exit(1);
         }
 
-        SparkImporterVariables.setRunningMode(RUNNING_MODE.CSV_IMPORT_AND_PROCESSING);
+        //parse arguments to create SparkRunnerConfig
+        csvImportAndProcessingArguments.createOrUpdateSparkRunnerConfig(this.sparkRunnerConfig);
 
-        //workaround to overcome the issue that different Application argument classes are used but we need the target folder for the result steps
-        SparkImporterVariables.setTargetFolder(ARGS.getFileDestination());
-        SparkImporterVariables.setDevTypeCastCheckEnabled(ARGS.isDevTypeCastCheckEnabled());
-        SparkImporterVariables.setDevProcessStateColumnWorkaroundEnabled(ARGS.isDevProcessStateColumnWorkaroundEnabled());
-        SparkImporterVariables.setRevCountEnabled(ARGS.isRevisionCount());
-        SparkImporterVariables.setSaveMode(ARGS.getSaveMode() == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
-        SparkImporterVariables.setOutputFormat(ARGS.getOutputFormat());
-        SparkImporterVariables.setWorkingDirectory(ARGS.getWorkingDirectory());
-        SparkImporterLogger.setLogDirectory(ARGS.getLogDirectory());
-        
-        SparkImporterVariables.setProcessFilterDefinitionId(ARGS.getProcessDefinitionFilterId());
-
-        dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
-
-        if(SparkImporterVariables.isDevProcessStateColumnWorkaroundEnabled() && dataLevel.equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(this.sparkRunnerConfig.isDevProcessStateColumnWorkaroundEnabled() && sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
             try {
                 throw new FaultyConfigurationException("Process state workaround option cannot be used with activity data level.");
             } catch (FaultyConfigurationException e) {
@@ -70,15 +61,13 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
             }
         }
 
-        PreprocessingRunner.writeStepResultsIntoFile = ARGS.isWriteStepResultsToCSV();
-
         // Delete destination files, required to avoid exception during runtime
-        if(SparkImporterVariables.getSaveMode().equals(SaveMode.Overwrite)) {
-            FileUtils.deleteQuietly(new File(ARGS.getFileDestination()));
+        if(this.sparkRunnerConfig.getSaveMode().equals(SaveMode.Overwrite)) {
+            FileUtils.deleteQuietly(new File(this.sparkRunnerConfig.getTargetFolder()));
         }
 
         SparkImporterLogger.getInstance().writeInfo("Starting CSV import and processing");
-        SparkImporterLogger.getInstance().writeInfo("Importing CSV file: " + ARGS.getFileSource());
+        SparkImporterLogger.getInstance().writeInfo("Importing CSV file: " + this.sparkRunnerConfig.getSourceFolder());
     }
 
     @Override
@@ -106,19 +95,19 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
         //Load source CSV file
         Dataset<Row> dataset = sparkSession.read()
                 .option("inferSchema", "true")
-                .option("delimiter", ARGS.getDelimiter())
+                .option("delimiter", this.sparkRunnerConfig.getDelimiter())
                 .option("header", "true")
                 .option("ignoreLeadingWhiteSpace", "false")
                 .option("ignoreTrailingWhiteSpace", "false")
-                .csv(ARGS.getFileSource());
+                .csv(this.sparkRunnerConfig.getSourceFolder());
 
         // write imported CSV structure to file for debugging
-        if (SparkImporterCSVArguments.getInstance().isWriteStepResultsToCSV()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result");
+        if (this.sparkRunnerConfig.isWriteStepResultsIntoFile()) {
+            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result", this.sparkRunnerConfig);
         }
 
         InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
-        dataset = initialCleanupStep.runPreprocessingStep(dataset, false, SparkImporterVariables.DATA_LEVEL_PROCESS, null);
+        dataset = initialCleanupStep.runPreprocessingStep(dataset, null, this.sparkRunnerConfig);
 
         return dataset;
     }
