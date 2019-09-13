@@ -29,7 +29,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         for(String column : dataset.columns()) {
             if(column.equals(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)) {
                 continue;
-            } else if(column.equals(SparkImporterVariables.VAR_DURATION)) {
+            } else if(column.equals(SparkImporterVariables.VAR_DURATION) || column.endsWith("_rev")) {
                 aggregationMap.put(column, "max");
             } else if(column.equals(SparkImporterVariables.VAR_STATE)) {
                 aggregationMap.put(column, "ProcessState");
@@ -84,6 +84,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         //in case we add the CSV we have a name column in the first dataset of the join so we call drop again to make sure it is gone
         dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
         dataset = dataset.drop(SparkImporterVariables.VAR_ACT_INST_ID);
+        dataset = dataset.drop(SparkImporterVariables.VAR_DATA_SOURCE);
 
         SparkImporterLogger.getInstance().writeInfo("Found " + dataset.count() + " process instances.");
 

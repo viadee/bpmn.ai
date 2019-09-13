@@ -38,7 +38,8 @@ public class AddReducedColumnsToDatasetStep implements PreprocessingStepInterfac
                 SparkImporterVariables.VAR_TEXT2,
                 SparkImporterVariables.VAR_TIMESTAMP,
                 SparkImporterVariables.VAR_SEQUENCE_COUNTER,
-                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_INSTANCE_ID
+                SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_INSTANCE_ID,
+                SparkImporterVariables.VAR_DATA_SOURCE
         });
 
         if(!config.isDevProcessStateColumnWorkaroundEnabled()) {

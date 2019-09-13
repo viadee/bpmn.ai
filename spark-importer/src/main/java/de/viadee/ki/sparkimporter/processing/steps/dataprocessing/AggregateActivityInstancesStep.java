@@ -26,7 +26,7 @@ public class AggregateActivityInstancesStep implements PreprocessingStepInterfac
         for(String column : dataset.columns()) {
             if(column.equals(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)) {
                 continue;
-            } else if(column.equals(SparkImporterVariables.VAR_DURATION)) {
+            } else if(column.equals(SparkImporterVariables.VAR_DURATION) || column.endsWith("_rev")) {
                 aggregationMap.put(column, "max");
             } else if(column.equals(SparkImporterVariables.VAR_STATE)) {
                 aggregationMap.put(column, "ProcessState");
