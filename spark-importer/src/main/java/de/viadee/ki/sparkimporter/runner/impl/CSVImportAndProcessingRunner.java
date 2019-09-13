@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.functions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,6 +109,9 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
 
         InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
         dataset = initialCleanupStep.runPreprocessingStep(dataset, null, this.sparkRunnerConfig);
+
+        //for CSV inputs all rows are handled as variableUpdate rows
+        dataset = dataset.withColumn(SparkImporterVariables.VAR_DATA_SOURCE, functions.lit(SparkImporterVariables.EVENT_VARIABLE_UPDATE));
 
         return dataset;
     }

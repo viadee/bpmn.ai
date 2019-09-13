@@ -55,4 +55,8 @@ public final class SparkImporterVariables {
 
     public static final String PIPELINE_MODE_LEARN = "learn";
     public static final String PIPELINE_MODE_PREDICT = "predict";
+
+    public final static String EVENT_PROCESS_INSTANCE = "processInstance";
+    public final static String EVENT_VARIABLE_UPDATE = "variableUpdate";
+    public final static String EVENT_ACTIVITY_INSTANCE = "activityInstance";
 }

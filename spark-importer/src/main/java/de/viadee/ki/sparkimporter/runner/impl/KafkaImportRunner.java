@@ -38,15 +38,10 @@ public class KafkaImportRunner extends SparkRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaImportRunner.class);
 
-    public final static String TOPIC_PROCESS_INSTANCE = "processInstance";
-    public final static String TOPIC_VARIABLE_UPDATE = "variableUpdate";
-    public final static String TOPIC_ACTIVITY_INSTANCE = "activityInstance";
-
     private final Map<String, Object> kafkaConsumerConfigPI  = new HashMap<>();
     private final Map<String, Object> kafkaConsumerConfigVU  = new HashMap<>();
     private final Map<String, Object> kafkaConsumerConfigAI  = new HashMap<>();
 
-    private JavaRDD<String> masterRdd = null;
     private Dataset<Row> masterDataset = null;
 
     private List<String> receivedQueues = new ArrayList<>();
@@ -142,8 +137,6 @@ public class KafkaImportRunner extends SparkRunner {
 
         final long startMillis = System.currentTimeMillis();
 
-        masterRdd = sparkSession.emptyDataset(Encoders.STRING()).javaRDD();
-
         // if we are in batch mode we create the countdown latch so we can shutdown the streaming
         // context once the number of queues (EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) are empty.
         if(this.sparkRunnerConfig.isBatchMode()) {
@@ -180,26 +173,26 @@ public class KafkaImportRunner extends SparkRunner {
         JavaInputDStream<ConsumerRecord<String, String>> processInstances = KafkaUtils.createDirectStream(
                 jssc,
                 LocationStrategies.PreferConsistent(),
-                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{TOPIC_PROCESS_INSTANCE}), kafkaConsumerConfigPI));
+                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{SparkImporterVariables.EVENT_PROCESS_INSTANCE}), kafkaConsumerConfigPI));
 
         //go through pipe elements
         processInstances
                 .map(record -> record.value())
                 .foreachRDD((VoidFunction<JavaRDD<String>>) stringJavaRDD -> {
-                    processMasterRDD(stringJavaRDD, TOPIC_PROCESS_INSTANCE);
+                    processMasterRDD(stringJavaRDD, SparkImporterVariables.EVENT_PROCESS_INSTANCE);
                 });
 
         // Create direct kafka stream with brokers and topics
         JavaInputDStream<ConsumerRecord<String, String>> variableUpdates = KafkaUtils.createDirectStream(
                 jssc,
                 LocationStrategies.PreferConsistent(),
-                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{TOPIC_VARIABLE_UPDATE}), kafkaConsumerConfigVU));
+                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{SparkImporterVariables.EVENT_VARIABLE_UPDATE}), kafkaConsumerConfigVU));
 
         //go through pipe elements
         variableUpdates
                 .map(record -> record.value())
                 .foreachRDD((VoidFunction<JavaRDD<String>>) stringJavaRDD -> {
-                    processMasterRDD(stringJavaRDD, TOPIC_VARIABLE_UPDATE);
+                    processMasterRDD(stringJavaRDD, SparkImporterVariables.EVENT_VARIABLE_UPDATE);
                 });
 
 
@@ -217,13 +210,13 @@ public class KafkaImportRunner extends SparkRunner {
             JavaInputDStream<ConsumerRecord<String, String>> activityInstances = KafkaUtils.createDirectStream(
                     jssc,
                     LocationStrategies.PreferConsistent(),
-                    ConsumerStrategies.Subscribe(Arrays.asList(new String[]{TOPIC_ACTIVITY_INSTANCE}), kafkaConsumerConfigAI));
+                    ConsumerStrategies.Subscribe(Arrays.asList(new String[]{SparkImporterVariables.EVENT_ACTIVITY_INSTANCE}), kafkaConsumerConfigAI));
 
             //go through pipe elements
             activityInstances
                     .map(record -> record.value())
                     .foreachRDD((VoidFunction<JavaRDD<String>>) stringJavaRDD -> {
-                        processMasterRDD(stringJavaRDD, TOPIC_ACTIVITY_INSTANCE);
+                        processMasterRDD(stringJavaRDD, SparkImporterVariables.EVENT_ACTIVITY_INSTANCE);
                     });
         }
 

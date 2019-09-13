@@ -3,7 +3,6 @@ package de.viadee.ki.sparkimporter.processing.steps.dataprocessing;
 import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
-import de.viadee.ki.sparkimporter.runner.impl.KafkaImportRunner;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
 import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import de.viadee.ki.sparkimporter.util.logging.SparkImporterLogger;
@@ -41,7 +40,7 @@ public class AggregateActivityInstancesStep implements PreprocessingStepInterfac
         //first aggregation
         //activity level, take only processInstance and activityInstance rows
         dataset = dataset
-                .filter(dataset.col(SparkImporterVariables.VAR_DATA_SOURCE).notEqual(KafkaImportRunner.TOPIC_PROCESS_INSTANCE))
+                .filter(dataset.col(SparkImporterVariables.VAR_DATA_SOURCE).notEqual(SparkImporterVariables.EVENT_PROCESS_INSTANCE))
                 .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID, SparkImporterVariables.VAR_ACT_INST_ID)
                 .agg(aggregationMap);
 

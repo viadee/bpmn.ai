@@ -119,7 +119,7 @@ public class KafkaImportApplicationIntegrationTest {
 
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("D68E9C8A88236BC6AC366201F2881FB2", hash);
+        assertEquals("15254E402E5D700FB125E2BD670FE716", hash);
 
         //close Spark session
         sparkSession.close();
@@ -148,7 +148,7 @@ public class KafkaImportApplicationIntegrationTest {
 
         //check hash of dataset
         String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
-        assertEquals("ED7A9A4579D66A7081A51CA4F1727D97", hash);
+        assertEquals("9CEE92C16D7803E0ECF57666FDAC60D7", hash);
 
         //close Spark session
         sparkSession.close();
