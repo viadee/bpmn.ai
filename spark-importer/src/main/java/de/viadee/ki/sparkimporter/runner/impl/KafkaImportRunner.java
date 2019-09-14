@@ -42,10 +42,10 @@ public class KafkaImportRunner extends SparkRunner {
     private final Map<String, Object> kafkaConsumerConfigVU  = new HashMap<>();
     private final Map<String, Object> kafkaConsumerConfigAI  = new HashMap<>();
 
+    private final int kafkaPollingDuration = 5000;
+
     private Dataset<Row> masterDataset = null;
-
     private List<String> receivedQueues = new ArrayList<>();
-
     private List<String> emptyQueues = new ArrayList<>();
     private CountDownLatch countDownLatch;
 
@@ -143,7 +143,7 @@ public class KafkaImportRunner extends SparkRunner {
             countDownLatch = new CountDownLatch(1);
         }
 
-        int duration = 5000;
+        
 
         // list of host:port pairs used for establishing the initial connections to the Kafka cluster
         kafkaConsumerConfigPI.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, this.sparkRunnerConfig.getKafkaBroker());
@@ -167,7 +167,7 @@ public class KafkaImportRunner extends SparkRunner {
 
         // Create context with a x seconds batch interval
         JavaSparkContext jsc = new JavaSparkContext(sparkSession.sparkContext());
-        JavaStreamingContext jssc = new JavaStreamingContext(jsc, Duration.apply(duration));
+        JavaStreamingContext jssc = new JavaStreamingContext(jsc, Duration.apply(kafkaPollingDuration));
 
         // Create direct kafka stream with brokers and topics
         JavaInputDStream<ConsumerRecord<String, String>> processInstances = KafkaUtils.createDirectStream(
