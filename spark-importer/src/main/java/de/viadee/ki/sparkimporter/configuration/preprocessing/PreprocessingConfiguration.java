@@ -7,6 +7,9 @@ import java.util.List;
 
 public class PreprocessingConfiguration {
 
+    @SerializedName("data_level")
+    private String dataLevel = "";
+
     @SerializedName("variable_configuration")
     private List<VariableConfiguration> variableConfiguration = new ArrayList<>();
 
@@ -21,6 +24,14 @@ public class PreprocessingConfiguration {
 
     @SerializedName("pipeline_step_configuration")
     private PipelineStepConfiguration pipelineStepConfiguration = new PipelineStepConfiguration();
+
+    public String getDataLevel() {
+        return dataLevel;
+    }
+
+    public void setDataLevel(String dataLevel) {
+        this.dataLevel = dataLevel;
+    }
 
     public List<VariableConfiguration> getVariableConfiguration() {
         return variableConfiguration;

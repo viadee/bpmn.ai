@@ -103,4 +103,21 @@ public class ConfigurationUtils {
             SparkImporterLogger.getInstance().writeError("An error occurred while writing the configuration file: " + e.getMessage());
         }
     }
+
+    public void validateConfigurationFileVsSparkRunnerConfig(SparkRunnerConfig config) {
+        if(this.configuration.getPreprocessingConfiguration().getDataLevel().equals("")) {
+            SparkImporterLogger.getInstance().writeInfo("No data level set in configuration file. Setting it to run parameter (" + config.getDataLevel() + ")");
+            this.configuration.getPreprocessingConfiguration().setDataLevel(config.getDataLevel());
+            writeConfigurationToFile(config);
+            return;
+        }
+        if(!config.getDataLevel().equals(this.configuration.getPreprocessingConfiguration().getDataLevel())) {
+            String message = "The data level from the run parameters ("
+                    + config.getDataLevel() + ") does not match the one from the existing configuration file ("
+                    + this.configuration.getPreprocessingConfiguration().getDataLevel()
+                    + ")! Exiting...";
+            SparkImporterLogger.getInstance().writeError(message);
+            throw new RuntimeException(message);
+        }
+    }
 }

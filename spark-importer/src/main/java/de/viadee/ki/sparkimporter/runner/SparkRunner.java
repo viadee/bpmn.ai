@@ -98,12 +98,15 @@ public abstract class SparkRunner {
             ConfigurationUtils.getInstance().createEmptyConfig(this.sparkRunnerConfig);
         } else {
             SparkImporterLogger.getInstance().writeInfo("Configuration file found: " + this.sparkRunnerConfig.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName(this.sparkRunnerConfig));
+            ConfigurationUtils.getInstance().validateConfigurationFileVsSparkRunnerConfig(this.sparkRunnerConfig);
         }
     }
 
     private void writeConfig() {
         //write initial config file
         if(this.sparkRunnerConfig.isInitialConfigToBeWritten()) {
+            Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(this.sparkRunnerConfig);
+            configuration.getPreprocessingConfiguration().setDataLevel(this.sparkRunnerConfig.getDataLevel());
             ConfigurationUtils.getInstance().writeConfigurationToFile(this.sparkRunnerConfig);
         }
     }
