@@ -35,8 +35,8 @@ public class SparkRunnerConfig implements Serializable {
 
     private SparkRunner.RUNNING_MODE runningMode = null;
 
-    private boolean generateJsonPreview = false;
-    private int jsonPreviewLineCount = 1000;
+    private boolean generateResultPreview = false;
+    private int resultPreviewLineCount = 100;
 
     private boolean closeSparkSessionAfterRun = true;
 
@@ -106,10 +106,10 @@ public class SparkRunnerConfig implements Serializable {
         }
 
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.JSON_PREVIEW)) != null) {
-            setGenerateJsonPreview(true);
+            setGenerateResultPreview(true);
         }
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.JSON_PREVIEW_LINES)) != null) {
-            setJsonPreviewLineCount(Integer.parseInt(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.JSON_PREVIEW_LINES))));
+            setResultPreviewLineCount(Integer.parseInt(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.JSON_PREVIEW_LINES))));
         }
     }
 
@@ -285,20 +285,20 @@ public class SparkRunnerConfig implements Serializable {
         this.kafkaBroker = kafkaBroker;
     }
 
-    public boolean isGenerateJsonPreview() {
-        return generateJsonPreview;
+    public boolean isGenerateResultPreview() {
+        return generateResultPreview;
     }
 
-    public void setGenerateJsonPreview(boolean generateJsonPreview) {
-        this.generateJsonPreview = generateJsonPreview;
+    public void setGenerateResultPreview(boolean generateResultPreview) {
+        this.generateResultPreview = generateResultPreview;
     }
 
-    public int getJsonPreviewLineCount() {
-        return jsonPreviewLineCount;
+    public int getResultPreviewLineCount() {
+        return resultPreviewLineCount;
     }
 
-    public void setJsonPreviewLineCount(int jsonPreviewLineCount) {
-        this.jsonPreviewLineCount = jsonPreviewLineCount;
+    public void setResultPreviewLineCount(int resultPreviewLineCount) {
+        this.resultPreviewLineCount = resultPreviewLineCount;
     }
 
     public boolean isCloseSparkSessionAfterRun() {

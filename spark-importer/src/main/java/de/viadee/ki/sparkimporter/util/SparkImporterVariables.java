@@ -59,4 +59,6 @@ public final class SparkImporterVariables {
     public final static String EVENT_PROCESS_INSTANCE = "processInstance";
     public final static String EVENT_VARIABLE_UPDATE = "variableUpdate";
     public final static String EVENT_ACTIVITY_INSTANCE = "activityInstance";
+
+    public final static String RESULT_PREVIEW_TEMP_TABLE = "resultpreview";
 }

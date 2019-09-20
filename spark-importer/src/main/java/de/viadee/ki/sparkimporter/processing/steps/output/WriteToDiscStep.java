@@ -4,12 +4,12 @@ import de.viadee.ki.sparkimporter.annotation.PreprocessingStepDescription;
 import de.viadee.ki.sparkimporter.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.ki.sparkimporter.runner.config.SparkRunnerConfig;
 import de.viadee.ki.sparkimporter.util.SparkImporterUtils;
+import de.viadee.ki.sparkimporter.util.SparkImporterVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
 
 import java.util.Map;
-import java.util.UUID;
 
 @PreprocessingStepDescription(name = "Write to disc", description = "The resulting dataset is written into a file. It could e.g. also be written to a HDFS filesystem.")
 public class WriteToDiscStep implements PreprocessingStepInterface {
@@ -28,10 +28,8 @@ public class WriteToDiscStep implements PreprocessingStepInterface {
 
         SparkImporterUtils.getInstance().writeDatasetToParquet(dataset, "result", config);
 
-        //TODO cleanup
-        if(config.isGenerateJsonPreview()) {
-            dataset.write().mode(SaveMode.Overwrite).saveAsTable("result");
-            SparkImporterUtils.getInstance().writeDatasetToJson(dataset.limit(config.getJsonPreviewLineCount()), UUID.randomUUID().toString(), config);
+        if(config.isGenerateResultPreview()) {
+            dataset.limit(config.getResultPreviewLineCount()).write().mode(SaveMode.Overwrite).saveAsTable(SparkImporterVariables.RESULT_PREVIEW_TEMP_TABLE);
         }
 
         return dataset;
