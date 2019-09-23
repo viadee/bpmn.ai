@@ -3,6 +3,7 @@
     "filter_query": ""
   },
   "preprocessing": {
+    "data_level": "activity",
     "variable_configuration": [
       {
         "variable_name": "a",
@@ -84,62 +85,86 @@
         {
           "id": "DataFilterStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DataFilterStep",
-          "dependsOn": ""
+          "dependsOn": "",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "ColumnRemoveStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ColumnRemoveStep",
-          "dependsOn": "DataFilterStep"
+          "dependsOn": "DataFilterStep",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "ReduceColumnsStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsStep",
-          "dependsOn": "ColumnRemoveStep"
+          "dependsOn": "ColumnRemoveStep",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "DetermineProcessVariablesStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineProcessVariablesStep",
-          "dependsOn": "ReduceColumnsStep"
+          "dependsOn": "ReduceColumnsStep",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "AddVariableColumnsStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariableColumnsStep",
-          "dependsOn": "DetermineProcessVariablesStep"
+          "dependsOn": "DetermineProcessVariablesStep",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "AggregateActivityInstancesStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateActivityInstancesStep",
-          "dependsOn": "AddVariableColumnsStep"
+          "dependsOn": "AddVariableColumnsStep",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "CreateColumnsFromJsonStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep",
-          "dependsOn": "AggregateActivityInstancesStep"
+          "dependsOn": "AggregateActivityInstancesStep",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "FillActivityInstancesHistoryStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.FillActivityInstancesHistoryStep",
-          "dependsOn": "CreateColumnsFromJsonStep"
+          "dependsOn": "CreateColumnsFromJsonStep",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "AddReducedColumnsToDatasetStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddReducedColumnsToDatasetStep",
-          "dependsOn": "FillActivityInstancesHistoryStep"
+          "dependsOn": "FillActivityInstancesHistoryStep",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "ColumnHashStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ColumnHashStep",
-          "dependsOn": "AddReducedColumnsToDatasetStep"
+          "dependsOn": "AddReducedColumnsToDatasetStep",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "TypeCastStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.TypeCastStep",
-          "dependsOn": "ColumnHashStep"
+          "dependsOn": "ColumnHashStep",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "WriteToDiscStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep",
-          "dependsOn": "TypeCastStep"
+          "dependsOn": "TypeCastStep",
+          "parameters": {},
+          "active": true
         }
       ]
     }

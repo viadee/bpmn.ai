@@ -1,6 +1,7 @@
 {
   "data_extraction": {},
   "preprocessing": {
+    "data_level": "activity",
     "variable_configuration": [],
     "variable_name_mapping": [],
     "column_configuration": [],
@@ -10,17 +11,23 @@
         {
           "id": "ColumnsPreparationStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.importing.ColumnsPreparationStep",
-          "dependsOn": ""
+          "dependsOn": "",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "InitialCleanupStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep",
-          "dependsOn": "ColumnsPreparationStep"
+          "dependsOn": "ColumnsPreparationStep",
+          "parameters": {},
+          "active": true
         },
         {
           "id": "WriteToDataSinkStep",
           "className": "de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep",
-          "dependsOn": "InitialCleanupStep"
+          "dependsOn": "InitialCleanupStep",
+          "parameters": {},
+          "active": true
         }
       ]
     }
