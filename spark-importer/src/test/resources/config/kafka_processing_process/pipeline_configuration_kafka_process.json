@@ -84,77 +84,77 @@
       "steps": [
         {
           "id": "DataFilterStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DataFilterStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.dataprocessing.DataFilterStep",
           "dependsOn": "",
           "parameters": {},
           "active": true
         },
         {
           "id": "ColumnRemoveStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ColumnRemoveStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.dataprocessing.ColumnRemoveStep",
           "dependsOn": "DataFilterStep",
           "parameters": {},
           "active": true
         },
         {
           "id": "ReduceColumnsStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ReduceColumnsStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.dataprocessing.ReduceColumnsStep",
           "dependsOn": "ColumnRemoveStep",
           "parameters": {},
           "active": true
         },
         {
           "id": "DetermineProcessVariablesStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.DetermineProcessVariablesStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.dataprocessing.DetermineProcessVariablesStep",
           "dependsOn": "ReduceColumnsStep",
           "parameters": {},
           "active": true
         },
         {
           "id": "AddVariableColumnsStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddVariableColumnsStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.dataprocessing.AddVariableColumnsStep",
           "dependsOn": "DetermineProcessVariablesStep",
           "parameters": {},
           "active": true
         },
         {
           "id": "AggregateProcessInstancesStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AggregateProcessInstancesStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.dataprocessing.AggregateProcessInstancesStep",
           "dependsOn": "AddVariableColumnsStep",
           "parameters": {},
           "active": true
         },
         {
           "id": "CreateColumnsFromJsonStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.CreateColumnsFromJsonStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.dataprocessing.CreateColumnsFromJsonStep",
           "dependsOn": "AggregateProcessInstancesStep",
           "parameters": {},
           "active": true
         },
         {
           "id": "AddReducedColumnsToDatasetStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.AddReducedColumnsToDatasetStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.dataprocessing.AddReducedColumnsToDatasetStep",
           "dependsOn": "CreateColumnsFromJsonStep",
           "parameters": {},
           "active": true
         },
         {
           "id": "ColumnHashStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.ColumnHashStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.dataprocessing.ColumnHashStep",
           "dependsOn": "AddReducedColumnsToDatasetStep",
           "parameters": {},
           "active": true
         },
         {
           "id": "TypeCastStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.dataprocessing.TypeCastStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.dataprocessing.TypeCastStep",
           "dependsOn": "ColumnHashStep",
           "parameters": {},
           "active": true
         },
         {
           "id": "WriteToDiscStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.output.WriteToDiscStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.output.WriteToDiscStep",
           "dependsOn": "TypeCastStep",
           "parameters": {},
           "active": true

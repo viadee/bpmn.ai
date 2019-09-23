@@ -10,21 +10,21 @@
       "steps": [
         {
           "id": "ColumnsPreparationStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.importing.ColumnsPreparationStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.importing.ColumnsPreparationStep",
           "dependsOn": "",
           "parameters": {},
           "active": true
         },
         {
           "id": "InitialCleanupStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.importing.InitialCleanupStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.importing.InitialCleanupStep",
           "dependsOn": "ColumnsPreparationStep",
           "parameters": {},
           "active": true
         },
         {
           "id": "WriteToDataSinkStep",
-          "className": "de.viadee.ki.sparkimporter.processing.steps.output.WriteToDataSinkStep",
+          "className": "de.viadee.bpmnai.core.processing.steps.output.WriteToDataSinkStep",
           "dependsOn": "InitialCleanupStep",
           "parameters": {},
           "active": true

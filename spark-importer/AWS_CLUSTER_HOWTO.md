@@ -131,7 +131,7 @@ If you are only running one slave you might need to run a slave on the master as
 ## Submit Spark job
 As we now have the input data uploaded and the result folder created in HDFS and the Spark application jar is uploaded to all nodes we can submit the Spark job. This is done by running the spark-submit command. The command below is an example for running the CSV Importer and Processing Application. The pplication parameters are descibed in the [README](./README.MD).
 
-	spark-submit --class de.viadee.ki.sparkimporter.CSVImportAndProcessingApplication \
+	spark-submit --class de.viadee.bpmnai.core.CSVImportAndProcessingApplication \
 		--master spark://<ec2-cluster-master-hostname>:7077 \
 		--deploy-mode cluster /home/ec2-user/spark-importer-1.0-SNAPSHOT.jar \
 		-fs hdfs://<ec2-cluster-master-hostname>:9000/data/integration_test_file.csv \
