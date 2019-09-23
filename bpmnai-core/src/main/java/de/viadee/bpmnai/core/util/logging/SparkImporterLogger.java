@@ -48,7 +48,7 @@ public class SparkImporterLogger {
                 }
             });
 
-            appLogger = Logger.getLogger("de.viadee.ki.spark.importer");
+            appLogger = Logger.getLogger("de.viadee.bpmnai.core");
             appLogger.addHandler(logFileHandler);
         } catch (IOException e) {
             e.printStackTrace();

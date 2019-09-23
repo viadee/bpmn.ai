@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 .Rproj.user
 .Rhistory
 .RData
@@ -6,27 +5,24 @@
 
 **/.idea
 **/.DS_STORE
-spark-importer/integration-test-result-csv
-spark-importer/integration-test-result-kafka-import-activity
-spark-importer/integration-test-result-kafka-processing-activity
-spark-importer/integration-test-result-kafka-import-process
-spark-importer/integration-test-result-kafka-processing-process
+bpmnai-core/integration-test-result-csv
+bpmnai-core/integration-test-result-kafka-import-activity
+bpmnai-core/integration-test-result-kafka-processing-activity
+bpmnai-core/integration-test-result-kafka-import-process
+bpmnai-core/integration-test-result-kafka-processing-process
 **/vcs.xml
-spark-importer/out
-spark-importer/target
-spark-importer/bin/
-spark-importer/.settings/
+bpmnai-core/out
+bpmnai-core/target
+bpmnai-core/bin/
+bpmnai-core/.settings/
 .project
-spark-importer/.classpath
+bpmnai-core/.classpath
 marketing/Provi Analyse/metastore_db
 .RDataTmp
 .RDataTmp1
 Thumbs.db
 service-caller.iml
-<<<<<<< HEAD
-*.log
-=======
-=======
+
 # Compiled class file
 *.class
 
@@ -50,18 +46,16 @@ service-caller.iml
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
->>>>>>> 928de9da4bfea155dfa5a8da93f3b333b4797981
->>>>>>> fc9e5a4caa1c1bb86e16031e432e8a3732edcd44
-spark-importer/spark-importer.log.1
+bpmnai-core/spark-importer.log.1
 servicecaller/.gitignore
 servicecaller/.settings/org.eclipse.jdt.core.prefs
 servicecaller/.classpath
 servicecaller/.settings/org.eclipse.m2e.core.prefs
-spark-importer/pipeline_configuration.json
-spark-importer/spark-importer.log.3
-spark-importer/spark-importer.log.2
-spark-importer/spark-importer.log.1.lck
-spark-importer/spark-importer.log.2.lck
+bpmnai-corepipeline_configuration.json
+bpmnai-core/spark-importer.log.3
+bpmnai-core/spark-importer.log.2
+bpmnai-core/spark-importer.log.1.lck
+bpmnai-core/spark-importer.log.2.lck
 tutorials/spark importer/kafkatutorialproducer/.classpath
 tutorials/spark importer/kafkatutorialproducer/.settings/org.eclipse.jdt.core.prefs
 tutorials/spark importer/kafkatutorialproducer/.gitignore
