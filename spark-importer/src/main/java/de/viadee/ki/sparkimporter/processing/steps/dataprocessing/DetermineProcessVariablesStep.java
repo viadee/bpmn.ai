@@ -237,6 +237,8 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
         SparkSession sparkSession = SparkSession.builder().getOrCreate();
         Dataset<Row> helpDataSet = sparkSession.createDataFrame(filteredVariablesRows, schema).toDF().orderBy(VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
+        dataset.cache();
+        helpDataSet.cache();
         SparkImporterLogger.getInstance().writeInfo("Found " + helpDataSet.count() + " process variables.");
 
         if(config.isWriteStepResultsIntoFile()) {

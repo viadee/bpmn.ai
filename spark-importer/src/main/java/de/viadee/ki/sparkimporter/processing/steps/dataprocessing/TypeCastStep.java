@@ -102,6 +102,7 @@ public class TypeCastStep implements PreprocessingStepInterface {
                                         .otherwise(lit(""))
                         ).otherwise(lit(""))
                 );
+                dataset.cache();
 
                 // check for cast errors and write warning to application log
                 if(dataset.filter(column+"_castresult == 'CAST_ERROR?'").count() > 0) {

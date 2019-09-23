@@ -86,6 +86,7 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         dataset = dataset.drop(SparkImporterVariables.VAR_ACT_INST_ID);
         dataset = dataset.drop(SparkImporterVariables.VAR_DATA_SOURCE);
 
+        dataset.cache();
         SparkImporterLogger.getInstance().writeInfo("Found " + dataset.count() + " process instances.");
 
         if(config.isWriteStepResultsIntoFile()) {

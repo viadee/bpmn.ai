@@ -161,6 +161,7 @@ public class SparkImporterUtils {
         }
 
         //save dataset into CSV file
+        dataSet.cache();
         dataSet
                 .write()
                 .option("header", "true")

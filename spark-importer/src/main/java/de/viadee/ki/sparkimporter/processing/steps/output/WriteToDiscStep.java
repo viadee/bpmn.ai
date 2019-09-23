@@ -24,8 +24,7 @@ public class WriteToDiscStep implements PreprocessingStepInterface {
             }
         }
 
-        dataset = dataset.cache();
-
+        dataset.cache();
         SparkImporterUtils.getInstance().writeDatasetToParquet(dataset, "result", config);
 
         if(config.isGenerateResultPreview()) {

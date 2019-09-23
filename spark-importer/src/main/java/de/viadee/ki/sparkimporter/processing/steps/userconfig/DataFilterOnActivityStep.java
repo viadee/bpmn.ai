@@ -40,6 +40,7 @@ public class DataFilterOnActivityStep implements PreprocessingStepInterface {
         SparkImporterLogger.getInstance().writeInfo("Filtering data with activity instance filter query: " + query + ".");
 
         // save size of initial dataset for log
+        dataSet.cache();
         Long initialDSCount = dataSet.count();
 
         // repartition by process instance and order by start_time for this operation
@@ -82,6 +83,8 @@ public class DataFilterOnActivityStep implements PreprocessingStepInterface {
         activityDataSet = activityDataSet.withColumnRenamed(SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT", SparkImporterVariables.VAR_ACT_INST_ID);
         variables = variables.drop(SparkImporterVariables.VAR_ACT_INST_ID+"_RIGHT");
         dataSet = activityDataSet.union(variables);
+
+        dataSet.cache();
         SparkImporterLogger.getInstance().writeInfo("DataFilterOnActivityStep: The filtered DataSet contains "+dataSet.count()+" rows, (before: "+ initialDSCount+" rows)");
 
         if (config.isWriteStepResultsIntoFile()) {

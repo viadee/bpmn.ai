@@ -63,6 +63,7 @@ public class AggregateActivityInstancesStep implements PreprocessingStepInterfac
 
         dataset = dataset.sort(SparkImporterVariables.VAR_START_TIME);
 
+        dataset.cache();
         SparkImporterLogger.getInstance().writeInfo("Found " + dataset.count() + " activity instances.");
 
         if(config.isWriteStepResultsIntoFile()) {
