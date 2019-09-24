@@ -13,7 +13,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <spark-scala.version>2.11</spark-scala.version>
-        <spark.version>2.3.1</spark.version>
+        <spark.version>2.3.4</spark.version>
         <jcommander.version>1.72</jcommander.version>
         <univocity-parsers.version>2.7.5</univocity-parsers.version>
         <commons-io.version>2.6</commons-io.version>
@@ -44,7 +44,7 @@
         <url>GitHub</url>
     </scm>
 
-    <name>bpmn.ai</name>
+    <name>bpmn.ai-core</name>
     <description>Tooling to feed Camunda logs into a data mining pipeline.</description>
     <inceptionYear>2018</inceptionYear>
 
