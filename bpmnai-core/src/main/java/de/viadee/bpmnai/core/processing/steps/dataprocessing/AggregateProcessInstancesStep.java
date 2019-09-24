@@ -1,11 +1,11 @@
 package de.viadee.bpmnai.core.processing.steps.dataprocessing;
 
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.annotation.PreprocessingStepDescription;
 import de.viadee.bpmnai.core.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -27,26 +27,26 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         //apply first and processState aggregator
         Map<String, String> aggregationMap = new HashMap<>();
         for(String column : dataset.columns()) {
-            if(column.equals(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)) {
+            if(column.equals(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID)) {
                 continue;
-            } else if(column.equals(SparkImporterVariables.VAR_DURATION) || column.endsWith("_rev")) {
+            } else if(column.equals(BpmnaiVariables.VAR_DURATION) || column.endsWith("_rev")) {
                 aggregationMap.put(column, "max");
-            } else if(column.equals(SparkImporterVariables.VAR_STATE)) {
+            } else if(column.equals(BpmnaiVariables.VAR_STATE)) {
                 aggregationMap.put(column, "ProcessState");
             } else {
                 aggregationMap.put(column, "AllButEmptyString");
             }
         }
 
-        Column filter = not(isnull(dataset.col(SparkImporterVariables.VAR_STATE)));
-        if(config.isDevProcessStateColumnWorkaroundEnabled() && config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
-            filter = isnull(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME));
+        Column filter = not(isnull(dataset.col(BpmnaiVariables.VAR_STATE)));
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && config.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_PROCESS)) {
+            filter = isnull(dataset.col(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME));
         }
 
         //first aggregation
         Dataset<Row> datasetPIAgg = dataset
                 .filter(filter)
-                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
+                .groupBy(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID)
                 .agg(aggregationMap);
 
         //rename back columns after aggregation
@@ -61,14 +61,14 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
             }
         }
 
-        filter = isnull(dataset.col(SparkImporterVariables.VAR_STATE));
-        if(config.isDevProcessStateColumnWorkaroundEnabled() && config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
-            filter = not(isnull(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)));
+        filter = isnull(dataset.col(BpmnaiVariables.VAR_STATE));
+        if(config.isDevProcessStateColumnWorkaroundEnabled() && config.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_PROCESS)) {
+            filter = not(isnull(dataset.col(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)));
         }
 
         dataset = dataset
                 .filter(filter)
-                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)
+                .groupBy(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID)
                 .agg(aggregationMap)
                 .union(datasetPIAgg);
 
@@ -82,15 +82,15 @@ public class AggregateProcessInstancesStep implements PreprocessingStepInterface
         }
 
         //in case we add the CSV we have a name column in the first dataset of the join so we call drop again to make sure it is gone
-        dataset = dataset.drop(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
-        dataset = dataset.drop(SparkImporterVariables.VAR_ACT_INST_ID);
-        dataset = dataset.drop(SparkImporterVariables.VAR_DATA_SOURCE);
+        dataset = dataset.drop(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+        dataset = dataset.drop(BpmnaiVariables.VAR_ACT_INST_ID);
+        dataset = dataset.drop(BpmnaiVariables.VAR_DATA_SOURCE);
 
         dataset.cache();
-        SparkImporterLogger.getInstance().writeInfo("Found " + dataset.count() + " process instances.");
+        BpmnaiLogger.getInstance().writeInfo("Found " + dataset.count() + " process instances.");
 
         if(config.isWriteStepResultsIntoFile()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_process_instances", config);
+            BpmnaiUtils.getInstance().writeDatasetToCSV(dataset, "agg_of_process_instances", config);
         }
 
         //return preprocessed data

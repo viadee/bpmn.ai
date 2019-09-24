@@ -4,7 +4,7 @@ import com.beust.jcommander.Parameter;
 import de.viadee.bpmnai.core.exceptions.FaultyConfigurationException;
 import de.viadee.bpmnai.core.runner.SparkRunner;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 
 /**
  * Configures command line parameters of the import application.
@@ -79,7 +79,7 @@ public class CSVImportAndProcessingArguments extends AbstractArguments {
 	protected void validateConfig(SparkRunnerConfig config) {
 		super.validateConfig(config);
 
-		if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+		if(config.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_ACTIVITY)) {
 			try {
 				throw new FaultyConfigurationException("Date level activity is not supported for CSVImportAndProcessingApplication.");
 			} catch (FaultyConfigurationException e) {

@@ -16,9 +16,9 @@ import de.viadee.bpmnai.core.processing.steps.dataprocessing.AddVariableColumnsS
 import de.viadee.bpmnai.core.processing.steps.dataprocessing.DetermineProcessVariablesStep;
 import de.viadee.bpmnai.core.processing.steps.dataprocessing.ReduceColumnsStep;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 import de.viadee.bpmnai.core.util.helper.SparkBroadcastHelper;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.spark.scheduler.*;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -97,7 +97,7 @@ public abstract class SparkRunner {
             this.sparkRunnerConfig.setInitialConfigToBeWritten(true);
             ConfigurationUtils.getInstance().createEmptyConfig(this.sparkRunnerConfig);
         } else {
-            SparkImporterLogger.getInstance().writeInfo("Configuration file found: " + this.sparkRunnerConfig.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName(this.sparkRunnerConfig));
+            BpmnaiLogger.getInstance().writeInfo("Configuration file found: " + this.sparkRunnerConfig.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName(this.sparkRunnerConfig));
             ConfigurationUtils.getInstance().validateConfigurationFileVsSparkRunnerConfig(this.sparkRunnerConfig);
         }
     }
@@ -219,7 +219,7 @@ public abstract class SparkRunner {
         
         // filter dataset if only a specific processDefinitionId should be preprocessed (-pf)
         if(this.sparkRunnerConfig.getProcessFilterDefinitionId() != null) {
-        	dataset = dataset.filter(dataset.col(SparkImporterVariables.VAR_PROCESS_DEF_ID).equalTo(this.sparkRunnerConfig.getProcessFilterDefinitionId()));
+        	dataset = dataset.filter(dataset.col(BpmnaiVariables.VAR_PROCESS_DEF_ID).equalTo(this.sparkRunnerConfig.getProcessFilterDefinitionId()));
         }
         
         //go through pipe elements
@@ -239,7 +239,7 @@ public abstract class SparkRunner {
 
         String logMessage = "Job ran for " + ((endMillis - startMillis) / 1000) + " seconds in total";
         LOG.info(logMessage);
-        SparkImporterLogger.getInstance().writeInfo(logMessage);
+        BpmnaiLogger.getInstance().writeInfo(logMessage);
 
         /**
          * if the created configuration file is a minimal one, overwrite the steps with the default pipeline
@@ -247,10 +247,10 @@ public abstract class SparkRunner {
         if (this.sparkRunnerConfig.isMinimalPipelineToBeBuild()){
             logMessage = "Filling the minimal configuration pipeline with the applications default pipeline...";
             LOG.info(logMessage);
-            SparkImporterLogger.getInstance().writeInfo(logMessage);
+            BpmnaiLogger.getInstance().writeInfo(logMessage);
             logMessage = "Execute again to process data with under the newly created configuration.";
             LOG.info(logMessage);
-            SparkImporterLogger.getInstance().writeInfo(logMessage);
+            BpmnaiLogger.getInstance().writeInfo(logMessage);
             overwritePipelineSteps();
         }
 

@@ -1,6 +1,6 @@
 package de.viadee.bpmnai.core.processing.aggregation;
 
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.expressions.MutableAggregationBuffer;
 import org.apache.spark.sql.expressions.UserDefinedAggregateFunction;
@@ -49,7 +49,7 @@ public class ProcessStatesAggregationFunction extends UserDefinedAggregateFuncti
     // immutable.
     @Override
     public void initialize(MutableAggregationBuffer buffer) {
-        buffer.update(0, SparkImporterVariables.PROCESS_STATE_ACTIVE);
+        buffer.update(0, BpmnaiVariables.PROCESS_STATE_ACTIVE);
     }
 
     // Updates the given aggregation buffer `buffer` with new input data from `input`
@@ -57,12 +57,12 @@ public class ProcessStatesAggregationFunction extends UserDefinedAggregateFuncti
     public void update(MutableAggregationBuffer buffer, Row input) {
         //TODO: only implemented for ACTIVE and COMPLETED state so far
         if (!input.isNullAt(0)) {
-            String currentValue = (buffer.size() == 0 || buffer.getString(0) == null ? SparkImporterVariables.PROCESS_STATE_ACTIVE : buffer.getString(0));
+            String currentValue = (buffer.size() == 0 || buffer.getString(0) == null ? BpmnaiVariables.PROCESS_STATE_ACTIVE : buffer.getString(0));
 
             String value = currentValue;
-            if(!currentValue.equals(SparkImporterVariables.PROCESS_STATE_COMPLETED)){
-                if(input.getString(0).equals(SparkImporterVariables.PROCESS_STATE_COMPLETED)) {
-                    buffer.update(0, SparkImporterVariables.PROCESS_STATE_COMPLETED);
+            if(!currentValue.equals(BpmnaiVariables.PROCESS_STATE_COMPLETED)){
+                if(input.getString(0).equals(BpmnaiVariables.PROCESS_STATE_COMPLETED)) {
+                    buffer.update(0, BpmnaiVariables.PROCESS_STATE_COMPLETED);
                 }
             }
         }
@@ -72,16 +72,16 @@ public class ProcessStatesAggregationFunction extends UserDefinedAggregateFuncti
     @Override
     public void merge(MutableAggregationBuffer buffer1, Row buffer2) {
         //TODO: only implemented for ACTIVE and COMPLETED state so far
-        String value = SparkImporterVariables.PROCESS_STATE_ACTIVE;
+        String value = BpmnaiVariables.PROCESS_STATE_ACTIVE;
         if (!buffer1.isNullAt(0) && !buffer2.isNullAt(0)) {
             String b1 = buffer1.getString(0);
             String b2 = buffer2.getString(0);
 
-            if(b1.equals(SparkImporterVariables.PROCESS_STATE_COMPLETED)){
+            if(b1.equals(BpmnaiVariables.PROCESS_STATE_COMPLETED)){
                 value = b1;
             } else {
-                if(b2.equals(SparkImporterVariables.PROCESS_STATE_COMPLETED)) {
-                    value = SparkImporterVariables.PROCESS_STATE_COMPLETED;
+                if(b2.equals(BpmnaiVariables.PROCESS_STATE_COMPLETED)) {
+                    value = BpmnaiVariables.PROCESS_STATE_COMPLETED;
                 }
             }
         } else if(!buffer1.isNullAt(0)){

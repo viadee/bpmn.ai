@@ -6,7 +6,7 @@ import de.viadee.bpmnai.core.processing.steps.dataprocessing.CreateColumnsFromJs
 import de.viadee.bpmnai.core.processing.steps.dataprocessing.TypeCastStep;
 import de.viadee.bpmnai.core.processing.steps.importing.ColumnsPreparationStep;
 import de.viadee.bpmnai.core.runner.SparkPredictionServiceRunner;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +19,7 @@ public class KafkaProcessingPredictionServiceRunner extends SparkPredictionServi
 
     @Override
     public void initialize() {
-        this.sparkRunnerConfig.setPipelineMode(SparkImporterVariables.PIPELINE_MODE_PREDICT);
+        this.sparkRunnerConfig.setPipelineMode(BpmnaiVariables.PIPELINE_MODE_PREDICT);
     }
 
     @Override

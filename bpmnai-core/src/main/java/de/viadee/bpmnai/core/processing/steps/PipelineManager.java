@@ -1,7 +1,7 @@
 package de.viadee.bpmnai.core.processing.steps;
 
 import de.viadee.bpmnai.core.exceptions.FaultyConfigurationException;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -16,7 +16,7 @@ public class PipelineManager {
     public PipelineManager(List<PipelineStep> pipelineSteps) throws FaultyConfigurationException {
         this.pipelineSteps = pipelineSteps;
         buildPipeline();
-        SparkImporterLogger.getInstance().writeInfo("Resulting pipeline from configuration: " + orderedPipeline.toString());
+        BpmnaiLogger.getInstance().writeInfo("Resulting pipeline from configuration: " + orderedPipeline.toString());
     }
 
     public LinkedList<PipelineStep> getOrderedPipeline() {
@@ -32,7 +32,7 @@ public class PipelineManager {
         for(PipelineStep ps : pipelineSteps) {
             if(!ps.hasPredecessor()) {
                 if(orderedPipeline.size() > 0) {
-                    SparkImporterLogger.getInstance().writeError("More that one starting processing step found!");
+                    BpmnaiLogger.getInstance().writeError("More that one starting processing step found!");
                 } else {
                     orderedPipeline.add(ps);
                 }
@@ -41,14 +41,14 @@ public class PipelineManager {
         }
         if(orderedPipeline.size() == 0) {
             String message = "No starting processing step found!";
-            SparkImporterLogger.getInstance().writeError(message);
+            BpmnaiLogger.getInstance().writeError(message);
             throw new FaultyConfigurationException(message);
         }
 
         // check for unique IDs - continued
         if(pipelineSteps.size() != pipelineStepsIdCheck.size()) {
             String message = "Duplicate step IDs found in step configuration!";
-            SparkImporterLogger.getInstance().writeError(message);
+            BpmnaiLogger.getInstance().writeError(message);
             throw new FaultyConfigurationException(message);
         }
 
@@ -78,7 +78,7 @@ public class PipelineManager {
 
             if(!elementFound) {
                 String errorMessage = "Could not add all steps to pipeline. Please check the step configuration! Pipeline before exception: " + orderedPipeline.toString();
-                SparkImporterLogger.getInstance().writeError(errorMessage);
+                BpmnaiLogger.getInstance().writeError(errorMessage);
                 throw new FaultyConfigurationException(errorMessage);
             }
         }

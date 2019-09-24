@@ -1,7 +1,7 @@
 package de.viadee.bpmnai.core.processing.steps.dataprocessing;
 
 import de.viadee.bpmnai.core.configuration.util.ConfigurationUtils;
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.annotation.PreprocessingStepDescription;
 import de.viadee.bpmnai.core.configuration.Configuration;
 import de.viadee.bpmnai.core.configuration.preprocessing.ColumnConfiguration;
@@ -9,9 +9,9 @@ import de.viadee.bpmnai.core.configuration.preprocessing.PreprocessingConfigurat
 import de.viadee.bpmnai.core.configuration.preprocessing.VariableConfiguration;
 import de.viadee.bpmnai.core.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 import de.viadee.bpmnai.core.util.helper.SparkBroadcastHelper;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.DataType;
@@ -77,7 +77,7 @@ public class TypeCastStep implements PreprocessingStepInterface {
                 // was initially a variable
                 configurationDataType = variableTypeConfigMap.get(column).getVariableType();
                 configurationParseFormat = variableTypeConfigMap.get(column).getParseFormat();
-                if (config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
+                if (config.getPipelineMode().equals(BpmnaiVariables.PIPELINE_MODE_LEARN)) {
                     isVariableColumn = varMap.keySet().contains(column);
                 } else {
                     isVariableColumn = true;
@@ -106,7 +106,7 @@ public class TypeCastStep implements PreprocessingStepInterface {
 
                 // check for cast errors and write warning to application log
                 if(dataset.filter(column+"_castresult == 'CAST_ERROR?'").count() > 0) {
-                    SparkImporterLogger.getInstance().writeWarn("Column '" + column + "' seems to have cast errors. Please check the data type (is defined as '" + configurationDataType + "')");
+                    BpmnaiLogger.getInstance().writeWarn("Column '" + column + "' seems to have cast errors. Please check the data type (is defined as '" + configurationDataType + "')");
                 } else {
                     // drop help columns as there are no cast errors for this column and rename casted column to actual column name
                     dataset = dataset.drop(column, column+"_castresult").withColumnRenamed(column+"_casted", column);
@@ -117,13 +117,13 @@ public class TypeCastStep implements PreprocessingStepInterface {
             }
 
             // cast revision columns for former variables, revisions columns only exist on process level
-            if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) && config.isRevCountEnabled() && isVariableColumn) {
+            if(config.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_PROCESS) && config.isRevCountEnabled() && isVariableColumn) {
                 dataset = dataset.withColumn(column+"_rev", dataset.col(column+"_rev").cast("integer"));
             }
         }
 
         if(config.isWriteStepResultsIntoFile()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "type_cast_columns", config);
+            BpmnaiUtils.getInstance().writeDatasetToCSV(dataset, "type_cast_columns", config);
         }
 
         //return preprocessed data

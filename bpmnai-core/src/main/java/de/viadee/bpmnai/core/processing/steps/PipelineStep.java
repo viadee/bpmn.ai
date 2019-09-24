@@ -2,7 +2,7 @@ package de.viadee.bpmnai.core.processing.steps;
 
 import de.viadee.bpmnai.core.configuration.preprocessing.Step;
 import de.viadee.bpmnai.core.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 
 import java.util.Map;
 import java.util.Objects;
@@ -21,15 +21,15 @@ public class PipelineStep {
             step =
                     (Class<PreprocessingStepInterface>) Class.forName(cs.getClassName());
         } catch (ClassNotFoundException e) {
-            SparkImporterLogger.getInstance().writeError("Could not find the class '" + cs.getClassName() + "' for custom step '" + cs.getId() + "' " + e.getMessage());
+            BpmnaiLogger.getInstance().writeError("Could not find the class '" + cs.getClassName() + "' for custom step '" + cs.getId() + "' " + e.getMessage());
         }
         if(step != null) {
             try {
                 preprocessingStep = step.newInstance();
             } catch (InstantiationException e) {
-                SparkImporterLogger.getInstance().writeError("Could not find instantiate class '" + cs.getClassName() + "' for custom step '" + cs.getId() + "' " + e.getMessage());
+                BpmnaiLogger.getInstance().writeError("Could not find instantiate class '" + cs.getClassName() + "' for custom step '" + cs.getId() + "' " + e.getMessage());
             } catch (IllegalAccessException e) {
-                SparkImporterLogger.getInstance().writeError("Could not find instantiate class '" + cs.getClassName() + "' for custom step '" + cs.getId() + "'. " + e.getMessage());
+                BpmnaiLogger.getInstance().writeError("Could not find instantiate class '" + cs.getClassName() + "' for custom step '" + cs.getId() + "'. " + e.getMessage());
             }
         }
 

@@ -4,9 +4,9 @@ import de.viadee.bpmnai.core.configuration.Configuration;
 import de.viadee.bpmnai.core.configuration.preprocessing.VariableConfiguration;
 import de.viadee.bpmnai.core.configuration.util.ConfigurationUtils;
 import de.viadee.bpmnai.core.processing.interfaces.PreprocessingStepInterface;
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -20,7 +20,7 @@ public class ColumnsPreparationStep implements PreprocessingStepInterface {
 
 
         List<String> predictionVariables = new ArrayList<>();
-        if(config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT)) {
+        if(config.getPipelineMode().equals(BpmnaiVariables.PIPELINE_MODE_PREDICT)) {
             Configuration configuration = ConfigurationUtils.getInstance().getConfiguration(config);
             List<VariableConfiguration> variableConfigurations = configuration.getPreprocessingConfiguration().getVariableConfiguration();
             for(VariableConfiguration vc : variableConfigurations) {
@@ -30,7 +30,7 @@ public class ColumnsPreparationStep implements PreprocessingStepInterface {
 
         //rename columns
         for(String columnName : dataset.columns()) {
-            if(config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)
+            if(config.getPipelineMode().equals(BpmnaiVariables.PIPELINE_MODE_LEARN)
                     || !predictionVariables.contains(columnName)) {
                 dataset = dataset.withColumnRenamed(columnName, columnName.replaceAll("([A-Z])","_$1").concat("_").toLowerCase());
             }
@@ -59,7 +59,7 @@ public class ColumnsPreparationStep implements PreprocessingStepInterface {
 
         // write imported CSV structure to file for debugging
         if (config.isWriteStepResultsIntoFile()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result", config);
+            BpmnaiUtils.getInstance().writeDatasetToCSV(dataset, "import_result", config);
         }
         
         return dataset;

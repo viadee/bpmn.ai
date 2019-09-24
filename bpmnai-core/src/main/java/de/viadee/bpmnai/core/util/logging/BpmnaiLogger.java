@@ -8,7 +8,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-public class SparkImporterLogger {
+public class BpmnaiLogger {
 
     private static Logger appLogger;
     private static FileHandler logFileHandler = null;
@@ -17,9 +17,9 @@ public class SparkImporterLogger {
 
     private String logDirectory = ".";
 
-    private static SparkImporterLogger instance;
+    private static BpmnaiLogger instance;
 
-    private SparkImporterLogger(){
+    private BpmnaiLogger(){
         setupLogger();
     }
 
@@ -56,9 +56,9 @@ public class SparkImporterLogger {
 
     }
 
-    public static synchronized SparkImporterLogger getInstance(){
+    public static synchronized BpmnaiLogger getInstance(){
         if(instance == null){
-            instance = new SparkImporterLogger();
+            instance = new BpmnaiLogger();
         }
         return instance;
     }

@@ -4,7 +4,7 @@ import de.viadee.bpmnai.core.annotation.PreprocessingStepDescription;
 import de.viadee.bpmnai.core.annotation.PreprocessingStepParameter;
 import de.viadee.bpmnai.core.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -17,17 +17,17 @@ public class DataFilterStep implements PreprocessingStepInterface {
     public Dataset<Row> runPreprocessingStep(Dataset<Row> dataset, Map<String, Object> parameters, SparkRunnerConfig config) {
 
     	if (parameters == null || parameters.size() == 0) {
-            SparkImporterLogger.getInstance().writeWarn("No parameters found for the DataFilterStep");
+            BpmnaiLogger.getInstance().writeWarn("No parameters found for the DataFilterStep");
             return dataset;
         }
     	
     	String query = (String) parameters.get("query");               
-        SparkImporterLogger.getInstance().writeInfo("Filtering data with filter query: " + query + ".");
+        BpmnaiLogger.getInstance().writeInfo("Filtering data with filter query: " + query + ".");
         dataset = dataset.filter(query);
 
         dataset.cache();
         if(dataset.count() == 0) {
-            SparkImporterLogger.getInstance().writeInfo("Filtering resulted in zero lines of data. Aborting. Please check your filter query.");
+            BpmnaiLogger.getInstance().writeInfo("Filtering resulted in zero lines of data. Aborting. Please check your filter query.");
             System.exit(1);
         }
                

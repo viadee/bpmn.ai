@@ -9,7 +9,7 @@ import de.viadee.bpmnai.core.configuration.modelprediction.ModelPredictionConfig
 import de.viadee.bpmnai.core.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.bpmnai.core.runner.SparkRunner;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 
 import java.io.*;
 
@@ -59,7 +59,7 @@ public class ConfigurationUtils {
                 try (Reader reader = new FileReader(getConfigurationFilePath(config))) {
                     configuration = gson.fromJson(reader, Configuration.class);
                 } catch (IOException e) {
-                    SparkImporterLogger.getInstance().writeError("An error occurred while reading the configuration file: " + e.getMessage());
+                    BpmnaiLogger.getInstance().writeError("An error occurred while reading the configuration file: " + e.getMessage());
                 }
             }
         }
@@ -73,7 +73,7 @@ public class ConfigurationUtils {
         if (!config.getRunningMode().equals(SparkRunner.RUNNING_MODE.KAFKA_IMPORT)) {
             pipelineType = "minimal";
         }
-        SparkImporterLogger.getInstance().writeInfo("No config file found. Creating " + pipelineType + " config file for dataset at " + config.getWorkingDirectory() + "/" + getConfigurationFileName(config));
+        BpmnaiLogger.getInstance().writeInfo("No config file found. Creating " + pipelineType + " config file for dataset at " + config.getWorkingDirectory() + "/" + getConfigurationFileName(config));
 
         PreprocessingConfiguration preprocessingConfiguration = new PreprocessingConfiguration();
 
@@ -92,7 +92,7 @@ public class ConfigurationUtils {
         try (Writer writer = new FileWriter(config.getWorkingDirectory()+"/"+getConfigurationFileName(config))) {
             gson.toJson(configuration, writer);
         } catch (IOException e) {
-            SparkImporterLogger.getInstance().writeError("An error occurred while writing the configuration file: " + e.getMessage());
+            BpmnaiLogger.getInstance().writeError("An error occurred while writing the configuration file: " + e.getMessage());
         };
     }
 
@@ -100,13 +100,13 @@ public class ConfigurationUtils {
         try (Writer writer = new FileWriter(config.getWorkingDirectory()+"/"+getConfigurationFileName(config))) {
             gson.toJson(configuration, writer);
         } catch (IOException e) {
-            SparkImporterLogger.getInstance().writeError("An error occurred while writing the configuration file: " + e.getMessage());
+            BpmnaiLogger.getInstance().writeError("An error occurred while writing the configuration file: " + e.getMessage());
         }
     }
 
     public void validateConfigurationFileVsSparkRunnerConfig(SparkRunnerConfig config) {
         if(this.configuration.getPreprocessingConfiguration().getDataLevel().equals("")) {
-            SparkImporterLogger.getInstance().writeInfo("No data level set in configuration file. Setting it to run parameter (" + config.getDataLevel() + ")");
+            BpmnaiLogger.getInstance().writeInfo("No data level set in configuration file. Setting it to run parameter (" + config.getDataLevel() + ")");
             this.configuration.getPreprocessingConfiguration().setDataLevel(config.getDataLevel());
             writeConfigurationToFile(config);
             return;
@@ -116,7 +116,7 @@ public class ConfigurationUtils {
                     + config.getDataLevel() + ") does not match the one from the existing configuration file ("
                     + this.configuration.getPreprocessingConfiguration().getDataLevel()
                     + ")! Exiting...";
-            SparkImporterLogger.getInstance().writeError(message);
+            BpmnaiLogger.getInstance().writeError(message);
             throw new RuntimeException(message);
         }
     }

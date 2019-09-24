@@ -1,8 +1,8 @@
 package de.viadee.bpmnai.core.runner.config;
 
 import de.viadee.bpmnai.core.runner.SparkRunner;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.spark.sql.SaveMode;
 
 import java.io.Serializable;
@@ -21,8 +21,8 @@ public class SparkRunnerConfig implements Serializable {
     private boolean devProcessStateColumnWorkaroundEnabled = false;
     private boolean revCountEnabled = false;
     private SaveMode saveMode = SaveMode.Append;
-    private String dataLevel = SparkImporterVariables.DATA_LEVEL_PROCESS;
-    private String outputFormat = SparkImporterVariables.OUTPUT_FORMAT_PARQUET;
+    private String dataLevel = BpmnaiVariables.DATA_LEVEL_PROCESS;
+    private String outputFormat = BpmnaiVariables.OUTPUT_FORMAT_PARQUET;
     private String delimiter = "|";
     private String outputDelimiter = "|";
     private String processDefinitionFilter = "";
@@ -31,7 +31,7 @@ public class SparkRunnerConfig implements Serializable {
 
     private String processFilterDefinitionId = null;
 
-    private String pipelineMode = SparkImporterVariables.PIPELINE_MODE_LEARN;
+    private String pipelineMode = BpmnaiVariables.PIPELINE_MODE_LEARN;
 
     private SparkRunner.RUNNING_MODE runningMode = null;
 
@@ -69,7 +69,7 @@ public class SparkRunnerConfig implements Serializable {
         }
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.LOG_DIRECTORY)) != null) {
             setLogDirectory(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.LOG_DIRECTORY)));
-            SparkImporterLogger.getInstance().setLogDirectory(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.LOG_DIRECTORY)));
+            BpmnaiLogger.getInstance().setLogDirectory(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.LOG_DIRECTORY)));
         }
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.FILE_SOURCE)) != null) {
             setSourceFolder(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.FILE_SOURCE)));
@@ -78,7 +78,7 @@ public class SparkRunnerConfig implements Serializable {
             setTargetFolder(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.FILE_DESTINATION)));
         }
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.SAVE_MODE)) != null) {
-            setSaveMode(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.SAVE_MODE)) == SparkImporterVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
+            setSaveMode(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.SAVE_MODE)) == BpmnaiVariables.SAVE_MODE_APPEND ? SaveMode.Append : SaveMode.Overwrite);
         }
         if(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.DATA_LEVEL)) != null) {
             setDataLevel(System.getenv(String.valueOf(ENVIRONMENT_VARIABLES.DATA_LEVEL)));

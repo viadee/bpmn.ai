@@ -1,14 +1,14 @@
 package de.viadee.bpmnai.core.processing.steps.dataprocessing;
 
 import de.viadee.bpmnai.core.configuration.util.ConfigurationUtils;
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.annotation.PreprocessingStepDescription;
 import de.viadee.bpmnai.core.configuration.Configuration;
 import de.viadee.bpmnai.core.configuration.preprocessing.ColumnConfiguration;
 import de.viadee.bpmnai.core.processing.PreprocessingRunner;
 import de.viadee.bpmnai.core.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.*;
 import scala.collection.Seq;
@@ -32,22 +32,22 @@ public class ReduceColumnsStep implements PreprocessingStepInterface {
 
         //these columns have to stay in in order to do the processing
         List<String> columnsToKeep = new ArrayList<>();
-        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
-        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
-        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE);
-        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION);
-        columnsToKeep.add(SparkImporterVariables.VAR_STATE);
-        columnsToKeep.add(SparkImporterVariables.VAR_LONG);
-        columnsToKeep.add(SparkImporterVariables.VAR_DOUBLE);
-        columnsToKeep.add(SparkImporterVariables.VAR_TEXT);
-        columnsToKeep.add(SparkImporterVariables.VAR_TEXT2);
-        columnsToKeep.add(SparkImporterVariables.VAR_DATA_SOURCE);
+        columnsToKeep.add(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID);
+        columnsToKeep.add(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+        columnsToKeep.add(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE);
+        columnsToKeep.add(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION);
+        columnsToKeep.add(BpmnaiVariables.VAR_STATE);
+        columnsToKeep.add(BpmnaiVariables.VAR_LONG);
+        columnsToKeep.add(BpmnaiVariables.VAR_DOUBLE);
+        columnsToKeep.add(BpmnaiVariables.VAR_TEXT);
+        columnsToKeep.add(BpmnaiVariables.VAR_TEXT2);
+        columnsToKeep.add(BpmnaiVariables.VAR_DATA_SOURCE);
 
-        if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
-            columnsToKeep.add(SparkImporterVariables.VAR_ACT_INST_ID);
-            columnsToKeep.add(SparkImporterVariables.VAR_START_TIME);
-            columnsToKeep.add(SparkImporterVariables.VAR_END_TIME);
-            columnsToKeep.add(SparkImporterVariables.VAR_DURATION);
+        if(config.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_ACTIVITY)) {
+            columnsToKeep.add(BpmnaiVariables.VAR_ACT_INST_ID);
+            columnsToKeep.add(BpmnaiVariables.VAR_START_TIME);
+            columnsToKeep.add(BpmnaiVariables.VAR_END_TIME);
+            columnsToKeep.add(BpmnaiVariables.VAR_DURATION);
         }
 
         //if there is no configuration file yet, write columns into the empty one
@@ -85,36 +85,36 @@ public class ReduceColumnsStep implements PreprocessingStepInterface {
 
         // select only relevant columns to continue
         List<Column> columns = new ArrayList<>();
-        columns.add(new Column(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID));
-        columns.add(new Column(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME));
-        columns.add(new Column(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE));
-        columns.add(new Column(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION));
-        columns.add(new Column(SparkImporterVariables.VAR_STATE));
-        columns.add(new Column(SparkImporterVariables.VAR_LONG));
-        columns.add(new Column(SparkImporterVariables.VAR_DOUBLE));
-        columns.add(new Column(SparkImporterVariables.VAR_TEXT));
-        columns.add(new Column(SparkImporterVariables.VAR_TEXT2));
-        columns.add(new Column(SparkImporterVariables.VAR_DATA_SOURCE));
+        columns.add(new Column(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID));
+        columns.add(new Column(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME));
+        columns.add(new Column(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE));
+        columns.add(new Column(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION));
+        columns.add(new Column(BpmnaiVariables.VAR_STATE));
+        columns.add(new Column(BpmnaiVariables.VAR_LONG));
+        columns.add(new Column(BpmnaiVariables.VAR_DOUBLE));
+        columns.add(new Column(BpmnaiVariables.VAR_TEXT));
+        columns.add(new Column(BpmnaiVariables.VAR_TEXT2));
+        columns.add(new Column(BpmnaiVariables.VAR_DATA_SOURCE));
 
-        if(config.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
-            columns.add(new Column(SparkImporterVariables.VAR_ACT_INST_ID));
-            columns.add(new Column(SparkImporterVariables.VAR_START_TIME));
-            columns.add(new Column(SparkImporterVariables.VAR_END_TIME));
-            columns.add(new Column(SparkImporterVariables.VAR_DURATION));
+        if(config.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_ACTIVITY)) {
+            columns.add(new Column(BpmnaiVariables.VAR_ACT_INST_ID));
+            columns.add(new Column(BpmnaiVariables.VAR_START_TIME));
+            columns.add(new Column(BpmnaiVariables.VAR_END_TIME));
+            columns.add(new Column(BpmnaiVariables.VAR_DURATION));
         }
 
-        if(Arrays.asList(dataset.columns()).contains(SparkImporterVariables.VAR_TIMESTAMP)) {
-            columns.add(new Column(SparkImporterVariables.VAR_TIMESTAMP));
+        if(Arrays.asList(dataset.columns()).contains(BpmnaiVariables.VAR_TIMESTAMP)) {
+            columns.add(new Column(BpmnaiVariables.VAR_TIMESTAMP));
         }
 
-        Seq<Column> selectionColumns = SparkImporterUtils.getInstance().asSeq(columns);
+        Seq<Column> selectionColumns = BpmnaiUtils.getInstance().asSeq(columns);
 
         dataset = dataset
                 .select(selectionColumns)
-                .filter(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID + " <> 'null'");
+                .filter(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID + " <> 'null'");
 
         if(config.isWriteStepResultsIntoFile()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "reduced_columns", config);
+            BpmnaiUtils.getInstance().writeDatasetToCSV(dataset, "reduced_columns", config);
         }
 
         //return preprocessed data

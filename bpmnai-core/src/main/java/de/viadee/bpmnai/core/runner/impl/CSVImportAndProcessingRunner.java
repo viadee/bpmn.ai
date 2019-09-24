@@ -4,15 +4,15 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import de.viadee.bpmnai.core.processing.steps.dataprocessing.*;
 import de.viadee.bpmnai.core.processing.steps.importing.InitialCleanupStep;
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.exceptions.FaultyConfigurationException;
 import de.viadee.bpmnai.core.processing.steps.PipelineStep;
 import de.viadee.bpmnai.core.processing.steps.output.WriteToDiscStep;
 import de.viadee.bpmnai.core.runner.SparkRunner;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 import de.viadee.bpmnai.core.util.arguments.CSVImportAndProcessingArguments;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -53,7 +53,7 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
         //parse arguments to create SparkRunnerConfig
         csvImportAndProcessingArguments.createOrUpdateSparkRunnerConfig(this.sparkRunnerConfig);
 
-        if(this.sparkRunnerConfig.isDevProcessStateColumnWorkaroundEnabled() && sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(this.sparkRunnerConfig.isDevProcessStateColumnWorkaroundEnabled() && sparkRunnerConfig.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_ACTIVITY)) {
             try {
                 throw new FaultyConfigurationException("Process state workaround option cannot be used with activity data level.");
             } catch (FaultyConfigurationException e) {
@@ -67,8 +67,8 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
             FileUtils.deleteQuietly(new File(this.sparkRunnerConfig.getTargetFolder()));
         }
 
-        SparkImporterLogger.getInstance().writeInfo("Starting CSV import and processing");
-        SparkImporterLogger.getInstance().writeInfo("Importing CSV file: " + this.sparkRunnerConfig.getSourceFolder());
+        BpmnaiLogger.getInstance().writeInfo("Starting CSV import and processing");
+        BpmnaiLogger.getInstance().writeInfo("Importing CSV file: " + this.sparkRunnerConfig.getSourceFolder());
     }
 
     @Override
@@ -104,14 +104,14 @@ public class CSVImportAndProcessingRunner extends SparkRunner {
 
         // write imported CSV structure to file for debugging
         if (this.sparkRunnerConfig.isWriteStepResultsIntoFile()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "import_result", this.sparkRunnerConfig);
+            BpmnaiUtils.getInstance().writeDatasetToCSV(dataset, "import_result", this.sparkRunnerConfig);
         }
 
         InitialCleanupStep initialCleanupStep = new InitialCleanupStep();
         dataset = initialCleanupStep.runPreprocessingStep(dataset, null, this.sparkRunnerConfig);
 
         //for CSV inputs all rows are handled as variableUpdate rows
-        dataset = dataset.withColumn(SparkImporterVariables.VAR_DATA_SOURCE, functions.lit(SparkImporterVariables.EVENT_VARIABLE_UPDATE));
+        dataset = dataset.withColumn(BpmnaiVariables.VAR_DATA_SOURCE, functions.lit(BpmnaiVariables.EVENT_VARIABLE_UPDATE));
 
         return dataset;
     }

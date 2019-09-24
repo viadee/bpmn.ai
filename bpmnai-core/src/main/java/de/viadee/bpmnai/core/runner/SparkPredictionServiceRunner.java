@@ -1,6 +1,6 @@
 package de.viadee.bpmnai.core.runner;
 
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.configuration.Configuration;
 import de.viadee.bpmnai.core.configuration.modelprediction.ModelPredictionConfiguration;
 import de.viadee.bpmnai.core.configuration.preprocessing.PipelineStepConfiguration;
@@ -13,7 +13,7 @@ import de.viadee.bpmnai.core.processing.aggregation.ProcessStatesAggregationFunc
 import de.viadee.bpmnai.core.processing.steps.PipelineManager;
 import de.viadee.bpmnai.core.processing.steps.PipelineStep;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -47,7 +47,7 @@ public abstract class SparkPredictionServiceRunner {
             this.sparkRunnerConfig.setInitialConfigToBeWritten(true);
             ConfigurationUtils.getInstance().createEmptyConfig(this.sparkRunnerConfig);
         } else {
-            SparkImporterLogger.getInstance().writeInfo("Configuration file found: " + this.sparkRunnerConfig.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName(this.sparkRunnerConfig));
+            BpmnaiLogger.getInstance().writeInfo("Configuration file found: " + this.sparkRunnerConfig.getWorkingDirectory() + "/" + ConfigurationUtils.getInstance().getConfigurationFileName(this.sparkRunnerConfig));
         }
     }
 
@@ -102,7 +102,7 @@ public abstract class SparkPredictionServiceRunner {
         for(String var : predictionVars) {
             usedColumns.add(new Column(var));
         }
-        dataset = dataset.select(SparkImporterUtils.getInstance().asSeq(usedColumns));
+        dataset = dataset.select(BpmnaiUtils.getInstance().asSeq(usedColumns));
 
         //go through pipe elements
         // Define processing steps to run

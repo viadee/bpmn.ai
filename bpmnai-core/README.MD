@@ -12,7 +12,7 @@ Each of those applications serves a different purpose.
 
 ## Data pipeline
 The picture below shows the pipeline through which the data flows from Camunda to the Machine Learning engine. Each of the three application serves a specific purpose and use cases around importing into, data aggregation and transformation inside and exporting data from Apache Spark. 
-![alt text](./doc/SparkImporterApplicationFlow.png "CSVImportAndProcessingApplication Pipeline")
+![alt text](doc/BpmnaiApplicationFlow.png "CSVImportAndProcessingApplication Pipeline")
 
 
 ## CSV Import and Processing

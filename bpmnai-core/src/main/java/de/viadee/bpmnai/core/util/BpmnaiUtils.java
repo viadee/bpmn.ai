@@ -1,7 +1,7 @@
 package de.viadee.bpmnai.core.util;
 
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -24,15 +24,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class SparkImporterUtils {
+public class BpmnaiUtils {
 
-    private static SparkImporterUtils instance;
+    private static BpmnaiUtils instance;
 
-    private SparkImporterUtils(){}
+    private BpmnaiUtils(){}
 
-    public static synchronized SparkImporterUtils getInstance(){
+    public static synchronized BpmnaiUtils getInstance(){
         if(instance == null){
-            instance = new SparkImporterUtils();
+            instance = new BpmnaiUtils();
         }
         return instance;
     }
@@ -76,12 +76,12 @@ public class SparkImporterUtils {
 
         //save dataset into parquet file
         dataSet
-        		.repartition(dataSet.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID))
+        		.repartition(dataSet.col(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID))
                 .write()
                 .mode(config.getSaveMode())
                 .save(targetFolder + "/parquet");
 
-        if(config.getOutputFormat().equals(SparkImporterVariables.OUTPUT_FORMAT_CSV) && subDirectory.equals("result")) {
+        if(config.getOutputFormat().equals(BpmnaiVariables.OUTPUT_FORMAT_CSV) && subDirectory.equals("result")) {
             SparkSession sparkSession = SparkSession.builder().getOrCreate();
             Dataset<Row> parquetData = sparkSession.read().load(targetFolder + "/parquet");
             parquetData
@@ -117,7 +117,7 @@ public class SparkImporterUtils {
                     FileUtil.copy(fileSystem, new Path(targetFolder + "/result.csv"), fileSystem, new Path(targetFolder + "/csv/result.csv"), true, conf);
 
                 } catch (IOException e) {
-                    SparkImporterLogger.getInstance().writeError("An error occurred during the renaming of the result file in HDFS. Exception: " + e.getMessage());
+                    BpmnaiLogger.getInstance().writeError("An error occurred during the renaming of the result file in HDFS. Exception: " + e.getMessage());
                 }
             } else {
                 File dir = new File(targetFolder + "/csv");
@@ -129,7 +129,7 @@ public class SparkImporterUtils {
                         try {
                             Files.move(file.toPath(), targetFile.toPath());
                         } catch (IOException e) {
-                            SparkImporterLogger.getInstance().writeError("An error occurred during the renaming of the result file. Exception: " + e.getMessage());
+                            BpmnaiLogger.getInstance().writeError("An error occurred during the renaming of the result file. Exception: " + e.getMessage());
                         }
                     }
                 }
@@ -139,7 +139,7 @@ public class SparkImporterUtils {
                     FileUtils.cleanDirectory(dir);
                     Files.move(targetFile.toPath(), new File(dir + "/result.csv").toPath());
                 } catch (IOException e) {
-                    SparkImporterLogger.getInstance().writeError("An error occurred during the renaming of the result file. Exception: " + e.getMessage());
+                    BpmnaiLogger.getInstance().writeError("An error occurred during the renaming of the result file. Exception: " + e.getMessage());
                 }
             }
         }
@@ -218,8 +218,8 @@ public class SparkImporterUtils {
      * @return the cleaned dataset
      */
     public Dataset<Row> removeEmptyLinesAfterImport(Dataset<Row> dataset) {
-        return dataset.filter(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID + " <> 'null'")
-                .filter(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID + " <> ''");
+        return dataset.filter(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID + " <> 'null'")
+                .filter(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID + " <> ''");
     }
 
     /**
@@ -250,7 +250,7 @@ public class SparkImporterUtils {
         }
 
         return ds1
-                .select(SparkImporterUtils.getInstance().asSeq(allUniqueColumns.stream().map(Column::new).collect(Collectors.toList())))
-                .union(ds2.select(SparkImporterUtils.getInstance().asSeq(allUniqueColumns.stream().map(Column::new).collect(Collectors.toList()))));
+                .select(BpmnaiUtils.getInstance().asSeq(allUniqueColumns.stream().map(Column::new).collect(Collectors.toList())))
+                .union(ds2.select(BpmnaiUtils.getInstance().asSeq(allUniqueColumns.stream().map(Column::new).collect(Collectors.toList()))));
     }
 }
