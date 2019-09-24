@@ -85,10 +85,10 @@ public class Application {
 }
 ```
 
-The application can now be started. Therefore the following program arguments and VM arguments should be specified via the run configuration. These correspond to the parameters from the Spark Importer. Details can be found [here](./README.MD).
+The application can now be started. Therefore the following program arguments and VM arguments should be specified via the run configuration. These correspond to the parameters from bpmn.ai-core. Details can be found [here](./README.MD).
 
 
-The first time you run the application, a configuration file called *"pipeline_configuration.json"* is created which is located in the selected workspace folder. This json file can be used to determine which preprocessing steps from the Spark Importer will be executed and in which order. In addition, the previously created project-specific steps can be integrated in the preprocessing. The corresponding parameters can also be defined.
+The first time you run the application, a configuration file called *"pipeline_configuration.json"* is created which is located in the selected workspace folder. This json file can be used to determine which preprocessing steps from the bpmn.ai-core will be executed and in which order. In addition, the previously created project-specific steps can be integrated in the preprocessing. The corresponding parameters can also be defined.
 
 In the following, a project-specific step is shown as an example. The variable "dependsOn" determines the predecessor of the step and the parameter "parameters" requires to pass the function specific parameters.
 

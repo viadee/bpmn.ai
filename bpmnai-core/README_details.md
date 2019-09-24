@@ -1,6 +1,6 @@
 # viadee Spark BPMN process data importer details
 
-This document describes the steps that are implemented in the Spark Importer application to get more in-depth understanding of the application.
+This document describes the steps that are implemented in the bpmn.ai-core application to get more in-depth understanding of the application.
 
 ## Data processing steps
 When data runs through the processing, there are multiple steps involved. They differ in user configuration and generic processing steps and if the process or activity level is targeted for the processing. 

@@ -358,4 +358,4 @@ Then you can run the spark-submit command from the bin folder of your Apache Spa
 	bin/spark-submit --class de.viadee.ki.sparkimporter.SparkImporterCSVApplication --master "local[*]" --deploy-mode client --name ViadeeSparkImporter <path_to_packaged_jar> -fs <path_to_input_csv> -fd <path_to_target_folder_for_results> -d <field_delimiter>
 
 ## More details
-For more details and in-depth infomation on the Spark importer application please see [this document](./README_details.md).
+For more details and in-depth infomation on the bpmn.ai-core application please see [this document](./README_details.md).

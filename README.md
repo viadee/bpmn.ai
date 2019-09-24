@@ -33,9 +33,9 @@ We are currently collecting feedback and prioritising ideas for further developm
 
 # Components
 
-## Spark-Importer
+## bpmn.ai-core
 
-The Spark Importer contains three Apache Spark applications that are used to translate data from the Camunda engine to a data mining table that consists of one row per process instance with additional columns for each process variable. This data mining table is then used to train a machine learning algorithm to predict certain future events of the process.
+The bpmn.ai-core contains three Apache Spark applications that are used to translate data from the Camunda engine to a data mining table that consists of one row per process instance with additional columns for each process variable. This data mining table is then used to train a machine learning algorithm to predict certain future events of the process.
 The following applications are available:
 
 * CSVImportAndProcessingApplication
