@@ -4,9 +4,9 @@
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![Status](https://travis-ci.org/viadee/bpmn.ai.svg?branch=master)](https://travis-ci.org/viadee/bpmn.ai/branches "See test builds")
-[![Sonarcloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.viadee:spark-importer&metric=coverage)](https://sonarcloud.io/dashboard?id=de.viadee:spark-importer)
+[![Sonarcloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.viadee:bpmnai-core&metric=coverage)](https://sonarcloud.io/dashboard?id=de.viadee:bpmnai-core)
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/viadee/bpmn.ai.svg)
-[![Maven Central](https://img.shields.io/maven-central/v/de.viadee/spark-importer.svg)](https://search.maven.org/search?q=g:de.viadee%20a:spark-importer)
+[![Maven Central](https://img.shields.io/maven-central/v/de.viadee/bpmnai-core.svg)](https://search.maven.org/search?q=g:de.viadee%20a:bpmnai-core)
 
 *Read this in other languages: [German](README.de.md).*
 
