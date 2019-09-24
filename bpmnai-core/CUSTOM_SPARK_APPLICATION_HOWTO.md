@@ -14,7 +14,7 @@ whereas the Artifact ID can be chosen arbitrarily.
 
 ## Set project dependencies
 
-Next the file pom.xml must be adapted. Therefore, one has to create the dependency to the spark-importer and include the viadee-snapshot repository.
+Next the file pom.xml must be adapted. Therefore, one has to create the dependency to the bpmnai-core and include the viadee-snapshot repository.
 
     <repositories>
             <repository>
@@ -37,9 +37,9 @@ Next the file pom.xml must be adapted. Therefore, one has to create the dependen
 ```
 <dependencies>
     <dependency>
-        <groupId>de.viadee.ki</groupId>
-        <artifactId>spark-importer</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <groupId>de.viadee</groupId>
+        <artifactId>bpmnai.core</artifactId>
+        <version>1.2.0-SNAPSHOT</version>
     </dependency>
 </dependencies>
 ```

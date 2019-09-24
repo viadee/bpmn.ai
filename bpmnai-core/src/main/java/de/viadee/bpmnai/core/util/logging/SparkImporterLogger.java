@@ -13,7 +13,7 @@ public class SparkImporterLogger {
     private static Logger appLogger;
     private static FileHandler logFileHandler = null;
 
-    private static final String LOG_FILE_NAME = "spark-importer.log";
+    private static final String LOG_FILE_NAME = "bpmnai-core.log";
 
     private String logDirectory = ".";
 

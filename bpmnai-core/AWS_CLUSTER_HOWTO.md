@@ -92,7 +92,7 @@ To login to the master of the cluster via ssh you can simply run
 ### Upload the Spark application jar
 In order for the application to run on the Spark cluster, you need to disibute the applcation jar to all nodes. Thios can easiky be done by using the following command
 
-	flintrock copy-file <cluster-name> <path_to_spark-importer.jar> /home/ec2-user/
+	flintrock copy-file <cluster-name> <path_to_bpmnai-core.jar> /home/ec2-user/
 
 This copies the files into the home directoy of the ec2-user account with which Flintrock logs you in.
 		
@@ -133,7 +133,7 @@ As we now have the input data uploaded and the result folder created in HDFS and
 
 	spark-submit --class de.viadee.bpmnai.core.CSVImportAndProcessingApplication \
 		--master spark://<ec2-cluster-master-hostname>:7077 \
-		--deploy-mode cluster /home/ec2-user/spark-importer-1.0-SNAPSHOT.jar \
+		--deploy-mode cluster /home/ec2-user/bpmnai-core-1.2.0-SNAPSHOT.jar \
 		-fs hdfs://<ec2-cluster-master-hostname>:9000/data/integration_test_file.csv \
 		-fd hdfs://<ec2-cluster-master-hostname>:9000/result -d "|"
 		
