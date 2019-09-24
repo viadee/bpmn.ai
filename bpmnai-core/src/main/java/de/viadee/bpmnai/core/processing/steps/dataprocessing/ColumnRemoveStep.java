@@ -1,6 +1,6 @@
 package de.viadee.bpmnai.core.processing.steps.dataprocessing;
 
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.annotation.PreprocessingStepDescription;
 import de.viadee.bpmnai.core.configuration.Configuration;
 import de.viadee.bpmnai.core.configuration.preprocessing.ColumnConfiguration;
@@ -8,8 +8,8 @@ import de.viadee.bpmnai.core.configuration.preprocessing.PreprocessingConfigurat
 import de.viadee.bpmnai.core.configuration.util.ConfigurationUtils;
 import de.viadee.bpmnai.core.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -26,16 +26,16 @@ public class ColumnRemoveStep implements PreprocessingStepInterface {
 
         //these columns have to stay in in order to do the processing
         List<String> columnsToKeep = new ArrayList<>();
-        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
-        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
-        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE);
-        columnsToKeep.add(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION);
-        columnsToKeep.add(SparkImporterVariables.VAR_STATE);
-        columnsToKeep.add(SparkImporterVariables.VAR_LONG);
-        columnsToKeep.add(SparkImporterVariables.VAR_DOUBLE);
-        columnsToKeep.add(SparkImporterVariables.VAR_TEXT);
-        columnsToKeep.add(SparkImporterVariables.VAR_TEXT2);
-        columnsToKeep.add(SparkImporterVariables.VAR_DATA_SOURCE);
+        columnsToKeep.add(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID);
+        columnsToKeep.add(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+        columnsToKeep.add(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE);
+        columnsToKeep.add(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION);
+        columnsToKeep.add(BpmnaiVariables.VAR_STATE);
+        columnsToKeep.add(BpmnaiVariables.VAR_LONG);
+        columnsToKeep.add(BpmnaiVariables.VAR_DOUBLE);
+        columnsToKeep.add(BpmnaiVariables.VAR_TEXT);
+        columnsToKeep.add(BpmnaiVariables.VAR_TEXT2);
+        columnsToKeep.add(BpmnaiVariables.VAR_DATA_SOURCE);
 
         List<String> columnsToRemove = new ArrayList<>();
 
@@ -46,10 +46,10 @@ public class ColumnRemoveStep implements PreprocessingStepInterface {
                 for(ColumnConfiguration cc : preprocessingConfiguration.getColumnConfiguration()) {
                     if(!cc.isUseColumn()) {
                         if(columnsToKeep.contains(cc.getColumnName())) {
-                            SparkImporterLogger.getInstance().writeWarn("The column '" + cc.getColumnName() + "' has to stay in in order to do the processing. It will not be removed. Comment: " + cc.getComment());
+                            BpmnaiLogger.getInstance().writeWarn("The column '" + cc.getColumnName() + "' has to stay in in order to do the processing. It will not be removed. Comment: " + cc.getComment());
                         } else {
                             columnsToRemove.add(cc.getColumnName());
-                            SparkImporterLogger.getInstance().writeInfo("The column '" + cc.getColumnName() + "' will be removed. Comment: " + cc.getComment());
+                            BpmnaiLogger.getInstance().writeInfo("The column '" + cc.getColumnName() + "' will be removed. Comment: " + cc.getComment());
                         }
                     }
                 }
@@ -66,12 +66,12 @@ public class ColumnRemoveStep implements PreprocessingStepInterface {
                     public void accept(String s) {
                         if(!existingColumns.contains(s)) {
                             // log the fact that a variable that should be filtered does not exist
-                            SparkImporterLogger.getInstance().writeWarn("The column '" + s + "' is configured to be filtered, but does not exist in the data.");
+                            BpmnaiLogger.getInstance().writeWarn("The column '" + s + "' is configured to be filtered, but does not exist in the data.");
                         }
                     }
                 });
 
-        dataSet = dataSet.drop(SparkImporterUtils.getInstance().asSeq(columnsToRemove));
+        dataSet = dataSet.drop(BpmnaiUtils.getInstance().asSeq(columnsToRemove));
 
         return dataSet;
     }

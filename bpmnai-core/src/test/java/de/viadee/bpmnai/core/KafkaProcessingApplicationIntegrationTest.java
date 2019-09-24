@@ -1,6 +1,6 @@
 package de.viadee.bpmnai.core;
 
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
@@ -110,7 +110,7 @@ public class KafkaProcessingApplicationIntegrationTest {
         assertEquals(43, importedDataset.columns().length);
 
         //check hash of dataset
-        String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
+        String hash = BpmnaiUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
         System.out.println(hash);
         assertEquals("A8BBFC3B17C00C40C9883DA1F396D453", hash);
 

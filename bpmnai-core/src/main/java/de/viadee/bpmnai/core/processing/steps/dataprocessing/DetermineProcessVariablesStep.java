@@ -1,6 +1,6 @@
 package de.viadee.bpmnai.core.processing.steps.dataprocessing;
 
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.annotation.PreprocessingStepDescription;
 import de.viadee.bpmnai.core.configuration.Configuration;
 import de.viadee.bpmnai.core.configuration.preprocessing.PreprocessingConfiguration;
@@ -9,9 +9,9 @@ import de.viadee.bpmnai.core.configuration.preprocessing.VariableNameMapping;
 import de.viadee.bpmnai.core.configuration.util.ConfigurationUtils;
 import de.viadee.bpmnai.core.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 import de.viadee.bpmnai.core.util.helper.SparkBroadcastHelper;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -26,8 +26,8 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static de.viadee.bpmnai.core.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME;
-import static de.viadee.bpmnai.core.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE;
+import static de.viadee.bpmnai.core.util.BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME;
+import static de.viadee.bpmnai.core.util.BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE;
 import static org.apache.spark.sql.functions.*;
 
 @PreprocessingStepDescription(name = "Determine process variables", description = "Determines all process variables.")
@@ -62,7 +62,7 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
                 for(VariableConfiguration vc : preprocessingConfiguration.getVariableConfiguration()) {
                     if(!vc.isUseVariable()) {
                         variablesToFilter.add(vc.getVariableName());
-                        SparkImporterLogger.getInstance().writeInfo("The variable '" + vc.getVariableName() + "' will be filtered out. Comment: " + vc.getComment());
+                        BpmnaiLogger.getInstance().writeInfo("The variable '" + vc.getVariableName() + "' will be filtered out. Comment: " + vc.getComment());
                     }
                 }
             }
@@ -70,7 +70,7 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
         }
 
         //check if all variables that should be filtered actually exist, otherwise log a warning
-        List<Row> existingVariablesRows = dataset.select(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).distinct().collectAsList();
+        List<Row> existingVariablesRows = dataset.select(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).distinct().collectAsList();
         List<String> existingVariables = existingVariablesRows
                 .stream()
                 .map(r -> r.getString(0)).collect(Collectors.toList());
@@ -82,14 +82,14 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
                     public void accept(String s) {
                         if(!existingVariables.contains(s)) {
                             // log the fact that a variable that should be filtered does not exist
-                            SparkImporterLogger.getInstance().writeWarn("The variable '" + s + "' is configured to be filtered, but does not exist in the data.");
+                            BpmnaiLogger.getInstance().writeWarn("The variable '" + s + "' is configured to be filtered, but does not exist in the data.");
                         }
                     }
                 });
 
         dataset = dataset.filter((FilterFunction<Row>) row -> {
             // keep the row if the variable name column does not contain a value that should be filtered
-            String variable = row.getAs(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
+            String variable = row.getAs(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
             //TODO: cleanup
             boolean keep = !variablesToFilter.contains(variable);
@@ -101,7 +101,7 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
         });
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "variable_filter", config);
+            BpmnaiUtils.getInstance().writeDatasetToCSV(dataset, "variable_filter", config);
         }
 
         return dataset;
@@ -119,7 +119,7 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
                     if(!vm.getOldName().equals("") && !vm.getNewName().equals("")) {
                         variableNameMappings.put(vm.getOldName(), vm.getNewName());
                     } else {
-                        SparkImporterLogger.getInstance().writeWarn("Ignoring variable name mapping '" + vm.getOldName() + "' -> '" + vm.getNewName() + "'.");
+                        BpmnaiLogger.getInstance().writeWarn("Ignoring variable name mapping '" + vm.getOldName() + "' -> '" + vm.getNewName() + "'.");
                     }
                 }
             }
@@ -129,15 +129,15 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
         for(String oldName : variableNameMappings.keySet()) {
             String newName = variableNameMappings.get(oldName);
 
-            SparkImporterLogger.getInstance().writeInfo("Renaming variable '" + oldName + "' to '" + newName + "' as per user configuration.");
+            BpmnaiLogger.getInstance().writeInfo("Renaming variable '" + oldName + "' to '" + newName + "' as per user configuration.");
 
-            dataset = dataset.withColumn(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
-                    when(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).equalTo(oldName), lit(newName))
-                            .otherwise(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)));
+            dataset = dataset.withColumn(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME,
+                    when(dataset.col(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME).equalTo(oldName), lit(newName))
+                            .otherwise(dataset.col(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME)));
         }
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "variable_name_mapping", config);
+            BpmnaiUtils.getInstance().writeDatasetToCSV(dataset, "variable_name_mapping", config);
         }
 
         return dataset;
@@ -145,10 +145,10 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
 
     private Dataset<Row> doVariableTypeDetermination(Dataset<Row> dataset, boolean writeStepResultIntoFile, SparkRunnerConfig config) {
         //Determine the process instances with their variable names and types
-        Dataset<Row> variablesTypesDataset = dataset.select(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION)
-                .groupBy(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME, SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE)
-                .agg(max(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION).alias(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION))
-                .filter(SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME+" <> 'null'"); // don't consider null variables'
+        Dataset<Row> variablesTypesDataset = dataset.select(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME, BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE, BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION)
+                .groupBy(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME, BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE)
+                .agg(max(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION).alias(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_REVISION))
+                .filter(BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME+" <> 'null'"); // don't consider null variables'
 
         //create broadcast variable for variables list
         Map<String, String> variablesAndTypes = new HashMap<>();
@@ -167,7 +167,7 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
 
 
         if(writeStepResultIntoFile) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(variablesTypesDataset, "variables_types_help", config);
+            BpmnaiUtils.getInstance().writeDatasetToCSV(variablesTypesDataset, "variables_types_help", config);
         }
 
         return dataset;
@@ -239,10 +239,10 @@ public class DetermineProcessVariablesStep implements PreprocessingStepInterface
 
         dataset.cache();
         helpDataSet.cache();
-        SparkImporterLogger.getInstance().writeInfo("Found " + helpDataSet.count() + " process variables.");
+        BpmnaiLogger.getInstance().writeInfo("Found " + helpDataSet.count() + " process variables.");
 
         if(config.isWriteStepResultsIntoFile()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_escalated", config);
+            BpmnaiUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_escalated", config);
         }
 
         return dataset;

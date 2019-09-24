@@ -1,10 +1,10 @@
 package de.viadee.bpmnai.core.processing.steps.output;
 
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.annotation.PreprocessingStepDescription;
 import de.viadee.bpmnai.core.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
@@ -25,10 +25,10 @@ public class WriteToDiscStep implements PreprocessingStepInterface {
         }
 
         dataset.cache();
-        SparkImporterUtils.getInstance().writeDatasetToParquet(dataset, "result", config);
+        BpmnaiUtils.getInstance().writeDatasetToParquet(dataset, "result", config);
 
         if(config.isGenerateResultPreview()) {
-            dataset.limit(config.getResultPreviewLineCount()).write().mode(SaveMode.Overwrite).saveAsTable(SparkImporterVariables.RESULT_PREVIEW_TEMP_TABLE);
+            dataset.limit(config.getResultPreviewLineCount()).write().mode(SaveMode.Overwrite).saveAsTable(BpmnaiVariables.RESULT_PREVIEW_TEMP_TABLE);
         }
 
         return dataset;

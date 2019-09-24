@@ -7,11 +7,11 @@ import de.viadee.bpmnai.core.processing.steps.importing.ColumnsPreparationStep;
 import de.viadee.bpmnai.core.processing.steps.importing.InitialCleanupStep;
 import de.viadee.bpmnai.core.processing.steps.output.WriteToDataSinkStep;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.util.arguments.KafkaImportArguments;
 import de.viadee.bpmnai.core.runner.SparkRunner;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.commons.io.FileUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -76,26 +76,26 @@ public class KafkaImportRunner extends SparkRunner {
         //parse arguments to create SparkRunnerConfig
         kafkaImportArguments.createOrUpdateSparkRunnerConfig(this.sparkRunnerConfig);
 
-        EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (this.sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? 2 : 3);
+        EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE = (this.sparkRunnerConfig.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_PROCESS) ? 2 : 3);
 
         // Delete destination files, required to avoid exception during runtime
         if(this.sparkRunnerConfig.getSaveMode().equals(SaveMode.Overwrite)) {
         	FileUtils.deleteQuietly(new File(this.sparkRunnerConfig.getTargetFolder()));
         }
 
-        SparkImporterLogger.getInstance().writeInfo("Starting Kafka import "+ (this.sparkRunnerConfig.isBatchMode() ? "in batch mode " : "") +"from: " + this.sparkRunnerConfig.getKafkaBroker());
+        BpmnaiLogger.getInstance().writeInfo("Starting Kafka import "+ (this.sparkRunnerConfig.isBatchMode() ? "in batch mode " : "") +"from: " + this.sparkRunnerConfig.getKafkaBroker());
     }
 
     private synchronized void processMasterRDD(JavaRDD<String> newRDD, String queue) {
         if (newRDD.count() == 0) {
             if(this.sparkRunnerConfig.isBatchMode()) {
-                SparkImporterLogger.getInstance().writeInfo("Kafka queue '" + queue + "' returned zero entries.");
+                BpmnaiLogger.getInstance().writeInfo("Kafka queue '" + queue + "' returned zero entries.");
 
                 if (!emptyQueues.contains(queue)) {
                     emptyQueues.add(queue);
                 }
                 if(emptyQueues.size() == EXPECTED_QUEUES_TO_BE_EMPTIED_IN_BATCH_MODE) {
-                    SparkImporterLogger.getInstance().writeInfo("All Kafka queues ("
+                    BpmnaiLogger.getInstance().writeInfo("All Kafka queues ("
                             + emptyQueues.stream().collect(Collectors.joining(","))
                             + ") returned zero entries once. Stopping as running in batch mode");
                     countDownLatch.countDown();
@@ -117,7 +117,7 @@ public class KafkaImportRunner extends SparkRunner {
         if (masterDataset == null) {
             masterDataset = newDataset;
         } else {
-            masterDataset = SparkImporterUtils.getInstance().unionDatasets(masterDataset, newDataset);
+            masterDataset = BpmnaiUtils.getInstance().unionDatasets(masterDataset, newDataset);
         }
     }
 
@@ -173,30 +173,30 @@ public class KafkaImportRunner extends SparkRunner {
         JavaInputDStream<ConsumerRecord<String, String>> processInstances = KafkaUtils.createDirectStream(
                 jssc,
                 LocationStrategies.PreferConsistent(),
-                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{SparkImporterVariables.EVENT_PROCESS_INSTANCE}), kafkaConsumerConfigPI));
+                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{BpmnaiVariables.EVENT_PROCESS_INSTANCE}), kafkaConsumerConfigPI));
 
         //go through pipe elements
         processInstances
                 .map(record -> record.value())
                 .foreachRDD((VoidFunction<JavaRDD<String>>) stringJavaRDD -> {
-                    processMasterRDD(stringJavaRDD, SparkImporterVariables.EVENT_PROCESS_INSTANCE);
+                    processMasterRDD(stringJavaRDD, BpmnaiVariables.EVENT_PROCESS_INSTANCE);
                 });
 
         // Create direct kafka stream with brokers and topics
         JavaInputDStream<ConsumerRecord<String, String>> variableUpdates = KafkaUtils.createDirectStream(
                 jssc,
                 LocationStrategies.PreferConsistent(),
-                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{SparkImporterVariables.EVENT_VARIABLE_UPDATE}), kafkaConsumerConfigVU));
+                ConsumerStrategies.Subscribe(Arrays.asList(new String[]{BpmnaiVariables.EVENT_VARIABLE_UPDATE}), kafkaConsumerConfigVU));
 
         //go through pipe elements
         variableUpdates
                 .map(record -> record.value())
                 .foreachRDD((VoidFunction<JavaRDD<String>>) stringJavaRDD -> {
-                    processMasterRDD(stringJavaRDD, SparkImporterVariables.EVENT_VARIABLE_UPDATE);
+                    processMasterRDD(stringJavaRDD, BpmnaiVariables.EVENT_VARIABLE_UPDATE);
                 });
 
 
-        if(this.sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(this.sparkRunnerConfig.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_ACTIVITY)) {
             // list of host:port pairs used for establishing the initial connections to the Kafka cluster
             kafkaConsumerConfigAI.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, this.sparkRunnerConfig.getKafkaBroker());
             kafkaConsumerConfigAI.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -210,13 +210,13 @@ public class KafkaImportRunner extends SparkRunner {
             JavaInputDStream<ConsumerRecord<String, String>> activityInstances = KafkaUtils.createDirectStream(
                     jssc,
                     LocationStrategies.PreferConsistent(),
-                    ConsumerStrategies.Subscribe(Arrays.asList(new String[]{SparkImporterVariables.EVENT_ACTIVITY_INSTANCE}), kafkaConsumerConfigAI));
+                    ConsumerStrategies.Subscribe(Arrays.asList(new String[]{BpmnaiVariables.EVENT_ACTIVITY_INSTANCE}), kafkaConsumerConfigAI));
 
             //go through pipe elements
             activityInstances
                     .map(record -> record.value())
                     .foreachRDD((VoidFunction<JavaRDD<String>>) stringJavaRDD -> {
-                        processMasterRDD(stringJavaRDD, SparkImporterVariables.EVENT_ACTIVITY_INSTANCE);
+                        processMasterRDD(stringJavaRDD, BpmnaiVariables.EVENT_ACTIVITY_INSTANCE);
                     });
         }
 
@@ -231,13 +231,13 @@ public class KafkaImportRunner extends SparkRunner {
                 e.printStackTrace();
             }
             final long endMillis = System.currentTimeMillis();
-            SparkImporterLogger.getInstance().writeInfo("Kafka import finished (took " + ((endMillis - startMillis) / 1000) + " seconds in total)");
+            BpmnaiLogger.getInstance().writeInfo("Kafka import finished (took " + ((endMillis - startMillis) / 1000) + " seconds in total)");
             jssc.stop(false);
         } else {
             try {
                 jssc.awaitTermination();
                 final long endMillis = System.currentTimeMillis();
-                SparkImporterLogger.getInstance().writeInfo("Kafka import finished (took " + ((endMillis - startMillis) / 1000) + " seconds in total)");
+                BpmnaiLogger.getInstance().writeInfo("Kafka import finished (took " + ((endMillis - startMillis) / 1000) + " seconds in total)");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

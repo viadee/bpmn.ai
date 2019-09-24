@@ -5,16 +5,16 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.viadee.bpmnai.core.configuration.util.ConfigurationUtils;
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.annotation.PreprocessingStepDescription;
 import de.viadee.bpmnai.core.configuration.Configuration;
 import de.viadee.bpmnai.core.configuration.preprocessing.PreprocessingConfiguration;
 import de.viadee.bpmnai.core.configuration.preprocessing.VariableConfiguration;
 import de.viadee.bpmnai.core.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 import de.viadee.bpmnai.core.util.helper.SparkBroadcastHelper;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -29,8 +29,8 @@ import org.apache.spark.sql.types.StructType;
 import java.io.IOException;
 import java.util.*;
 
-import static de.viadee.bpmnai.core.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME;
-import static de.viadee.bpmnai.core.util.SparkImporterVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE;
+import static de.viadee.bpmnai.core.util.BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_NAME;
+import static de.viadee.bpmnai.core.util.BpmnaiVariables.VAR_PROCESS_INSTANCE_VARIABLE_TYPE;
 
 @PreprocessingStepDescription(name = "Create columns from Json", description = "In this step each variable column is checked if it contains a json and if so, the first level of attributes is transformed into separate columns. No object or array parameters are converted.")
 public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
@@ -58,7 +58,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         }
 
         String[] vars = null;
-        if(config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
+        if(config.getPipelineMode().equals(BpmnaiVariables.PIPELINE_MODE_LEARN)) {
             //convert to String array so it is serializable and can be used in map function
             Set<String> variables = varMap.keySet();
             vars = new String[variables.size()];
@@ -78,7 +78,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         Dataset<Row> newColumnsDataset = dataset.flatMap((FlatMapFunction<Row, Row>) row -> {
             List<Row> newColumns = new ArrayList<>();
             for (String c : columns) {
-                if (config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
+                if (config.getPipelineMode().equals(BpmnaiVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
                     //it was a variable, so try to parse as json
                     ObjectMapper mapper = new ObjectMapper();
                     JsonFactory factory = mapper.getFactory();
@@ -134,7 +134,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
 
             for(String c : columns) {
                 String columnValue = null;
-                if (config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
+                if (config.getPipelineMode().equals(BpmnaiVariables.PIPELINE_MODE_PREDICT) || Arrays.asList(finalVars).contains(c)) {
                     //it was a variable, so try to parse as json
                     ObjectMapper mapper = new ObjectMapper();
                     JsonFactory factory = mapper.getFactory();
@@ -171,7 +171,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
                                     newColumnValues.put(columnName, value.asText());
                                 } else {
                                     //should not happen found column not detected in step before
-                                    SparkImporterLogger.getInstance().writeError("Found column in json not found in step before: "+columnName);
+                                    BpmnaiLogger.getInstance().writeError("Found column in json not found in step before: "+columnName);
                                 }
                             }
                         }
@@ -191,7 +191,7 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
         }, RowEncoder.apply(newSchema1));
 
 
-        if (config.getPipelineMode().equals(SparkImporterVariables.PIPELINE_MODE_LEARN)) {
+        if (config.getPipelineMode().equals(BpmnaiVariables.PIPELINE_MODE_LEARN)) {
             //create new Dataset
             //write column names into list
             List<Row> filteredVariablesRows = new ArrayList<>();
@@ -224,14 +224,14 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
                             Metadata.empty())
             });
 
-            SparkImporterLogger.getInstance().writeInfo("Found " + newColumns.size() + " additional process variables during Json processing.");
+            BpmnaiLogger.getInstance().writeInfo("Found " + newColumns.size() + " additional process variables during Json processing.");
 
             SparkSession sparkSession = SparkSession.builder().getOrCreate();
             Dataset<Row> helpDataSet = sparkSession.createDataFrame(filteredVariablesRows, schemaVars).toDF().orderBy(VAR_PROCESS_INSTANCE_VARIABLE_NAME);
 
             if(config.isWriteStepResultsIntoFile()) {
-                SparkImporterUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_after_json_escalated", config);
-                SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "create_columns_from_json", config);
+                BpmnaiUtils.getInstance().writeDatasetToCSV(helpDataSet, "variable_types_after_json_escalated", config);
+                BpmnaiUtils.getInstance().writeDatasetToCSV(dataset, "create_columns_from_json", config);
             }
         }
 
@@ -251,14 +251,14 @@ public class CreateColumnsFromJsonStep implements PreprocessingStepInterface {
                         variablesToFilter.add(vc.getVariableName());
 
                         if(Arrays.asList(dataset.columns()).contains(vc.getVariableName())) {
-                            SparkImporterLogger.getInstance().writeInfo("The variable '" + vc.getVariableName() + "' will be filtered out after json processing. Comment: " + vc.getComment());
+                            BpmnaiLogger.getInstance().writeInfo("The variable '" + vc.getVariableName() + "' will be filtered out after json processing. Comment: " + vc.getComment());
                         }
                     }
                 }
             }
         }
 
-        dataset = dataset.drop(SparkImporterUtils.getInstance().asSeq(variablesToFilter));
+        dataset = dataset.drop(BpmnaiUtils.getInstance().asSeq(variablesToFilter));
 
         return dataset;
     }

@@ -1,6 +1,6 @@
 package de.viadee.bpmnai.core;
 
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import kafka.admin.AdminUtils;
 import kafka.admin.RackAwareMode;
 import kafka.server.KafkaConfig;
@@ -118,7 +118,7 @@ public class KafkaImportApplicationIntegrationTest {
         assertEquals(43, importedDataset.count());
 
         //check hash of dataset
-        String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
+        String hash = BpmnaiUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
         assertEquals("15254E402E5D700FB125E2BD670FE716", hash);
 
         //close Spark session
@@ -147,7 +147,7 @@ public class KafkaImportApplicationIntegrationTest {
         assertEquals(55, importedDataset.count());
 
         //check hash of dataset
-        String hash = SparkImporterUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
+        String hash = BpmnaiUtils.getInstance().md5CecksumOfObject(importedDataset.collect());
         assertEquals("9CEE92C16D7803E0ECF57666FDAC60D7", hash);
 
         //close Spark session

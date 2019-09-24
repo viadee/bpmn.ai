@@ -1,10 +1,10 @@
 package de.viadee.bpmnai.core.processing.steps.dataprocessing;
 
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.annotation.PreprocessingStepDescription;
 import de.viadee.bpmnai.core.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 import de.viadee.bpmnai.core.util.helper.SparkBroadcastHelper;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -47,11 +47,11 @@ public class FillActivityInstancesHistoryStep implements PreprocessingStepInterf
         String[] columns = dataset.columns();
 
         //repartition py process instance and order by start_time for this operation
-        dataset = dataset.repartition(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID)).sortWithinPartitions(SparkImporterVariables.VAR_START_TIME);
+        dataset = dataset.repartition(dataset.col(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID)).sortWithinPartitions(BpmnaiVariables.VAR_START_TIME);
 
         //iterate through dataset and fill up values in each process instance
         dataset = dataset.map(row -> {
-            String currentProcessInstanceId = row.getAs(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID);
+            String currentProcessInstanceId = row.getAs(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID);
             String[] newRow = new String[columns.length];
 
             //check if we switch to a new process instance
@@ -88,7 +88,7 @@ public class FillActivityInstancesHistoryStep implements PreprocessingStepInterf
         }, RowEncoder.apply(dataset.schema()));
 
         if(config.isWriteStepResultsIntoFile()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "fill_activity_instances_history", config);
+            BpmnaiUtils.getInstance().writeDatasetToCSV(dataset, "fill_activity_instances_history", config);
         }
 
         //return preprocessed data

@@ -3,7 +3,7 @@ package de.viadee.bpmnai.core.processing.steps.output;
 import de.viadee.bpmnai.core.annotation.PreprocessingStepDescription;
 import de.viadee.bpmnai.core.processing.interfaces.PreprocessingStepInterface;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
@@ -32,7 +32,7 @@ public class WriteToDataSinkStep implements PreprocessingStepInterface {
   
     	dataset
                 //we repartition the data by process instances, which allows spark to better distribute the data between workers as the operations are related to a process instance
-                .repartition(dataset.col(SparkImporterVariables.VAR_PROCESS_INSTANCE_ID))
+                .repartition(dataset.col(BpmnaiVariables.VAR_PROCESS_INSTANCE_ID))
                 .write()
                 .mode(SaveMode.Append)
                 .save(config.getTargetFolder());

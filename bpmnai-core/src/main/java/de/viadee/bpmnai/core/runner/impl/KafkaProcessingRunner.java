@@ -6,11 +6,11 @@ import de.viadee.bpmnai.core.processing.steps.PipelineStep;
 import de.viadee.bpmnai.core.processing.steps.dataprocessing.*;
 import de.viadee.bpmnai.core.processing.steps.output.WriteToDiscStep;
 import de.viadee.bpmnai.core.runner.config.SparkRunnerConfig;
-import de.viadee.bpmnai.core.util.SparkImporterUtils;
+import de.viadee.bpmnai.core.util.BpmnaiUtils;
 import de.viadee.bpmnai.core.util.arguments.KafkaProcessingArguments;
 import de.viadee.bpmnai.core.runner.SparkRunner;
-import de.viadee.bpmnai.core.util.SparkImporterVariables;
-import de.viadee.bpmnai.core.util.logging.SparkImporterLogger;
+import de.viadee.bpmnai.core.util.BpmnaiVariables;
+import de.viadee.bpmnai.core.util.logging.BpmnaiLogger;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -52,7 +52,7 @@ public class KafkaProcessingRunner extends SparkRunner {
         // Delete destination files, required to avoid exception during runtime
         FileUtils.deleteQuietly(new File(this.sparkRunnerConfig.getTargetFolder()));
 
-        SparkImporterLogger.getInstance().writeInfo("Starting data processing with data from: " + this.sparkRunnerConfig.getSourceFolder());
+        BpmnaiLogger.getInstance().writeInfo("Starting data processing with data from: " + this.sparkRunnerConfig.getSourceFolder());
     }
 
     @Override
@@ -65,7 +65,7 @@ public class KafkaProcessingRunner extends SparkRunner {
         pipelineSteps.add(new PipelineStep(new DetermineProcessVariablesStep(), "ReduceColumnsStep"));
         pipelineSteps.add(new PipelineStep(new AddVariableColumnsStep(), "DetermineProcessVariablesStep"));
 
-        if(sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS)) {
+        if(sparkRunnerConfig.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_PROCESS)) {
             // process level
             pipelineSteps.add(new PipelineStep(new AggregateProcessInstancesStep(), "AddVariableColumnsStep"));
         } else {
@@ -75,14 +75,14 @@ public class KafkaProcessingRunner extends SparkRunner {
 
        // pipelineSteps.add(new PipelineStep(new DataFilterOnActivityStep(), "AddVariablesColumnsStep"));
 
-        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "AggregateProcessInstancesStep" : "AggregateActivityInstancesStep"));
+        pipelineSteps.add(new PipelineStep(new CreateColumnsFromJsonStep(), sparkRunnerConfig.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_PROCESS) ? "AggregateProcessInstancesStep" : "AggregateActivityInstancesStep"));
 
-        if(sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_ACTIVITY)) {
+        if(sparkRunnerConfig.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_ACTIVITY)) {
             // activity level
             pipelineSteps.add(new PipelineStep(new FillActivityInstancesHistoryStep(), "CreateColumnsFromJsonStep"));
         }
 
-        pipelineSteps.add(new PipelineStep(new AddReducedColumnsToDatasetStep(), sparkRunnerConfig.getDataLevel().equals(SparkImporterVariables.DATA_LEVEL_PROCESS) ? "CreateColumnsFromJsonStep" : "FillActivityInstancesHistoryStep"));
+        pipelineSteps.add(new PipelineStep(new AddReducedColumnsToDatasetStep(), sparkRunnerConfig.getDataLevel().equals(BpmnaiVariables.DATA_LEVEL_PROCESS) ? "CreateColumnsFromJsonStep" : "FillActivityInstancesHistoryStep"));
         pipelineSteps.add(new PipelineStep(new ColumnHashStep(), "AddReducedColumnsToDatasetStep"));
         pipelineSteps.add(new PipelineStep(new TypeCastStep(), "ColumnHashStep"));
         pipelineSteps.add(new PipelineStep(new WriteToDiscStep(), "TypeCastStep"));
@@ -98,7 +98,7 @@ public class KafkaProcessingRunner extends SparkRunner {
                 .load(this.sparkRunnerConfig.getSourceFolder());
 
         if(sparkRunnerConfig.isWriteStepResultsIntoFile()) {
-            SparkImporterUtils.getInstance().writeDatasetToCSV(dataset, "initial_dataset", sparkRunnerConfig);
+            BpmnaiUtils.getInstance().writeDatasetToCSV(dataset, "initial_dataset", sparkRunnerConfig);
         }
 
         return dataset;

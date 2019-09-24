@@ -1,6 +1,6 @@
 package de.viadee.bpmnai.core.util;
 
-public final class SparkImporterVariables {
+public final class BpmnaiVariables {
 
     public static final String VAR_ID = "id_";
     public static final String VAR_SUPER_PROCESS_INSTANCE_ID = "super_process_instance_id_";
