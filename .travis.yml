@@ -1,5 +1,5 @@
 language: java
-before_install: cd spark-importer
+before_install: cd bpmnai-core
 addons:
   # see https://docs.travis-ci.com/user/sonarcloud/
   sonarcloud:
