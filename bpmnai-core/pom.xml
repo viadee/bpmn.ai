@@ -5,7 +5,7 @@
 
 	<groupId>de.viadee</groupId>
 	<artifactId>bpmnai-core</artifactId>
-	<version>1.2.0</version>
+	<version>1.2.1</version>
 	<packaging>jar</packaging>
 
     <properties>
@@ -133,6 +133,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.1.1</version>
                         <executions>
                             <execution>
                                 <!-- unpack spring boot fat jar to allow using its components in docker build -->
@@ -302,6 +303,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>
 				<executions>
 					<execution>
 						<!-- unpack spring boot fat jar to allow using its components in docker build -->
