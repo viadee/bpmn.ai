@@ -1,4 +1,12 @@
-FROM ubuntu:18.04 as base
+FROM maven:3.6-jdk-8-alpine AS build-env
+
+COPY / /home
+WORKDIR /home
+RUN mvn clean package -DskipTests
+
+
+
+FROM ubuntu:18.04
 
 LABEL maintainer="mario.micudaj@viadee.de"
 
@@ -12,11 +20,11 @@ RUN addgroup --gid 1000 appuser && \
     mkdir -p /app && \
     mkdir -p /data
 
-ARG APP_COMPONENT_DIR=target
+ARG APP_COMPONENT_DIR=/home/target
 
-COPY ${APP_COMPONENT_DIR}/lib /app/lib
-COPY ${APP_COMPONENT_DIR}/dependency /app/bin
-COPY ${APP_COMPONENT_DIR}/dependency/META-INF /app/bin/META-INF
+COPY --from=build-env ${APP_COMPONENT_DIR}/lib /app/lib
+COPY --from=build-env ${APP_COMPONENT_DIR}/dependency /app/bin
+COPY --from=build-env ${APP_COMPONENT_DIR}/dependency/META-INF /app/bin/META-INF
 
 RUN chown -R appuser:appuser /app && \
     chown -R appuser:appuser /data && \
