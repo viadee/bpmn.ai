@@ -52,13 +52,13 @@ Im Order [Tutorial](/tutorials) befinden sich Beispiele zu den Anwendungen.
 
 Die folgende Grafik zeigt die Pipeline, durch die die Daten von Camunda zur Machine Learning Engine fließen. Jede der drei Anwendungen dient einem bestimmten Zweck und Anwendungsfällen rund um den Import in, die Datenaggregation und -transformation innerhalb und den Export von Daten aus Apache Spark.
 
-![alt text](./spark-importer/doc/SparkImporterApplicationFlow.png "SparkImporterCSVApplication Pipeline")
+![alt text](./bpmnai-core/doc/Pipeline.png "Bpmn.ai Pipeline")
 
-### SparkImporterCSVApplication
+### CSVImportAndProcessingApplication
 
 Diese Anwendung (Anwendungsklasse: CSVImportAndProcessingApplication) nimmt Daten aus einem CSV-Export von Camunda-History-Datenbanktabellen auf und aggregiert sie zu einer Data-Mining-Tabelle. Das Ergebnis ist auch eine CSV-Datei mit der Data-Mining-Tabellenstruktur.
 
-### SparkImporterKafkaImportApplication
+### KafkaImportApplication
 
 Diese Anwendung (Anwendungsklasse: KafkaImportApplication) ruft Daten von Kafka ab, in denen drei Warteschlangen zur Verfügung gestellt wurden und mit Daten aus dem History-Ereignishandler von Camunda gefüllt werden:
 
@@ -68,6 +68,6 @@ Diese Anwendung (Anwendungsklasse: KafkaImportApplication) ruft Daten von Kafka 
 
 Die abgerufenen Daten werden dann an einem definierten Ort als Parkettdateien gespeichert. Es findet keine Datenverarbeitung durch diese Anwendung statt, da sie als Spark-Anwendung laufen kann, die ständig Daten aus Kafka-Streams empfängt.
 
-### SparkImporterKafkaDataProcessingApplication
+### KafkaProcessingApplication
 
-Diese Anwendung (Anwendungsklasse: SparkImporterKafkaDataProcessingApplication) ruft Daten aus einem Kafka-Import ab. Die Daten durchlaufen die gleichen Schritte wie in der CSV-Import- und Verarbeitungsanwendung, es ist nur eine separate Anwendung, da sie eine andere Eingabe als der CSV-Fall haben.
+Diese Anwendung (Anwendungsklasse: KafkaProcessingApplication) ruft Daten aus einem Kafka-Import ab. Die Daten durchlaufen die gleichen Schritte wie in der CSV-Import- und Verarbeitungsanwendung, es ist nur eine separate Anwendung, da sie eine andere Eingabe als der CSV-Fall haben.
