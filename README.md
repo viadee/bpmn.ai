@@ -50,7 +50,7 @@ A **tutorial** and examples of the applications can be found in the [Wiki](https
 
 The following graphic shows the pipeline through which the data flows from Camunda to the Machine Learning engine. Each of the three applications serves a specific purpose and specific use cases concerning importing, aggregating and transforming data and exporting it from Apache Spark.
 
-![alt text](./spark-importer/doc/SparkImporterApplicationFlow.png "SparkImporterCSVApplication Pipeline")
+![alt text](./bpmnai-core/doc/SparkImporterApplicationFlow.png "SparkImporterCSVApplication Pipeline")
 
 ### CSVImportAndProcessingApplication
 
