@@ -10,9 +10,11 @@ The following applications three applications are available:
 
 Each of those applications serves a different purpose.
 
+You can find a UI to set up bpmn.ai in the following Github repository: [https://github.com/viadee/bpmn.ai-ui](https://github.com/viadee/bpmn.ai-ui)
+
 ## Data pipeline
 The picture below shows the pipeline through which the data flows from Camunda to the Machine Learning engine. Each of the three application serves a specific purpose and use cases around importing into, data aggregation and transformation inside and exporting data from Apache Spark. 
-![alt text](doc/BpmnaiApplicationFlow.png "CSVImportAndProcessingApplication Pipeline")
+![](doc/BpmnaiApplicationFlow.png)
 
 
 ## CSV Import and Processing

@@ -10,6 +10,8 @@
 
 *Read this in other languages: [German](README.de.md).*
 
+You can find a UI to set up bpmn.ai in the following Github repository: [https://github.com/viadee/bpmn.ai-ui](https://github.com/viadee/bpmn.ai-ui)
+
 Bpmn.ai describes the approach of preparing and using standard process data for data mining. Bpmn.ai covers the entire pipeline, which means data extraction, transformation and processing of the data, learning a suitable machine learning algorithm and applying the knowledge gained in order to optimize or automate processes: Such process centric Machine Learning Models can be used for wide variety of applications such as e.g. bottleneck analyses, process duration predictions or anomaly detection.
 
 This results in the following overall picture of a Java-focused AI infrastructure [bpmn.ai](https://www.viadee.de/bpmnai), which is very easy to set up and can also be used with large datasets:
@@ -50,7 +52,7 @@ A **tutorial** and examples of the applications can be found in the [Wiki](https
 
 The following graphic shows the pipeline through which the data flows from Camunda to the Machine Learning engine. Each of the three applications serves a specific purpose and specific use cases concerning importing, aggregating and transforming data and exporting it from Apache Spark.
 
-![alt text](./bpmnai-core/doc/Pipeline.png "Bpmn.ai Pipeline")
+![](./bpmnai-core/doc/BpmnaiApplicationFlow.png)
 
 ### CSVImportAndProcessingApplication
 
