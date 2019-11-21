@@ -16,7 +16,7 @@ Bpmn.ai describes the approach of preparing and using standard process data for 
 
 This results in the following overall picture of a Java-focused AI infrastructure [bpmn.ai](https://www.viadee.de/bpmnai), which is very easy to set up and can also be used with large datasets:
 
-![](./spark-importer/doc/Pipeline.en.png)
+![](./bpmnai-core/doc/Pipeline.en.png)
 
 This repository contains the (configurable) data preparation pipeline using Apache Spark. Oftentimes, 80% of the effort of a data mining project is spent on data preparation: If the data source is "known" beforehand and has a stable structure, a lot of things can be reused and everyone benefits from further development.
 
