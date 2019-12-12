@@ -67,8 +67,16 @@ public class FillActivityInstancesHistoryStep implements PreprocessingStepInterf
                 if(Arrays.asList(vars).contains(c)) {
                     //it was a variable
                     if(valuesToWrite.get(c) != null) {
-                        // we already have a value for the current process instance, so we use it
-                        columnValue = valuesToWrite.get(c);
+                        // we already have a value for the current process instance, so we use it if there is no new value provided
+                        String currentValue = row.getAs(c);
+                        if(currentValue != null) {
+                            //new value provided
+                            valuesToWrite.put(c, currentValue);
+                            columnValue = currentValue;
+                        } else {
+                            //null value
+                            columnValue = valuesToWrite.get(c);
+                        }
                     } else {
                         // we don't have a value yet for the current process instance
                         String currentValue = row.getAs(c);
