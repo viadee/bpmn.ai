@@ -4,23 +4,34 @@
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![Status](https://travis-ci.org/viadee/bpmn.ai.svg?branch=master)](https://travis-ci.org/viadee/bpmn.ai/branches "See test builds")
-[![Sonarcloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=de.viadee:bpmnai-core&metric=coverage)](https://sonarcloud.io/dashboard?id=de.viadee:bpmnai-core)
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/viadee/bpmn.ai.svg)
 [![Maven Central](https://img.shields.io/maven-central/v/de.viadee/bpmnai-core.svg)](https://search.maven.org/search?q=g:de.viadee%20a:bpmnai-core)
 
 *Read this in other languages: [German](README.de.md).*
 
-You can find a UI to set up bpmn.ai in the following Github repository: [https://github.com/viadee/bpmn.ai-ui](https://github.com/viadee/bpmn.ai-ui)
+## Orientation
+:dart: The goal: [bpmn.ai](https://www.viadee.de/bpmnai) is a set of tools and ideas that 
 
-Bpmn.ai describes the approach of preparing and using standard process data for data mining. Bpmn.ai covers the entire pipeline, which means data extraction, transformation and processing of the data, learning a suitable machine learning algorithm and applying the knowledge gained in order to optimize or automate processes: Such process centric Machine Learning Models can be used for wide variety of applications such as e.g. bottleneck analyses, process duration predictions or anomaly detection.
+* integrate the analytic power of machine learning approaches
+* the flexibility and expressiveness of the BPMN language
+* in order to find and implement different business cases in a sustainable, explainable way.
 
-This results in the following overall picture of a Java-focused AI infrastructure [bpmn.ai](https://www.viadee.de/bpmnai), which is very easy to set up and can also be used with large datasets:
+With this goal in mind, we provide different components for the open source community:
+
+* [bpmn.ai-patterns](https://github.com/viadee/bpmn.ai-patterns): A collection of process model patterns to orchestrate the use of AI in business processes (for executives and IT-architects).
+* bpmn.ai-core: In this repository you can find a reusable, scaleable data extraction pipeline (based on Apache Spark) that distills process data from popular BPMN-Engines (such as Camunda) into a machine learning-ready format, in order to reflect on the process in all kinds of ways (for data science engineers).
+* bpmn.ai-ui: You can find a UI to set up and control bpmn.ai-core in the following Github repository: [https://github.com/viadee/bpmn.ai-ui](https://github.com/viadee/bpmn.ai-ui) (for data science engineers).
+
+# bpmn.ai-core 
+bpmn.ai-core describes the approach of preparing and using standard process data for data mining with reusable analytics components. Bpmn.ai-core covers the entire pipeline, which means data extraction, transformation and processing of the data, learning a suitable machine learning algorithm and applying the knowledge gained in order to optimize or automate processes: Such process centric machine learning models can be used for wide variety of applications such as e.g. bottleneck analyses, process duration predictions or anomaly detection.
+
+This results in the following overall picture of a [bpmn.ai](https://www.viadee.de/bpmnai) process intelligence pipeline, which is very easy to set up and can also be used with large datasets:
 
 ![](./bpmnai-core/doc/Pipeline.en.png)
 
 This repository contains the (configurable) data preparation pipeline using Apache Spark. Oftentimes, 80% of the effort of a data mining project is spent on data preparation: If the data source is "known" beforehand and has a stable structure, a lot of things can be reused and everyone benefits from further development.
 
-# Collaboration
+## Collaboration
 
 The project is operated and further developed by the viadee Consulting AG in Münster, Westphalia. Results from theses at the WWU Münster and the FH Münster have been incorporated.
 
